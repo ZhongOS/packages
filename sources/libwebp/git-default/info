@@ -1,0 +1,6 @@
+URL=https://chromium.googlesource.com/webm/libwebp
+FILE=libwebp-git-default_git.tar.gz
+DIR=libwebp-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

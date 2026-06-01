@@ -1,0 +1,6 @@
+URL=https://gitlab.gnome.org/GNOME/libadwaita.git
+FILE=libadwaita-git-default_git.tar.gz
+DIR=libadwaita-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

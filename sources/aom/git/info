@@ -1,0 +1,6 @@
+URL=https://aomedia.googlesource.com/aom
+FILE=aom-git_git.tar.gz
+DIR=aom-git_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1

@@ -1,0 +1,38 @@
+diff -Nurp rustc-1.63.0-src.orig/vendor/libc/src/unix/linux_like/linux/gnu/b64/loongarch64/mod.rs rustc-1.63.0-src/vendor/libc/src/unix/linux_like/linux/gnu/b64/loongarch64/mod.rs
+--- rustc-1.63.0-src.orig/vendor/libc/src/unix/linux_like/linux/gnu/b64/loongarch64/mod.rs	2022-08-09 00:43:08.000000000 +0000
++++ rustc-1.63.0-src/vendor/libc/src/unix/linux_like/linux/gnu/b64/loongarch64/mod.rs	2022-09-17 01:38:24.995060681 +0000
+@@ -325,8 +325,6 @@ pub const SYS_vmsplice: ::c_long = 75;
+ pub const SYS_splice: ::c_long = 76;
+ pub const SYS_tee: ::c_long = 77;
+ pub const SYS_readlinkat: ::c_long = 78;
+-pub const SYS_newfstatat: ::c_long = 79;
+-pub const SYS_fstat: ::c_long = 80;
+ pub const SYS_sync: ::c_long = 81;
+ pub const SYS_fsync: ::c_long = 82;
+ pub const SYS_fdatasync: ::c_long = 83;
+@@ -409,8 +407,6 @@ pub const SYS_setgroups: ::c_long = 159;
+ pub const SYS_uname: ::c_long = 160;
+ pub const SYS_sethostname: ::c_long = 161;
+ pub const SYS_setdomainname: ::c_long = 162;
+-pub const SYS_getrlimit: ::c_long = 163;
+-pub const SYS_setrlimit: ::c_long = 164;
+ pub const SYS_getrusage: ::c_long = 165;
+ pub const SYS_umask: ::c_long = 166;
+ pub const SYS_prctl: ::c_long = 167;
+@@ -490,7 +486,6 @@ pub const SYS_rt_tgsigqueueinfo: ::c_lon
+ pub const SYS_perf_event_open: ::c_long = 241;
+ pub const SYS_accept4: ::c_long = 242;
+ pub const SYS_recvmmsg: ::c_long = 243;
+-//pub const SYS_arch_specific_syscall: ::c_long = 244;
+ pub const SYS_wait4: ::c_long = 260;
+ pub const SYS_prlimit64: ::c_long = 261;
+ pub const SYS_fanotify_init: ::c_long = 262;
+@@ -551,7 +546,7 @@ pub const SYS_landlock_add_rule: ::c_lon
+ pub const SYS_landlock_restrict_self: ::c_long = 446;
+ pub const SYS_process_mrelease: ::c_long = 448;
+ pub const SYS_futex_waitv: ::c_long = 449;
+-//pub const SYS_set_mempolicy_home_node: ::c_long = 450;
++pub const SYS_set_mempolicy_home_node: ::c_long = 450;
+ 
+ pub const POSIX_FADV_DONTNEED: ::c_int = 4;
+ pub const POSIX_FADV_NOREUSE: ::c_int = 5;

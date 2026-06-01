@@ -1,0 +1,6 @@
+URL=https://gitlab.freedesktop.org/mesa/mesa.git
+FILE=mesa-23.1.0-default_git.tar.gz
+DIR=mesa-23.1.0-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

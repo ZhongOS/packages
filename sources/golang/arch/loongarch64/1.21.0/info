@@ -1,0 +1,5 @@
+URL=https://github.com/golang/go.git
+FILE=golang-1.21.0_git.tar.gz
+DIR=golang-1.21.0_git
+GIT_BRANCH=master
+GIT_COMMIT=

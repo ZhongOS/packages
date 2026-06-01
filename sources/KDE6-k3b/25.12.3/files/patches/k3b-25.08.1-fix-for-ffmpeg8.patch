@@ -1,0 +1,16 @@
+diff --git a/plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp b/plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
+index e8eeb4b..8474075 100644
+--- a/plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
++++ b/plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
+@@ -161,10 +161,9 @@ void K3bFFMpegFile::close()
+     ::av_packet_free(&d->packet);
+ 
+     if( d->codec ) {
+-        ::avcodec_close(d->codecContext);
+-        d->codec = nullptr;
+         ::avcodec_free_context(&d->codecContext);
+         d->codecContext = nullptr;
++        d->codec = nullptr;
+     }
+ 
+     if( d->formatContext ) {

@@ -1,0 +1,6 @@
+URL=https://code.videolan.org/videolan/x264.git
+FILE=x264-git-default_git.tar.gz
+DIR=x264-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

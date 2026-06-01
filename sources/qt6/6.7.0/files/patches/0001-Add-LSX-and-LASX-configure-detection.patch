@@ -1,0 +1,383 @@
+From f165f5de16b48eef724cd68c3cf7235e0666cdab Mon Sep 17 00:00:00 2001
+From: Chen Zhanwang <chenzhanwang@mail.ustc.edu.cn>
+Date: Thu, 21 Mar 2024 17:28:40 +0800
+Subject: [PATCH 1/5] Add LSX and LASX configure detection
+
+Adds loongarch simd extension(LSX LASX) configure test and
+-feature-lsx and -feature-lasx configure options.
+Add detection of LSX and LASX at run-time in qsimd.cpp.
+
+Change-Id: I63eab2f4f45c306b672a89b376e0cbc01da0df83
+---
+ cmake/QtCompilerOptimization.cmake         |  2 +
+ cmake/QtFeature.cmake                      | 25 ++++++++++++
+ cmake/QtProcessConfigureArgs.cmake         |  1 +
+ config.tests/loongarch_simd/CMakeLists.txt | 26 ++++++++++++
+ config.tests/loongarch_simd/main.cpp       | 31 +++++++++++++++
+ configure.cmake                            | 24 +++++++++++
+ mkspecs/common/gcc-base.conf               |  2 +
+ mkspecs/features/simd.prf                  |  2 +
+ src/corelib/global/qsimd.cpp               | 46 +++++++++++++++++++++-
+ src/corelib/global/qsimd.h                 | 16 ++++++++
+ src/corelib/global/qsimd_p.h               | 19 +++++++++
+ 11 files changed, 193 insertions(+), 1 deletion(-)
+ create mode 100644 config.tests/loongarch_simd/CMakeLists.txt
+ create mode 100644 config.tests/loongarch_simd/main.cpp
+
+diff --git a/cmake/QtCompilerOptimization.cmake b/cmake/QtCompilerOptimization.cmake
+index ac542e9451..6610f978be 100644
+--- a/cmake/QtCompilerOptimization.cmake
++++ b/cmake/QtCompilerOptimization.cmake
+@@ -66,6 +66,8 @@ if(GCC OR CLANG OR QCC)
+     if(NOT UIKIT AND NOT QT_64BIT)
+         set(QT_CFLAGS_NEON   "${__prefix}-mfpu=neon")
+     endif()
++    set(QT_CFLAGS_LSX        "${__prefix}-mlsx")
++    set(QT_CFLAGS_LASX       "${__prefix}-mlasx")
+     set(QT_CFLAGS_MIPS_DSP   "${__prefix}-mdsp")
+     set(QT_CFLAGS_MIPS_DSPR2 "${__prefix}-mdspr2")
+     unset(__prefix)
+diff --git a/cmake/QtFeature.cmake b/cmake/QtFeature.cmake
+index 96cb308b2c..becaad6a73 100644
+--- a/cmake/QtFeature.cmake
++++ b/cmake/QtFeature.cmake
+@@ -1238,6 +1238,31 @@ function(qt_config_compile_test_x86simd extension label)
+     set(TEST_subarch_${extension} "${TEST_X86SIMD_${extension}}" CACHE INTERNAL "${label}")
+ endfunction()
+ 
++function(qt_config_compile_test_loongarchsimd extension label)
++        if (DEFINED TEST_LOONGARCHSIMD_${extension})
++        return()
++    endif()
++
++    set(flags "-DSIMD:string=${extension}")
++
++    qt_get_platform_try_compile_vars(platform_try_compile_vars)
++    list(APPEND flags ${platform_try_compile_vars})
++
++    message(STATUS "Performing Test ${label} intrinsics")
++    try_compile("TEST_LOONGARCHSIMD_${extension}"
++        "${CMAKE_CURRENT_BINARY_DIR}/config.tests/loongarch_simd_${extension}"
++        "${CMAKE_CURRENT_SOURCE_DIR}/config.tests/loongarch_simd"
++        loongarch_simd
++        CMAKE_FLAGS ${flags})
++    if(${TEST_LOONGARCHSIMD_${extension}})
++        set(status_label "Success")
++    else()
++        set(status_label "Failed")
++    endif()
++    message(STATUS "Performing Test ${label} intrinsics - ${status_label}")
++    set(TEST_subarch_${extension} "${TEST_LOONGARCHSIMD_${extension}}" CACHE INTERNAL "${label}")
++endfunction()
++
+ function(qt_config_compile_test_machine_tuple label)
+     if(DEFINED TEST_MACHINE_TUPLE OR NOT (LINUX OR HURD) OR ANDROID)
+         return()
+diff --git a/cmake/QtProcessConfigureArgs.cmake b/cmake/QtProcessConfigureArgs.cmake
+index 55980f275b..041ad59ca0 100644
+--- a/cmake/QtProcessConfigureArgs.cmake
++++ b/cmake/QtProcessConfigureArgs.cmake
+@@ -240,6 +240,7 @@ defstub(qt_add_qmake_lib_dependency)
+ defstub(qt_config_compile_test)
+ defstub(qt_config_compile_test_machine_tuple)
+ defstub(qt_config_compile_test_x86simd)
++defstub(qt_config_compile_test_loongarchsimd)
+ defstub(qt_config_compiler_supports_flag_test)
+ defstub(qt_config_linker_supports_flag_test)
+ defstub(qt_configure_add_report_entry)
+diff --git a/config.tests/loongarch_simd/CMakeLists.txt b/config.tests/loongarch_simd/CMakeLists.txt
+new file mode 100644
+index 0000000000..84748e9c9a
+--- /dev/null
++++ b/config.tests/loongarch_simd/CMakeLists.txt
+@@ -0,0 +1,26 @@
++# Copyright (C) 2022 The Qt Company Ltd.
++# SPDX-License-Identifier: BSD-3-Clause
++
++cmake_minimum_required(VERSION 3.16)
++project(loongarch_simd LANGUAGES CXX)
++
++include(../../cmake/QtPlatformSupport.cmake)
++include(../../cmake/QtCompilerOptimization.cmake)
++
++# FIXME: Make the this project handle a list of SIMD entries.
++# FIXME: Make this project handle appending of the cflags (similar to the qmake project).
++# This is needed for the loongarchsimd configure test (
++# aka we test to see if setting no SIMD (-mlsx) cflags at all, will result in their implicit
++# addition by the compiler).
++string(TOUPPER "${SIMD}" upper_simd)
++
++if(NOT DEFINED "QT_CFLAGS_${upper_simd}")
++    # Don't use CMake error() because a configure error also fails the try_compile() call.
++    # Instead use a compile flag that doesn't exist to force a compiler error.
++    set(QT_CFLAGS_${upper_simd} "--qt-cflags-not-found")
++endif()
++
++add_executable("SimdTest${SIMD}")
++target_sources("SimdTest${SIMD}" PRIVATE main.cpp)
++target_compile_options("SimdTest${SIMD}" PRIVATE ${QT_CFLAGS_${upper_simd}})
++target_compile_definitions("SimdTest${SIMD}" PRIVATE QT_COMPILER_SUPPORTS_${upper_simd})
+diff --git a/config.tests/loongarch_simd/main.cpp b/config.tests/loongarch_simd/main.cpp
+new file mode 100644
+index 0000000000..25e39ffecd
+--- /dev/null
++++ b/config.tests/loongarch_simd/main.cpp
+@@ -0,0 +1,31 @@
++// Copyright (C) 2017 Intel Corporation.
++// SPDX-License-Identifier: BSD-3-Clause
++
++#define T(x)                      (QT_COMPILER_SUPPORTS_ ## x)
++
++/* GCC requires attributes for a function */
++#define attribute_target(x)     __attribute__((__target__(x)))
++
++#if T(LSX)
++#include <lsxintrin.h>
++attribute_target("lsx") void test_lsx()
++{
++    __m128i a = __lsx_vldi(0);
++    (void) __lsx_vshuf_h(__lsx_vldi(0), a, a);
++}
++#endif
++
++#if T(LASX)
++#include <lsxintrin.h>
++#include <lasxintrin.h>
++attribute_target("lasx") void test_lasx()
++{
++    __m256i a = __lasx_xvldi(0);
++    __m256i b = __lasx_xvadd_b(a, a);
++    (void) __lasx_xvadd_b(a, b);
++}
++#endif
++int main()
++{
++    return 0;
++}
+diff --git a/configure.cmake b/configure.cmake
+index 1e144ac37c..430fec99e0 100644
+--- a/configure.cmake
++++ b/configure.cmake
+@@ -354,6 +354,12 @@ qt_config_compile_test_x86simd(avx512vbmi2 "AVX512VBMI2")
+ # x86: vaes
+ qt_config_compile_test_x86simd(vaes "VAES")
+ 
++# loongarch: lsx
++qt_config_compile_test_loongarchsimd(lsx "LSX")
++
++# loongarch: lasx
++qt_config_compile_test_loongarchsimd(lasx "LASX")
++
+ # posix_fallocate
+ qt_config_compile_test(posix_fallocate
+     LABEL "POSIX fallocate()"
+@@ -893,6 +899,18 @@ qt_feature("shani" PRIVATE
+ )
+ qt_feature_definition("shani" "QT_COMPILER_SUPPORTS_SHA" VALUE "1")
+ qt_feature_config("shani" QMAKE_PRIVATE_CONFIG)
++qt_feature("lsx" PRIVATE
++    LABEL "LSX"
++    CONDITION ( TEST_architecture_arch STREQUAL loongarch64 ) AND TEST_subarch_lsx
++)
++qt_feature_definition("lsx" "QT_COMPILER_SUPPORTS_LSX" VALUE "1")
++qt_feature_config("lsx" QMAKE_PRIVATE_CONFIG)
++qt_feature("lasx" PRIVATE
++    LABEL "LASX"
++    CONDITION ( TEST_architecture_arch STREQUAL loongarch64 ) AND TEST_subarch_lasx
++)
++qt_feature_definition("lasx" "QT_COMPILER_SUPPORTS_LASX" VALUE "1")
++qt_feature_config("lasx" QMAKE_PRIVATE_CONFIG)
+ qt_feature("mips_dsp" PRIVATE
+     LABEL "DSP"
+     CONDITION ( TEST_architecture_arch STREQUAL mips ) AND TEST_arch_${TEST_architecture_arch}_subarch_dsp
+@@ -1276,6 +1294,12 @@ qt_configure_add_summary_entry(
+     MESSAGE "ARM Extensions"
+     CONDITION ( TEST_architecture_arch STREQUAL arm ) OR ( TEST_architecture_arch STREQUAL arm64 )
+ )
++qt_configure_add_summary_entry(
++    TYPE "featureList"
++    ARGS "lsx lasx"
++    MESSAGE "LOONGARCH Extensions"
++    CONDITION ( TEST_architecture_arch STREQUAL loongarch64 )
++)
+ qt_configure_add_summary_entry(
+     ARGS "mips_dsp"
+     CONDITION ( TEST_architecture_arch STREQUAL mips )
+diff --git a/mkspecs/common/gcc-base.conf b/mkspecs/common/gcc-base.conf
+index ae58326289..ebaf8d4de0 100644
+--- a/mkspecs/common/gcc-base.conf
++++ b/mkspecs/common/gcc-base.conf
+@@ -119,6 +119,8 @@ QMAKE_CFLAGS_VAES      += -mvaes
+ QMAKE_CFLAGS_NEON      += -mfpu=neon
+ QMAKE_CFLAGS_MIPS_DSP  += -mdsp
+ QMAKE_CFLAGS_MIPS_DSPR2 += -mdspr2
++QMAKE_CFLAGS_LSX  += -mlsx
++QMAKE_CFLAGS_LASX += -mlasx
+ 
+ # -march=haswell is supported as of GCC 4.9 and Clang 3.6
+ QMAKE_CFLAGS_ARCH_HASWELL           = -march=core-avx2
+diff --git a/mkspecs/features/simd.prf b/mkspecs/features/simd.prf
+index 8e041297d2..a825fdd4a6 100644
+--- a/mkspecs/features/simd.prf
++++ b/mkspecs/features/simd.prf
+@@ -146,6 +146,8 @@ addSimdCompiler(rdseed)
+ addSimdCompiler(neon)
+ addSimdCompiler(mips_dsp)
+ addSimdCompiler(mips_dspr2)
++addSimdCompiler(lsx)
++addSimdCompiler(lasx)
+ 
+ # Haswell sub-architecture
+ defineTest(addSimdArch) {
+diff --git a/src/corelib/global/qsimd.cpp b/src/corelib/global/qsimd.cpp
+index 8bc5381591..4d58762245 100644
+--- a/src/corelib/global/qsimd.cpp
++++ b/src/corelib/global/qsimd.cpp
+@@ -33,7 +33,7 @@
+ #  endif
+ #elif defined(Q_OS_LINUX) && defined(Q_PROCESSOR_MIPS_32)
+ #  include "private/qcore_unix_p.h"
+-#elif QT_CONFIG(getauxval) && defined(Q_PROCESSOR_ARM)
++#elif QT_CONFIG(getauxval) && (defined(Q_PROCESSOR_ARM) || defined(Q_PROCESSOR_LOONGARCH))
+ #  include <sys/auxv.h>
+ 
+ // the kernel header definitions for HWCAP_*
+@@ -92,6 +92,19 @@ static const char features_string[] =
+     " dsp\0"
+     " dspr2\0";
+ 
++static const int features_indices[] = {
++       0, 1, 6
++};
++#elif defined(Q_PROCESSOR_LOONGARCH)
++/* Data:
++ lsx
++ lasx
++*/
++static const char features_string[] =
++    "\0"
++    " lsx\0"
++    " lasx\0";
++
+ static const int features_indices[] = {
+        0, 1, 6
+ };
+@@ -164,6 +177,37 @@ static inline quint64 detectProcessorFeatures()
+     return features;
+ }
+ 
++#elif defined(Q_PROCESSOR_LOONGARCH)
++static inline quint64 detectProcessorFeatures()
++{
++    quint64 features = 0;
++#  if QT_CONFIG(getauxval)
++    quint64 hwcap = getauxval(AT_HWCAP);
++
++    if (hwcap & HWCAP_LOONGARCH_LSX)
++        features |= CpuFeatureLSX;
++    if (hwcap & HWCAP_LOONGARCH_LASX)
++        features |= CpuFeatureLASX;
++#  else
++#    define LOONGARCH_CFG2 0x2
++#    define LOONGARCH_CFG2_LSX    (1 << 6)
++#    define LOONGARCH_CFG2_LASX   (1 << 7)
++    quint64 reg = 0;
++
++    __asm__ volatile(
++        "cpucfg %0, %1 \n\t"
++        : "+&r"(reg)
++        : "r"(LOONGARCH_CFG2)
++    );
++
++    if (reg & LOONGARCH_CFG2_LSX)
++        features |= CpuFeatureLSX;
++    if (reg & LOONGARCH_CFG2_LASX)
++        features |= CpuFeatureLASX;
++#  endif
++    return features;
++}
++
+ #elif defined(Q_PROCESSOR_X86)
+ 
+ #ifdef Q_PROCESSOR_X86_32
+diff --git a/src/corelib/global/qsimd.h b/src/corelib/global/qsimd.h
+index 4ef925ca33..357a5e0b8a 100644
+--- a/src/corelib/global/qsimd.h
++++ b/src/corelib/global/qsimd.h
+@@ -21,6 +21,8 @@
+  *  sse4_1     | x86
+  *  sse4_2     | x86
+  *  avx        | x86
++ *  lsx        | loongarch
++ *  lasx       | loongarch
+  *
+  * Code can use the following constructs to determine compiler support & status:
+  * - #if QT_COMPILER_USES(XXX) (e.g: #if QT_COMPILER_USES(neon) or QT_COMPILER_USES(sse4_1)
+@@ -53,6 +55,20 @@
+ #  define QT_COMPILER_USES_mips_dspr2 -1
+ #endif
+ 
++#if defined(Q_PROCESSOR_LOONGARCH) && defined(__loongarch_sx)
++#  include <lsxintrin.h>
++#  define QT_COMPILER_USES_lsx 1
++#else
++#  define QT_COMPILER_USES_lsx -1
++#endif
++
++#if defined(Q_PROCESSOR_LOONGARCH) && defined(__loongarch_asx)
++#  include <lasxintrin.h>
++#  define QT_COMPILER_USES_lasx 1
++#else
++#  define QT_COMPILER_USES_lasx -1
++#endif
++
+ #if defined(Q_PROCESSOR_X86) && defined(Q_CC_MSVC)
+ // MSVC doesn't define __SSE2__, so do it ourselves
+ #  if (defined(_M_X64) || _M_IX86_FP >= 2) && defined(QT_COMPILER_SUPPORTS_SSE2)
+diff --git a/src/corelib/global/qsimd_p.h b/src/corelib/global/qsimd_p.h
+index 012eb6cf4f..7b4462c881 100644
+--- a/src/corelib/global/qsimd_p.h
++++ b/src/corelib/global/qsimd_p.h
+@@ -116,6 +116,16 @@ QT_WARNING_DISABLE_INTEL(103)
+ #  if !defined(__MIPS_DSPR2__) && defined(__mips_dspr2) && defined(Q_PROCESSOR_MIPS_32)
+ #    define __MIPS_DSPR2__
+ #  endif
++#elif defined(Q_PROCESSOR_LOONGARCH)
++#  define QT_COMPILER_SUPPORTS_HERE(x)    QT_COMPILER_SUPPORTS(x)
++#  if defined(Q_CC_GNU)
++     /* GCC requires attributes for a function */
++#    define QT_FUNCTION_TARGET_STRING_lsx      "lsx"
++#    define QT_FUNCTION_TARGET_STRING_lasx     "lasx"
++#    define QT_FUNCTION_TARGET(x)  __attribute__((__target__(QT_FUNCTION_TARGET_STRING_ ## x)))
++#  else
++#    define QT_FUNCTION_TARGET(x)
++#  endif
+ #elif defined(Q_PROCESSOR_X86)
+ #  if defined(Q_CC_CLANG) && defined(Q_CC_MSVC)
+ #    define QT_COMPILER_SUPPORTS_HERE(x)    (__ ## x ## __)
+@@ -318,6 +328,9 @@ enum CPUFeatures {
+ #elif defined(Q_PROCESSOR_MIPS)
+     CpuFeatureDSP           = 2,
+     CpuFeatureDSPR2         = 4,
++#elif defined(Q_PROCESSOR_LOONGARCH)
++    CpuFeatureLSX           = 2,
++    CpuFeatureLASX          = 4,
+ #endif
+ };
+ 
+@@ -343,6 +356,12 @@ static const uint64_t qCompilerCpuFeatures = 0
+ #endif
+ #if defined __mips_dspr2
+         | CpuFeatureDSPR2
++#endif
++#if defined __loongarch_sx
++        | CpuFeatureLSX
++#endif
++#if defined __loongarch_asx
++        | CpuFeatureLASX
+ #endif
+         ;
+ #endif
+-- 
+2.43.0
+

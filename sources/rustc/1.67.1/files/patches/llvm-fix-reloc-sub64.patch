@@ -1,0 +1,44 @@
+diff --git src/llvm-project/llvm/lib/Target/LoongArch/MCTargetDesc/LoongArchELFStreamer.cpp src/llvm-project/llvm/lib/Target/LoongArch/MCTargetDesc/LoongArchELFStreamer.cpp
+index 39fc4d7..a74fee3 100644
+--- src/llvm-project/llvm/lib/Target/LoongArch/MCTargetDesc/LoongArchELFStreamer.cpp
++++ src/llvm-project/llvm/lib/Target/LoongArch/MCTargetDesc/LoongArchELFStreamer.cpp
+@@ -43,7 +43,8 @@
+ }
+ 
+ static bool requiresFixups(MCContext &C, const MCExpr *Value,
+-                           const MCExpr *&LHS, const MCExpr *&RHS) {
++                           const MCExpr *&LHS, const MCExpr *&RHS,
++                           LoongArchELFStreamer *MCS) {
+   const auto *MBE = dyn_cast<MCBinaryExpr>(Value);
+   if (MBE == nullptr)
+     return false;
+@@ -69,12 +70,18 @@
+                            MCConstantExpr::create(E.getConstant(), C), C);
+   RHS = E.getSymB();
+ 
+-  return (A.isInSection() ? true : !A.getName().empty()) ||
++  bool isCheckInstr =
++      StringSwitch<bool>(MCS->getCurrentSectionOnly()->getName())
++          .Case(".debug_aranges", true)
++          .Default(false);
++
++  return (A.isInSection()
++              ? (isCheckInstr ? A.getSection().hasInstructions() : true)
++              : !A.getName().empty()) ||
+          (B.isInSection() ? B.getSection().hasInstructions()
+                           : !B.getName().empty());
+ }
+ 
+-
+ LoongArchELFStreamer::LoongArchELFStreamer(MCContext &Context,
+                                  std::unique_ptr<MCAsmBackend> MAB,
+                                  std::unique_ptr<MCObjectWriter> OW,
+@@ -102,7 +109,7 @@
+ void LoongArchELFStreamer::emitValueImpl(const MCExpr *Value, unsigned Size,
+                                     SMLoc Loc) {
+   const MCExpr *A, *B;
+-  if (!requiresFixups(getContext(), Value, A, B))
++  if (!requiresFixups(getContext(), Value, A, B, this))
+     return MCELFStreamer::emitValueImpl(Value, Size, Loc);
+ 
+   MCStreamer::emitValueImpl(Value, Size, Loc);

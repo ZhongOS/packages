@@ -1,0 +1,5 @@
+URL=https://github.com/loongson/gcc.git
+FILE=gcc-13.0.1_git.tar.gz
+DIR=gcc-13.0.1_git
+GIT_BRANCH=loongarch-gcc-vector
+GIT_COMMIT=

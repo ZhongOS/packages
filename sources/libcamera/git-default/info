@@ -1,0 +1,6 @@
+URL=https://git.libcamera.org/libcamera/libcamera.git
+FILE=libcamera-git-default_git.tar.gz
+DIR=libcamera-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1

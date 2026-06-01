@@ -1,0 +1,10 @@
+--- webkitgtk-2.36.3.orig/Source/ThirdParty/ANGLE/include/GLSLANG/ShaderVars.h	2022-05-20 18:56:50.804905000 +0000
++++ webkitgtk-2.36.3/Source/ThirdParty/ANGLE/include/GLSLANG/ShaderVars.h	2022-08-02 07:19:56.853044475 +0000
+@@ -14,6 +14,7 @@
+ #include <array>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ // This type is defined here to simplify ANGLE's integration with glslang for SPIR-V.
+ using ShCompileOptions = uint64_t;

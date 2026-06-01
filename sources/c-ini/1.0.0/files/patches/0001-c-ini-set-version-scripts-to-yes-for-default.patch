@@ -1,0 +1,28 @@
+From 13378e71cf004a36c0a6d66b3c9eede6209718b0 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 25 Nov 2023 13:49:34 +0000
+Subject: [PATCH] c-ini set version-scripts to yes for default.
+
+---
+ src/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 7c7b1f3..c04f11b 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -23,9 +23,9 @@ libcini_both = both_libraries(
+         ],
+         dependencies: libcini_deps,
+         install: not meson.is_subproject(),
+-        link_args: dep_cstdaux.get_variable('version-scripts') == 'yes' ? [
++        link_args: [
+                 '-Wl,--version-script=@0@'.format(libcini_symfile),
+-        ] : [],
++        ],
+         link_depends: libcini_symfile,
+         soversion: 0,
+ )
+-- 
+2.31.1
+

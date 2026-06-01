@@ -1,0 +1,25 @@
+From 8ece709a56084a413b68633a9fa067c3aacdc480 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 18 Nov 2024 09:26:20 +0000
+Subject: [PATCH] pyside6 remove QtGraphs qxyseries_wrapper for Qt 6.8.0
+
+---
+ sources/pyside6/PySide6/QtGraphs/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt b/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt
+index b32c39f..13f3000 100644
+--- a/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt
++++ b/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt
+@@ -55,7 +55,7 @@ ${QtGraphs_GEN_DIR}/qscatterseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qsplineseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qvalueaxis_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qxymodelmapper_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qxyseries_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qxyseries_wrapper.cpp
+ # module is always needed
+ ${QtGraphs_GEN_DIR}/qtgraphs_module_wrapper.cpp
+ )
+-- 
+2.31.1
+

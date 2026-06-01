@@ -1,0 +1,139 @@
+From cc83853877499fe245f4f1a982de65b9d7242695 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 16 Aug 2024 08:10:44 +0000
+Subject: [PATCH] q5Go fix for cross build.
+
+---
+ src/translations/Makefile.am | 24 ++++++++++++------------
+ src/translations/Makefile.in | 24 ++++++++++++------------
+ templates/Makefile.am        | 12 ++++++------
+ templates/Makefile.in        | 12 ++++++------
+ 4 files changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/src/translations/Makefile.am b/src/translations/Makefile.am
+index 9810f5d..c36858f 100644
+--- a/src/translations/Makefile.am
++++ b/src/translations/Makefile.am
+@@ -4,20 +4,20 @@
+ EXTRA_DIST = qgo_de.qm qgo_fr.qm qgo_it.qm qgo_nl.qm 
+ 
+ install-data-local:
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_de.qm $(datadir)/qGo/translations/
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_fr.qm $(datadir)/qGo/translations/
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_it.qm $(datadir)/qGo/translations/
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_nl.qm $(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_de.qm ${DESTDIR}$(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_fr.qm ${DESTDIR}$(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_it.qm ${DESTDIR}$(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_nl.qm ${DESTDIR}$(datadir)/qGo/translations/
+ 
+ uninstall-local:
+-	-rm -f $(datadir)/qGo/translations/
+-	-rm -f $(datadir)/qGo/translations/
+-	-rm -f $(datadir)/qGo/translations/
+-	-rm -f $(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
+ 
+ ####### kdevelop will overwrite this part!!! (end)############
+ 
+diff --git a/src/translations/Makefile.in b/src/translations/Makefile.in
+index b37a04c..b627979 100644
+--- a/src/translations/Makefile.in
++++ b/src/translations/Makefile.in
+@@ -424,20 +424,20 @@ uninstall-am: uninstall-TranslationsDATA uninstall-local
+ 
+ 
+ install-data-local:
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_de.qm $(datadir)/qGo/translations/
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_fr.qm $(datadir)/qGo/translations/
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_it.qm $(datadir)/qGo/translations/
+-	$(mkinstalldirs) $(datadir)/qGo/translations/
+-	$(INSTALL_DATA) $(srcdir)/qgo_nl.qm $(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_de.qm ${DESTDIR}$(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_fr.qm ${DESTDIR}$(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_it.qm ${DESTDIR}$(datadir)/qGo/translations/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/qGo/translations/
++	$(INSTALL_DATA) $(srcdir)/qgo_nl.qm ${DESTDIR}$(datadir)/qGo/translations/
+ 
+ uninstall-local:
+-	-rm -f $(datadir)/qGo/translations/
+-	-rm -f $(datadir)/qGo/translations/
+-	-rm -f $(datadir)/qGo/translations/
+-	-rm -f $(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
++	-rm -f ${DESTDIR}$(datadir)/qGo/translations/
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+diff --git a/templates/Makefile.am b/templates/Makefile.am
+index 21bb57a..8402bca 100644
+--- a/templates/Makefile.am
++++ b/templates/Makefile.am
+@@ -4,14 +4,14 @@
+ EXTRA_DIST = sgf.desktop qgo.desktop 
+ 
+ install-data-local:
+-	$(mkinstalldirs) $(datadir)/mimelnk/text/
+-	$(INSTALL_DATA) $(srcdir)/sgf.desktop $(datadir)/mimelnk/text/
+-	$(mkinstalldirs) $(datadir)/applnk/Games/
+-	$(INSTALL_DATA) $(srcdir)/qgo.desktop $(datadir)/applnk/Games/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/mimelnk/text/
++	$(INSTALL_DATA) $(srcdir)/sgf.desktop ${DESTDIR}$(datadir)/mimelnk/text/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/applnk/Games/
++	$(INSTALL_DATA) $(srcdir)/qgo.desktop ${DESTDIR}$(datadir)/applnk/Games/
+ 
+ uninstall-local:
+-	-rm -f $(datadir)/mimelnk/text/
+-	-rm -f $(datadir)/applnk/Games/
++	-rm -f ${DESTDIR}$(datadir)/mimelnk/text/
++	-rm -f ${DESTDIR}$(datadir)/applnk/Games/
+ 
+ ####### kdevelop will overwrite this part!!! (end)############
+ Applinkdir = $(datadir)/applnk/Games/
+diff --git a/templates/Makefile.in b/templates/Makefile.in
+index d34e1bb..f7e8786 100644
+--- a/templates/Makefile.in
++++ b/templates/Makefile.in
+@@ -448,14 +448,14 @@ uninstall-am: uninstall-ApplinkDATA uninstall-MimelinkDATA \
+ 
+ 
+ install-data-local:
+-	$(mkinstalldirs) $(datadir)/mimelnk/text/
+-	$(INSTALL_DATA) $(srcdir)/sgf.desktop $(datadir)/mimelnk/text/
+-	$(mkinstalldirs) $(datadir)/applnk/Games/
+-	$(INSTALL_DATA) $(srcdir)/qgo.desktop $(datadir)/applnk/Games/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/mimelnk/text/
++	$(INSTALL_DATA) $(srcdir)/sgf.desktop ${DESTDIR}$(datadir)/mimelnk/text/
++	$(mkinstalldirs) ${DESTDIR}$(datadir)/applnk/Games/
++	$(INSTALL_DATA) $(srcdir)/qgo.desktop ${DESTDIR}$(datadir)/applnk/Games/
+ 
+ uninstall-local:
+-	-rm -f $(datadir)/mimelnk/text/
+-	-rm -f $(datadir)/applnk/Games/
++	-rm -f ${DESTDIR}$(datadir)/mimelnk/text/
++	-rm -f ${DESTDIR}$(datadir)/applnk/Games/
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+-- 
+2.31.1
+

@@ -1,0 +1,11 @@
+diff -Nurp webkitgtk-2.36.3.orig/Source/WTF/wtf/dtoa/utils.h webkitgtk-2.36.3/Source/WTF/wtf/dtoa/utils.h
+--- webkitgtk-2.36.3.orig/Source/WTF/wtf/dtoa/utils.h	2022-02-23 11:41:47.554152300 +0000
++++ webkitgtk-2.36.3/Source/WTF/wtf/dtoa/utils.h	2022-07-04 01:47:20.545954653 +0000
+@@ -82,6 +82,7 @@ int main(int argc, char** argv) {
+ #if defined(_M_X64) || defined(__x86_64__) || \
+     defined(__ARMEL__) || defined(__avr32__) || defined(_M_ARM) || defined(_M_ARM64) || \
+     defined(__hppa__) || defined(__ia64__) || \
++    defined(__loongarch__) || \
+     defined(__mips__) || \
+     defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
+     defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \

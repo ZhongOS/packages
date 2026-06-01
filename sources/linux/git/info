@@ -1,0 +1,6 @@
+URL=https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+FILE=linux-git_git.tar.gz
+DIR=linux-git_git
+GIT_BRANCH=master
+GIT_COMMIT=
+GIT_SUBMODULE=0

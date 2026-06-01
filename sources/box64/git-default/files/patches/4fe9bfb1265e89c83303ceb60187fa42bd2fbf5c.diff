@@ -1,0 +1,26 @@
+diff --git a/src/emu/x64runf0.c b/src/emu/x64runf0.c
+index 70d945ec2..ce7145fc6 100644
+--- a/src/emu/x64runf0.c
++++ b/src/emu/x64runf0.c
+@@ -745,7 +745,7 @@ uintptr_t RunF0(x64emu_t *emu, rex_t rex, uintptr_t addr)
+                             GETGD;
+ #if defined(DYNAREC) && !defined(TEST_INTERPRETER)
+                             if (rex.w) {
+-#if defined(__riscv)
++#if defined(__riscv) || defined(__loongarch64)
+                                 while (native_lock_xchg_d(&emu->context->mutex_16b, 1)); // lock
+                                 tmp64u = ((uint64_t*)ED)[0];
+                                 tmp64u2 = ((uint64_t*)ED)[1];
+diff --git a/src/include/box64context.h b/src/include/box64context.h
+index 19c45f904..b87067295 100644
+--- a/src/include/box64context.h
++++ b/src/include/box64context.h
+@@ -165,7 +165,7 @@ typedef struct box64context_s {
+     rbtree*             db_sizes;
+     int                 trace_dynarec;
+     pthread_mutex_t     mutex_lock;     // this is for the Test interpreter
+-    #ifdef __riscv
++    #if defined(__riscv) || defined(__loongarch64)
+     uint32_t            mutex_16b;
+     #endif
+     #endif

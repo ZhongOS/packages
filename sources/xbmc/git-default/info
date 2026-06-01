@@ -1,0 +1,6 @@
+URL=https://github.com/xbmc/xbmc
+FILE=xbmc-git-default_git.tar.gz
+DIR=xbmc-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1

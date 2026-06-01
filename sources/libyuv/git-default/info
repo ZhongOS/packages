@@ -1,0 +1,6 @@
+URL=https://chromium.googlesource.com/libyuv/libyuv
+FILE=libyuv-git-default_git.tar.gz
+DIR=libyuv-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

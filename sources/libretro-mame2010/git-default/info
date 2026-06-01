@@ -1,0 +1,6 @@
+URL=https://github.com/libretro/mame2010-libretro.git
+FILE=libretro-mame2010-git-default_git.tar.gz
+DIR=libretro-mame2010-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

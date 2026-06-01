@@ -1,0 +1,6 @@
+URL=https://gitlab.com/qemu-project/qemu.git
+FILE=qemu-8.0.2-default_git.tar.gz
+DIR=qemu-8.0.2-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

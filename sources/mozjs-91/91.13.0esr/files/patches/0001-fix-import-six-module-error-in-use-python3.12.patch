@@ -1,0 +1,24 @@
+From 13b972b35bae317acef42f81d5df39dc213a7259 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 9 Oct 2023 06:44:27 +0000
+Subject: [PATCH] fix import six module error in use python3.12.
+
+---
+ configure.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.py b/configure.py
+index 70bfbb1..8d07b3a 100644
+--- a/configure.py
++++ b/configure.py
+@@ -18,7 +18,6 @@ from collections.abc import Iterable
+ base_dir = os.path.abspath(os.path.dirname(__file__))
+ sys.path.insert(0, os.path.join(base_dir, "python", "mozboot"))
+ sys.path.insert(0, os.path.join(base_dir, "python", "mozbuild"))
+-sys.path.insert(0, os.path.join(base_dir, "third_party", "python", "six"))
+ from mozbuild.configure import (
+     ConfigureSandbox,
+     TRACE,
+-- 
+2.31.1
+

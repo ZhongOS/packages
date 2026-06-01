@@ -1,0 +1,6 @@
+URL=git://sourceware.org/git/gcc.git
+FILE=gcc-git-default_git.tar.gz
+DIR=gcc-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

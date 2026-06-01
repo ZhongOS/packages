@@ -1,0 +1,24 @@
+From be7f1c1ed475d67b24546407d3afb95257c08d70 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 3 Jun 2023 11:27:54 +0000
+Subject: [PATCH] powerdevil set disable suspend session by default.
+
+---
+ daemon/actions/bundled/suspendsessionconfig.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/daemon/actions/bundled/suspendsessionconfig.cpp b/daemon/actions/bundled/suspendsessionconfig.cpp
+index ec2c3fb..a0f5878 100644
+--- a/daemon/actions/bundled/suspendsessionconfig.cpp
++++ b/daemon/actions/bundled/suspendsessionconfig.cpp
+@@ -118,6 +118,7 @@ QList< QPair< QString, QWidget* > > SuspendSessionConfig::buildUi()
+         comboBoxMaxWidth = qMax(comboBoxMaxWidth, m_suspendThenHibernateEnabled->sizeHint().width());
+         m_suspendThenHibernateEnabled->setMinimumWidth(300);
+         m_suspendThenHibernateEnabled->setMaximumWidth(comboBoxMaxWidth);
++	m_suspendThenHibernateEnabled->setChecked(false);
+     }
+ 
+     return retlist;
+-- 
+2.31.1
+

@@ -1,0 +1,6 @@
+URL=https://github.com/mozilla/cbindgen.git
+FILE=cbindgen-git-default_git.tar.gz
+DIR=cbindgen-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

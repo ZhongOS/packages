@@ -1,0 +1,9 @@
+URL=https://projects.blender.org/blender/blender.git
+FILE=blender-git-default_git.tar.gz
+DIR=blender-git-default_git
+GIT_BRANCH=blender-v4.5-release
+BRANCH_SAVE=blender-v4.0-release
+GIT_COMMIT=
+COMMIT_SAVE=ee0fd0ed195cc668eb2552a55a7735ccaf23ff70
+COMMIT_SAVE=d4d0daa934cd5433a219c22d9f36312e2271da91
+GIT_SUBMODULE=0

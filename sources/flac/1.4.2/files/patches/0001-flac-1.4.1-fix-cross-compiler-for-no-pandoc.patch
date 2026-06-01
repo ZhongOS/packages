@@ -1,0 +1,27 @@
+From e2bfc685cdebfeb702d631855d90afe1df56fb29 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@loongson.cn>
+Date: Wed, 19 Oct 2022 01:49:34 +0000
+Subject: [PATCH] flac 1.4.1: fix cross compiler for no pandoc.
+
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index daa6304..592adca 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -483,8 +483,8 @@ if test -n "$PANDOC" ; then
+ AC_DEFINE(FLAC__HAS_PANDOC)
+ AH_TEMPLATE(FLAC__HAS_PANDOC, [define if you have pandoc])
+ else
+-AC_CHECK_FILE($srcdir/man/flac.1,[HAVE_MAN_FLAC=yes])
+-AC_CHECK_FILE($srcdir/man/metaflac.1,[HAVE_MAN_METAFLAC=yes])
++HAVE_MAN_FLAC=yes
++HAVE_MAN_METAFLAC=yes
+ fi
+ AM_CONDITIONAL(FLaC__HAS_PREBUILT_MANPAGES, test "x$HAVE_MAN_FLAC$HAVE_MAN_METAFLAC" = "xyesyes")
+ 
+-- 
+2.31.1
+

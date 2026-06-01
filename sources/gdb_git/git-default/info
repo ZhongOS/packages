@@ -1,0 +1,6 @@
+URL=https://sourceware.org/git/binutils-gdb.git
+FILE=gdb_git-git-default_git.tar.gz
+DIR=gdb_git-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

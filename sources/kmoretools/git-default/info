@@ -1,0 +1,6 @@
+URL=https://invent.kde.org/libraries/kmoretools.git
+FILE=kmoretools-git-default_git.tar.gz
+DIR=kmoretools-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

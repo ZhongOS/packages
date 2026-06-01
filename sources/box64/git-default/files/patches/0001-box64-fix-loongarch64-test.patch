@@ -1,0 +1,64 @@
+From e0fbbca907602d2a2de5f7344c6df95bdf7f40cc Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 8 Apr 2024 10:10:20 +0000
+Subject: [PATCH] box64 fix loongarch64 test.
+
+---
+ src/dynarec/la64/dynarec_la64_00.c | 27 ---------------------------
+ 1 file changed, 27 deletions(-)
+
+diff --git a/src/dynarec/la64/dynarec_la64_00.c b/src/dynarec/la64/dynarec_la64_00.c
+index c32d1bc..2bedf23 100644
+--- a/src/dynarec/la64/dynarec_la64_00.c
++++ b/src/dynarec/la64/dynarec_la64_00.c
+@@ -134,21 +134,6 @@ uintptr_t dynarec64_00(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int ni
+             i64 = F32S;
+             emit_or32c(dyn, ninst, rex, xRAX, i64, x3, x4);
+             break;
+-        case 0x0F:
+-            switch (rep) {
+-                case 0:
+-                    addr = dynarec64_0F(dyn, addr, ip, ninst, rex, ok, need_epilog);
+-                    break;
+-                case 1:
+-                    addr = dynarec64_F20F(dyn, addr, ip, ninst, rex, ok, need_epilog);
+-                    break;
+-                case 2:
+-                    addr = dynarec64_F30F(dyn, addr, ip, ninst, rex, ok, need_epilog);
+-                    break;
+-                default:
+-                    DEFAULT;
+-            }
+-            break;
+         case 0x19:
+             INST_NAME("SBB Ed, Gd");
+             READFLAGS(X_CF);
+@@ -391,15 +376,6 @@ uintptr_t dynarec64_00(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int ni
+                 }
+             }
+             break;
+-        case 0x64:
+-            addr = dynarec64_64(dyn, addr, ip, ninst, rex, rep, _FS, ok, need_epilog);
+-            break;
+-        case 0x65:
+-            addr = dynarec64_64(dyn, addr, ip, ninst, rex, rep, _GS, ok, need_epilog);
+-            break;
+-        case 0x66:
+-            addr = dynarec64_66(dyn, addr, ip, ninst, rex, rep, ok, need_epilog);
+-            break;
+         case 0x68:
+             INST_NAME("PUSH Id");
+             i64 = F32S;
+@@ -1507,9 +1483,6 @@ uintptr_t dynarec64_00(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int ni
+             *need_epilog = 0;
+             *ok = 0;
+             break;
+-        case 0xF0:
+-            addr = dynarec64_F0(dyn, addr, ip, ninst, rex, rep, ok, need_epilog);
+-            break;
+         case 0xF6:
+             nextop = F8;
+             switch ((nextop >> 3) & 7) {
+-- 
+2.31.1
+

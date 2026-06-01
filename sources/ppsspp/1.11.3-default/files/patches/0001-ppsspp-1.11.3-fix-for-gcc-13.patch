@@ -1,0 +1,102 @@
+From 612a5120f8fbd35bd8cdc202798732f9497f03c4 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 9 Jul 2023 03:06:53 +0000
+Subject: [PATCH] ppsspp 1.11.3 fix for gcc 13.
+
+---
+ Common/Data/Format/IniFile.h   | 1 +
+ Common/GPU/OpenGL/GLFeatures.h | 1 +
+ Common/Net/NetBuffer.cpp       | 1 +
+ Common/Net/NetBuffer.h         | 1 +
+ Common/StringUtils.h           | 1 +
+ Core/Reporting.h               | 1 +
+ GPU/Common/IndexGenerator.cpp  | 1 +
+ 7 files changed, 7 insertions(+)
+
+diff --git a/Common/Data/Format/IniFile.h b/Common/Data/Format/IniFile.h
+index 87bd1d1..05ba628 100644
+--- a/Common/Data/Format/IniFile.h
++++ b/Common/Data/Format/IniFile.h
+@@ -8,6 +8,7 @@
+ #include <map>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ #include "Common/File/Path.h"
+ 
+diff --git a/Common/GPU/OpenGL/GLFeatures.h b/Common/GPU/OpenGL/GLFeatures.h
+index 6a8f15b..9e570e0 100644
+--- a/Common/GPU/OpenGL/GLFeatures.h
++++ b/Common/GPU/OpenGL/GLFeatures.h
+@@ -5,6 +5,7 @@
+ #pragma once
+ 
+ #include <string>
++#include <cstdint>
+ 
+ // TODO: Replace with thin3d's vendor enum.
+ enum {
+diff --git a/Common/Net/NetBuffer.cpp b/Common/Net/NetBuffer.cpp
+index 331f24b..759be85 100644
+--- a/Common/Net/NetBuffer.cpp
++++ b/Common/Net/NetBuffer.cpp
+@@ -19,6 +19,7 @@
+ #include "Common/Log.h"
+ #include "Common/Net/NetBuffer.h"
+ #include "Common/TimeUtil.h"
++#include <cstdint>
+ 
+ namespace net {
+ 
+diff --git a/Common/Net/NetBuffer.h b/Common/Net/NetBuffer.h
+index 6247aca..656a4e0 100644
+--- a/Common/Net/NetBuffer.h
++++ b/Common/Net/NetBuffer.h
+@@ -1,6 +1,7 @@
+ ﻿#pragma once
+ 
+ #include "Common/Buffer.h"
++#include <cstdint>
+ 
+ namespace net {
+ 
+diff --git a/Common/StringUtils.h b/Common/StringUtils.h
+index 89127be..71daef9 100644
+--- a/Common/StringUtils.h
++++ b/Common/StringUtils.h
+@@ -21,6 +21,7 @@
+ 
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ #ifdef _MSC_VER
+ #define strncasecmp _strnicmp
+diff --git a/Core/Reporting.h b/Core/Reporting.h
+index 4971d4b..869597e 100644
+--- a/Core/Reporting.h
++++ b/Core/Reporting.h
+@@ -23,6 +23,7 @@
+ #include "Common/CommonTypes.h"
+ #include "Common/File/Path.h"
+ #include "Common/LogReporting.h"
++#include <cstdint>
+ 
+ class PointerWrap;
+ 
+diff --git a/GPU/Common/IndexGenerator.cpp b/GPU/Common/IndexGenerator.cpp
+index 446d7a6..97b1bae 100644
+--- a/GPU/Common/IndexGenerator.cpp
++++ b/GPU/Common/IndexGenerator.cpp
+@@ -20,6 +20,7 @@
+ #include "ppsspp_config.h"
+ #include "CPUDetect.h"
+ #include "Common.h"
++#include <cstdint>
+ 
+ #ifdef _M_SSE
+ #include <emmintrin.h>
+-- 
+2.31.1
+

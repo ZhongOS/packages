@@ -1,0 +1,45 @@
+From 9258b1c6139fb3e569abe3d41e7f5bb7b2a0fadf Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 1 Sep 2024 13:49:58 +0000
+Subject: [PATCH] qtwebengine 6.7.2 fix h264 for ffmpeg 7 patch 2.
+
+---
+ .../chromium/media/filters/ffmpeg_video_decoder.cc        | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/qtwebengine/src/3rdparty/chromium/media/filters/ffmpeg_video_decoder.cc b/qtwebengine/src/3rdparty/chromium/media/filters/ffmpeg_video_decoder.cc
+index e62b2af..34e4dfd 100644
+--- a/qtwebengine/src/3rdparty/chromium/media/filters/ffmpeg_video_decoder.cc
++++ b/qtwebengine/src/3rdparty/chromium/media/filters/ffmpeg_video_decoder.cc
+@@ -204,10 +204,6 @@ int FFmpegVideoDecoder::GetVideoBuffer(struct AVCodecContext* codec_context,
+     frame->linesize[plane] = layout->planes()[plane].stride;
+   }
+ 
+-  // This seems unsafe, given threaded decoding.  However, `reordered_opaque` is
+-  // also going away upstream, so we need a whole new mechanism either way.
+-  frame->reordered_opaque = codec_context->reordered_opaque;
+-
+   // This will be freed by `ReleaseVideoBufferImpl`.
+   auto* opaque = new OpaqueData(fb_priv, frame_pool_, data, allocation_size,
+                                 std::move(*layout));
+@@ -354,8 +350,6 @@ bool FFmpegVideoDecoder::FFmpegDecode(const DecoderBuffer& buffer) {
+     DCHECK(packet->data);
+     DCHECK_GT(packet->size, 0);
+ 
+-    // Let FFmpeg handle presentation timestamp reordering.
+-    codec_context_->reordered_opaque = buffer.timestamp().InMicroseconds();
+   }
+   FFmpegDecodingLoop::DecodeStatus decode_status = decoding_loop_->DecodePacket(
+       packet, base::BindRepeating(&FFmpegVideoDecoder::OnNewFrame,
+@@ -414,7 +408,7 @@ bool FFmpegVideoDecoder::OnNewFrame(AVFrame* frame) {
+   }
+   gfx::Size natural_size = aspect_ratio.GetNaturalSize(visible_rect);
+ 
+-  const auto pts = base::Microseconds(frame->reordered_opaque);
++  const auto pts = base::Microseconds(frame->pts);
+   auto video_frame = VideoFrame::WrapExternalDataWithLayout(
+       opaque->layout, visible_rect, natural_size, opaque->data, opaque->size,
+       pts);
+-- 
+2.31.1
+

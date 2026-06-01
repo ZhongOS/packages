@@ -1,0 +1,6 @@
+URL=https://github.com/loongson/jdk8u.git
+FILE=jdk8-8u_git.tar.gz
+DIR=jdk8-8u_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

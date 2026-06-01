@@ -1,0 +1,28 @@
+From 453d6abc458bee95a736ef3482e1614f95b085e9 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 25 Nov 2023 13:32:28 +0000
+Subject: [PATCH] c-rbtree set version-scripts to yes for default.
+
+---
+ src/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 9461203..9c357e0 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -19,9 +19,9 @@ libcrbtree_both = both_libraries(
+         ],
+         dependencies: libcrbtree_deps,
+         install: not meson.is_subproject(),
+-        link_args: dep_cstdaux.get_variable('version-scripts') == 'yes' ? [
++        link_args:[
+                 '-Wl,--version-script=@0@'.format(libcrbtree_symfile),
+-        ] : [],
++        ],
+         link_depends: libcrbtree_symfile,
+         soversion: 0,
+ )
+-- 
+2.31.1
+

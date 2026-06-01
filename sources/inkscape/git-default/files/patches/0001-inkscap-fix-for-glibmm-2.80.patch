@@ -1,0 +1,57 @@
+From c19608fd90608569b345760b52614870ddaef001 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 23 Aug 2024 01:42:03 +0000
+Subject: [PATCH] inkscap fix for glibmm 2.80.
+
+---
+ src/ui/tools/tool-base.cpp            | 2 +-
+ src/ui/widget/gradient-with-stops.cpp | 6 +++---
+ src/ui/widget/ink-spin-button.cpp     | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/ui/tools/tool-base.cpp b/src/ui/tools/tool-base.cpp
+index 8434ef3..b50ee09 100644
+--- a/src/ui/tools/tool-base.cpp
++++ b/src/ui/tools/tool-base.cpp
+@@ -474,7 +474,7 @@ bool ToolBase::root_handler(CanvasEvent const &event)
+                 if (panning_cursor == 0) {
+                     panning_cursor = 1;
+                     auto window = dynamic_cast<Gtk::Window *>(_desktop->getCanvas()->get_root());
+-                    auto cursor = Gdk::Cursor::create("move");
++                    auto cursor = Gdk::Cursor::create(Glib::ustring("move"));
+                     window->set_cursor(cursor);
+                 }
+ 
+diff --git a/src/ui/widget/gradient-with-stops.cpp b/src/ui/widget/gradient-with-stops.cpp
+index 281c485..f18ecb9 100644
+--- a/src/ui/widget/gradient-with-stops.cpp
++++ b/src/ui/widget/gradient-with-stops.cpp
+@@ -115,9 +115,9 @@ void GradientWithStops::css_changed(GtkCssStyleChange * /*change*/)
+ 
+     // load and cache cursors
+     if (!_cursor_mouseover) {
+-        _cursor_mouseover = Gdk::Cursor::create("grab");
+-        _cursor_dragging =  Gdk::Cursor::create("grabbing");
+-        _cursor_insert =    Gdk::Cursor::create("crosshair");
++        _cursor_mouseover = Gdk::Cursor::create(Glib::ustring("grab"));
++        _cursor_dragging =  Gdk::Cursor::create(Glib::ustring("grabbing"));
++        _cursor_insert =    Gdk::Cursor::create(Glib::ustring("crosshair"));
+         set_stop_cursor(nullptr);
+     }
+ }
+diff --git a/src/ui/widget/ink-spin-button.cpp b/src/ui/widget/ink-spin-button.cpp
+index ad5c522..bdf74c2 100644
+--- a/src/ui/widget/ink-spin-button.cpp
++++ b/src/ui/widget/ink-spin-button.cpp
+@@ -409,7 +409,7 @@ void InkSpinButton::on_motion_leave() {
+ void InkSpinButton::on_motion_enter_value(double x, double y) {
+     _old_cursor = get_cursor();
+     if (!g_resizing_cursor) {
+-        g_resizing_cursor = Gdk::Cursor::create("ew-resize");
++        g_resizing_cursor = Gdk::Cursor::create(Glib::ustring("ew-resize"));
+     }
+     _current_cursor = g_resizing_cursor;
+     set_cursor(_current_cursor);
+-- 
+2.31.1
+

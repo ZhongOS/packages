@@ -1,0 +1,11 @@
+diff -Nurp dolphin-emu-6.0-default_git.orig/Externals/VulkanMemoryAllocator/include/vk_mem_alloc.h dolphin-emu-6.0-default_git/Externals/VulkanMemoryAllocator/include/vk_mem_alloc.h
+--- dolphin-emu-6.0-default_git.orig/Externals/VulkanMemoryAllocator/include/vk_mem_alloc.h	2023-09-10 04:24:48.993227571 +0000
++++ dolphin-emu-6.0-default_git/Externals/VulkanMemoryAllocator/include/vk_mem_alloc.h	2023-09-10 04:36:54.525109180 +0000
+@@ -2684,6 +2684,7 @@ remove them if not needed.
+     #include <cassert> // for assert
+     #include <algorithm> // for min, max
+     #include <mutex>
++    #include <cstdio>
+ #else
+     #include VMA_CONFIGURATION_USER_INCLUDES_H
+ #endif

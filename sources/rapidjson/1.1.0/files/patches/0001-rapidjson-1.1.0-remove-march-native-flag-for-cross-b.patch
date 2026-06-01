@@ -1,0 +1,34 @@
+From ac64738e4dd54d3102c7ed586a61a82bbab6e903 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 10 Jan 2024 09:55:49 +0000
+Subject: [PATCH] rapidjson 1.1.0 remove -march=native flag for cross build.
+
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ceda71b..9fc5273 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -50,7 +50,7 @@ if(CCACHE_FOUND)
+ endif(CCACHE_FOUND)
+ 
+ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Werror")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-error=implicit-fallthrough -Wno-error=class-memaccess")
+     if (RAPIDJSON_BUILD_CXX11)
+         if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
+             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+@@ -73,7 +73,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+         endif()
+     endif()
+ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Werror -Wno-missing-field-initializers")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-missing-field-initializers")
+     if (RAPIDJSON_BUILD_CXX11)
+         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+     endif()
+-- 
+2.31.1
+

@@ -1,0 +1,86 @@
+From 721a35bd48e8be7121fb9881e373cd3f91c2a8bb Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 25 Jun 2024 09:53:08 +0000
+Subject: [PATCH 2/3] workaround for generic cpu.
+
+---
+ src/core/hle/kernel/k_process.cpp | 12 ++++++------
+ src/core/hle/service/services.cpp |  2 +-
+ src/core/memory.cpp               |  8 +++++---
+ 3 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/src/core/hle/kernel/k_process.cpp b/src/core/hle/kernel/k_process.cpp
+index 80566b7..f47b147 100644
+--- a/src/core/hle/kernel/k_process.cpp
++++ b/src/core/hle/kernel/k_process.cpp
+@@ -1277,15 +1277,15 @@ void KProcess::InitializeInterfaces() {
+ #endif
+         if (this->Is64Bit()) {
+         for (size_t i = 0; i < Core::Hardware::NUM_CPU_CORES; i++) {
+-            m_arm_interfaces[i] = std::make_unique<Core::ArmDynarmic64>(
+-                m_kernel.System(), m_kernel.IsMulticore(), this,
+-                static_cast<Core::DynarmicExclusiveMonitor&>(*m_exclusive_monitor), i);
++//            m_arm_interfaces[i] = std::make_unique<Core::ArmDynarmic64>(
++//                m_kernel.System(), m_kernel.IsMulticore(), this,
++//                static_cast<Core::DynarmicExclusiveMonitor&>(*m_exclusive_monitor), i);
+         }
+     } else {
+         for (size_t i = 0; i < Core::Hardware::NUM_CPU_CORES; i++) {
+-            m_arm_interfaces[i] = std::make_unique<Core::ArmDynarmic32>(
+-                m_kernel.System(), m_kernel.IsMulticore(), this,
+-                static_cast<Core::DynarmicExclusiveMonitor&>(*m_exclusive_monitor), i);
++//            m_arm_interfaces[i] = std::make_unique<Core::ArmDynarmic32>(
++//                m_kernel.System(), m_kernel.IsMulticore(), this,
++//                static_cast<Core::DynarmicExclusiveMonitor&>(*m_exclusive_monitor), i);
+         }
+     }
+ }
+diff --git a/src/core/hle/service/services.cpp b/src/core/hle/service/services.cpp
+index 3defa4b..a8bcb97 100644
+--- a/src/core/hle/service/services.cpp
++++ b/src/core/hle/service/services.cpp
+@@ -73,7 +73,7 @@ Services::Services(std::shared_ptr<SM::ServiceManager>& sm, Core::System& system
+     // clang-format off
+     kernel.RunOnHostCoreProcess("audio",      [&] { Audio::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("FS",         [&] { FileSystem::LoopProcess(system); }).detach();
+-    kernel.RunOnHostCoreProcess("jit",        [&] { JIT::LoopProcess(system); }).detach();
++//    kernel.RunOnHostCoreProcess("jit",        [&] { JIT::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("ldn",        [&] { LDN::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("Loader",     [&] { LDR::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("nvservices", [&] { Nvidia::LoopProcess(system); }).detach();
+diff --git a/src/core/memory.cpp b/src/core/memory.cpp
+index f7eae9c..65325c5 100644
+--- a/src/core/memory.cpp
++++ b/src/core/memory.cpp
+@@ -785,6 +785,7 @@ struct Memory::Impl {
+         return true;
+     }
+ 
++#if 0
+     bool WriteExclusive128(Common::ProcessAddress vaddr, const u128 data, const u128 expected) {
+         u8* const ptr = GetPointerImpl(
+             GetInteger(vaddr),
+@@ -798,6 +799,7 @@ struct Memory::Impl {
+         }
+         return true;
+     }
++#endif
+ 
+     void HandleRasterizerDownload(VAddr v_address, size_t size) {
+         const auto* p = GetPointerImpl(
+@@ -1007,9 +1009,9 @@ bool Memory::WriteExclusive64(Common::ProcessAddress addr, u64 data, u64 expecte
+     return impl->WriteExclusive64(addr, data, expected);
+ }
+ 
+-bool Memory::WriteExclusive128(Common::ProcessAddress addr, u128 data, u128 expected) {
+-    return impl->WriteExclusive128(addr, data, expected);
+-}
++// bool Memory::WriteExclusive128(Common::ProcessAddress addr, u128 data, u128 expected) {
++//    return impl->WriteExclusive128(addr, data, expected);
++// }
+ 
+ std::string Memory::ReadCString(Common::ProcessAddress vaddr, std::size_t max_length) {
+     return impl->ReadCString(vaddr, max_length);
+-- 
+2.31.1
+

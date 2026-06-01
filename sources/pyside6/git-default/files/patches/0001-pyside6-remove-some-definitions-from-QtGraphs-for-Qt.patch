@@ -1,0 +1,55 @@
+From b58abc50a0c50494e7f122e658f4e082ba3d0446 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 30 Oct 2024 07:38:20 +0000
+Subject: [PATCH] pyside6 remove some definitions from QtGraphs for Qt 6.8.0
+
+---
+ .../pyside6/PySide6/QtGraphs/CMakeLists.txt   | 22 +++++++++----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt b/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt
+index 59cef22..2ca9a62 100644
+--- a/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt
++++ b/sources/pyside6/PySide6/QtGraphs/CMakeLists.txt
+@@ -32,27 +32,27 @@ ${QtGraphs_GEN_DIR}/qscatterdataproxy_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qsurface3dseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qsurfacedataitem_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qsurfacedataproxy_wrapper.cpp
+-${QtGraphs_GEN_DIR}/q3dbars_wrapper.cpp
+-${QtGraphs_GEN_DIR}/q3dscatter_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/q3dbars_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/q3dscatter_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/q3dscene_wrapper.cpp
+-${QtGraphs_GEN_DIR}/q3dsurface_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qabstract3dgraph_wrapper.cpp
+-${QtGraphs_GEN_DIR}/q3dinputhandler_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qabstract3dinputhandler_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qtouch3dinputhandler_wrapper.cpp
+-${QtGraphs_GEN_DIR}/q3dtheme_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/q3dsurface_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qabstract3dgraph_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/q3dinputhandler_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qabstract3dinputhandler_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qtouch3dinputhandler_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/q3dtheme_wrapper.cpp
+ # 2D
+ ${QtGraphs_GEN_DIR}/qbarcategoryaxis_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qabstractaxis_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qvalueaxis_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qabstractbarseries_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qabstractbarseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qbarseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qbarset_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qlineseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qabstractseries_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qscatterseries_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qgraphtheme_wrapper.cpp
+-${QtGraphs_GEN_DIR}/qseriestheme_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qgraphtheme_wrapper.cpp
++# ${QtGraphs_GEN_DIR}/qseriestheme_wrapper.cpp
+ ${QtGraphs_GEN_DIR}/qxyseries_wrapper.cpp
+ # module is always needed
+ ${QtGraphs_GEN_DIR}/qtgraphs_module_wrapper.cpp
+-- 
+2.31.1
+

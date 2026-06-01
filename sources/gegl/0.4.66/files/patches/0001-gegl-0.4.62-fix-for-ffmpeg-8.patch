@@ -1,0 +1,37 @@
+From c4f2a2b6caaefcc2685baef12ad5052eeb9864b3 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Thu, 25 Sep 2025 08:35:30 +0000
+Subject: [PATCH] gegl 0.4.62 fix for ffmpeg 8.
+
+---
+ operations/external/ff-load.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/operations/external/ff-load.c b/operations/external/ff-load.c
+index a8c2668..9237333 100644
+--- a/operations/external/ff-load.c
++++ b/operations/external/ff-load.c
+@@ -349,7 +349,7 @@ decode_frame (GeglOperation *operation,
+   if (frame < 2 || frame > prevframe + 64 || frame < prevframe )
+   {
+     int64_t seek_target = av_rescale_q (((frame) * AV_TIME_BASE * 1.0) / o->frame_rate
+-, AV_TIME_BASE_Q, p->video_stream->time_base) / p->video_ctx->ticks_per_frame;
++, AV_TIME_BASE_Q, p->video_stream->time_base) / 1;
+ 
+     if (av_seek_frame (p->video_fcontext, p->video_index, seek_target, (AVSEEK_FLAG_BACKWARD )) < 0)
+       fprintf (stderr, "video seek error!\n");
+@@ -403,7 +403,11 @@ decode_frame (GeglOperation *operation,
+                   break;
+                 }
+               got_picture = 1;
++#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 24, 100)
++              if ((pkt.dts == pkt.pts) || (p->lavc_frame->flags & AV_FRAME_FLAG_KEY))
++#else
+               if ((pkt.dts == pkt.pts) || (p->lavc_frame->key_frame!=0))
++#endif
+                 {
+                   // cur_dts and first_dts are moved to libavformat/internal.h
+                   /*
+-- 
+2.31.1
+

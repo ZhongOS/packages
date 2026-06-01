@@ -1,0 +1,6 @@
+URL=https://github.com/loongson/qemu.git
+FILE=qemu_git-8.1.0-default_git.tar.gz
+DIR=qemu_git-8.1.0-default_git
+GIT_BRANCH=kvm-loongarch
+GIT_COMMIT=
+GIT_SUBMODULE=0

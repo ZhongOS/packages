@@ -1,0 +1,9 @@
+URL=https://github.com/heiher/llvm-project.git
+FILE=llvm-project_git-32bit_git.tar.gz
+DIR=llvm-project_git-32bit_git
+GIT_BRANCH=la32
+# GIT_BRANCH=la32-reloc-2
+GIT_COMMIT=
+SAVE_GIT_COMMIT=5860d248a780aaef860db3d54184b49fc758c3c1
+GIT_SUBMODULE=0
+GIT_UPDATE_MODE=每次

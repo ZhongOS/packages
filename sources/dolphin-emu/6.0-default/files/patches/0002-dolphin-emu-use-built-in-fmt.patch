@@ -1,0 +1,33 @@
+From 666094360fb01fd78d0aaf9c49ea062f15f8bf46 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 10 Sep 2023 05:05:15 +0000
+Subject: [PATCH] dolphin-emu use built-in fmt.
+
+---
+ CMakeLists.txt | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c702c69..f30b46a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -686,14 +686,8 @@ if (_M_X86)
+ endif()
+ add_subdirectory(Externals/cpp-optparse)
+ 
+-find_package(fmt 8)
+-if(fmt_FOUND)
+-  message(STATUS "Using shared fmt ${fmt_VERSION}")
+-else()
+-  check_vendoring_approved(fmt)
+-  message(STATUS "Using static fmt from Externals")
+-  add_subdirectory(Externals/fmt EXCLUDE_FROM_ALL)
+-endif()
++message(STATUS "Using static fmt from Externals")
++add_subdirectory(Externals/fmt EXCLUDE_FROM_ALL)
+ add_subdirectory(Externals/imgui)
+ add_subdirectory(Externals/implot)
+ add_subdirectory(Externals/glslang)
+-- 
+2.31.1
+

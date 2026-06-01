@@ -1,0 +1,8 @@
+# URL=https://gitee.com/loongson-edu/la32r-QEMU.git
+# URL=https://gitlab.com/FlyGoat/qemu.git
+URL=https://github.com/loongson-community/qemu.git
+FILE=qemu_git-32bit-test_git.tar.gz
+DIR=qemu_git-32bit-test_git
+GIT_BRANCH=la32-user-exp
+GIT_COMMIT=
+GIT_SUBMODULE=1

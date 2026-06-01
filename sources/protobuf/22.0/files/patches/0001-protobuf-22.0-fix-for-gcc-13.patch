@@ -1,0 +1,24 @@
+From b9a01e8fbb4e7a7ac4f75fa1834c454edf7d54ee Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 1 Mar 2023 03:31:21 +0000
+Subject: [PATCH] protobuf 22.0 fix for gcc 13.
+
+---
+ src/google/protobuf/port.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/google/protobuf/port.h b/src/google/protobuf/port.h
+index 9ca45d9..f8c5544 100644
+--- a/src/google/protobuf/port.h
++++ b/src/google/protobuf/port.h
+@@ -40,6 +40,7 @@
+ #include <cstddef>
+ #include <new>
+ #include <string>
++#include <cstdint>
+ #include <type_traits>
+ 
+ #if PROTOBUF_RTTI
+-- 
+2.31.1
+

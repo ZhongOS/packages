@@ -1,0 +1,30 @@
+From 33168432b483485902fa7d9c413eec2389d4950e Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 26 Jan 2024 12:29:45 +0000
+Subject: [PATCH] Celestia force use fmt submodule.
+
+---
+ CMakeLists.txt | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ad9b72a..49341dd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -264,11 +264,8 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE) # -DEigen3_DIR=...
+ message(STATUS "Found Eigen3 ${EIGEN3_VERSION_STRING}")
+ link_libraries(Eigen3::Eigen)
+ 
+-find_package(fmt 6.1.0 CONFIG QUIET)
+-if(NOT fmt_FOUND)
+-  message(STATUS "Using fmt submodule")
+-  add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/fmt")
+-endif()
++message(STATUS "Using fmt submodule")
++add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/fmt")
+ link_libraries(fmt::fmt)
+ 
+ find_package(PNG REQUIRED)
+-- 
+2.31.1
+

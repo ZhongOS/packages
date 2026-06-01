@@ -1,0 +1,102 @@
+From 2ebfc453c56775a765056297a78b59d866b2e322 Mon Sep 17 00:00:00 2001
+From: Dongru Zhao <zhaodongru@yeah.net>
+Date: Fri, 16 May 2025 11:34:43 +0800
+Subject: [PATCH 3/3] Correct the translation function for the following
+ instructions:vmovd vpalignr vpsrlq
+
+---
+ target/i386/latx/translator/tr-simd-mov.c   |  2 ++
+ target/i386/latx/translator/tr-simd-shift.c | 15 ++++++++++++++-
+ target/i386/latx/translator/tr-simd.c       |  8 ++++----
+ 3 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/target/i386/latx/translator/tr-simd-mov.c b/target/i386/latx/translator/tr-simd-mov.c
+index e8c24b5..48435f6 100644
+--- a/target/i386/latx/translator/tr-simd-mov.c
++++ b/target/i386/latx/translator/tr-simd-mov.c
+@@ -736,6 +736,7 @@ bool translate_vmovd(IR1_INST *pir1)
+         IR2_OPND dest = ra_alloc_xmm(ir1_opnd_base_reg_num(opnd0));
+         la_xvandi_b(dest, dest, 0);
+         la_xvpickve_w(dest, src, 0);
++        set_high128_xreg_to_zero(dest);
+     } else if (ir1_opnd_is_mem(opnd0) && ir1_opnd_is_xmm(opnd1)) {
+         IR2_OPND src = ra_alloc_xmm(ir1_opnd_base_reg_num(opnd1));
+         store_freg_to_ir1(src, opnd0, false, false);
+@@ -744,6 +745,7 @@ bool translate_vmovd(IR1_INST *pir1)
+         IR2_OPND src = load_ireg_from_ir1(opnd1, UNKNOWN_EXTENSION, false);
+         la_xvandi_b(dest, dest, 0);
+         la_vinsgr2vr_w(dest, src, 0);
++        set_high128_xreg_to_zero(dest);
+     } else if (ir1_opnd_is_gpr(opnd0) && ir1_opnd_is_xmm(opnd1)) {
+         IR2_OPND dest = load_ireg_from_ir1(opnd0, UNKNOWN_EXTENSION, false);
+         IR2_OPND src = ra_alloc_xmm(ir1_opnd_base_reg_num(opnd1));
+diff --git a/target/i386/latx/translator/tr-simd-shift.c b/target/i386/latx/translator/tr-simd-shift.c
+index 9111626..711e14a 100644
+--- a/target/i386/latx/translator/tr-simd-shift.c
++++ b/target/i386/latx/translator/tr-simd-shift.c
+@@ -689,6 +689,8 @@ bool translate_vpsrlx(IR1_INST * pir1) {
+     IR2_INST * ( * rep_inst)(IR2_OPND, IR2_OPND);
+     IR2_INST * ( * tr_inst_i)(IR2_OPND, IR2_OPND, int);
+     IR2_INST * ( * tr_inst_r)(IR2_OPND, IR2_OPND, IR2_OPND);
++    IR2_OPND label_exit = ra_alloc_label();
++    IR2_OPND label_shift = ra_alloc_label();
+     int max_count;
+     switch (ir1_opcode(pir1)) {
+         case dt_X86_INS_VPSRLW:
+@@ -728,9 +730,19 @@ bool translate_vpsrlx(IR1_INST * pir1) {
+         IR2_OPND src2 = load_freg256_from_ir1(opnd2);
+         IR2_OPND mask = ra_alloc_ftemp();
+         IR2_OPND temp = ra_alloc_ftemp();
++
++        IR2_OPND count = ra_alloc_itemp();
++        IR2_OPND max = ra_alloc_itemp();
++        la_addi_d(max, zero_ir2_opnd, max_count);
++        la_vpickve2gr_d(count, src2, 0);
++        la_blt(count, max, label_shift);
++        la_xvxor_v(dest, dest, dest);
++        la_b(label_exit);
++
++        la_label(label_shift);
+         if (max_count == 63) {
+             la_xvreplve0_d(mask, src2);
+-            la_vldi(temp, VLDI_IMM_TYPE0(3, 63));
++            la_xvldi(temp, VLDI_IMM_TYPE0(3, 63));
+             la_xvsle_du(mask, mask, temp);
+         } else {
+             la_xvreplve0_d(mask, src2);
+@@ -743,6 +755,7 @@ bool translate_vpsrlx(IR1_INST * pir1) {
+     if (ir1_opnd_is_xmm(opnd0)) {
+         set_high128_xreg_to_zero(dest);
+     }
++    la_label(label_exit);
+     return true;
+ }
+ 
+diff --git a/target/i386/latx/translator/tr-simd.c b/target/i386/latx/translator/tr-simd.c
+index 03154b4..a0da49e 100644
+--- a/target/i386/latx/translator/tr-simd.c
++++ b/target/i386/latx/translator/tr-simd.c
+@@ -7489,16 +7489,16 @@ bool translate_vpalignr(IR1_INST * pir1) {
+         if (imm >= 32) {
+             la_vxor_v(dest, dest, dest);
+         } else if (imm >= 16 && imm < 32) {
+-            la_vbsrl_v(dest, src1, imm - 16);
++            la_xvbsrl_v(dest, src1, imm - 16);
+         } else {
+             /* slow path */
+             if (imm == 0) {
+                 la_vori_b(dest, src2, 0);
+             } else {
+                 IR2_OPND temp_src2 = ra_alloc_ftemp();
+-                la_vbsrl_v(temp_src2, src2, imm);
+-                la_vbsll_v(dest, src1, 16 - imm);
+-                la_vor_v(dest, temp_src2, dest);
++                la_xvbsrl_v(temp_src2, src2, imm);
++                la_xvbsll_v(dest, src1, 16 - imm);
++                la_xvor_v(dest, temp_src2, dest);
+ 
+             }
+         }
+-- 
+2.31.1
+

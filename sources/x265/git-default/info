@@ -1,0 +1,6 @@
+URL=https://bitbucket.org/multicoreware/x265_git.git
+FILE=x265-git-default_git.tar.gz
+DIR=x265-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

@@ -1,0 +1,5 @@
+URL=https://github.com/loongarch64/grub.git
+FILE=grub-2.11_git.tar.gz
+DIR=grub-2.11_git
+GIT_BRANCH=dev/patchwork/efi
+GIT_COMMIT=

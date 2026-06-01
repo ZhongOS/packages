@@ -1,0 +1,6 @@
+URL=https://gitlab.freedesktop.org/xorg/driver/xf86-video-intel.git
+FILE=xf86-video-intel-git-default_git.tar.gz
+DIR=xf86-video-intel-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

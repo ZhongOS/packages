@@ -1,0 +1,8 @@
+URL=https://gitlab.freedesktop.org/mesa/mesa.git
+FILE=mesa_git-main_git-default_git.tar.gz
+DIR=mesa_git-main_git-default_git
+GIT_BRANCH=main
+GIT_COMMIT=
+GIT_COMMIT_SAVE=d3e3c30d36728f5331615b402eaed3cd7d45cb24
+GIT_COMMIT_SAVE=f4e7aefe079b74ef218677185697c31fff7104d2
+GIT_SUBMODULE=0

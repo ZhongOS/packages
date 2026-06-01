@@ -1,0 +1,41 @@
+From d8ccd562cefbfc0388c7917480110cb004eeaa2b Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 3 Jan 2024 02:51:14 +0000
+Subject: [PATCH] fix amdgpu for wine.
+
+---
+ src/gallium/winsys/amdgpu/drm/amdgpu_bo.c     | 2 ++
+ src/gallium/winsys/radeon/drm/radeon_drm_bo.c | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/gallium/winsys/amdgpu/drm/amdgpu_bo.c b/src/gallium/winsys/amdgpu/drm/amdgpu_bo.c
+index ecaea7b..c4f545f 100644
+--- a/src/gallium/winsys/amdgpu/drm/amdgpu_bo.c
++++ b/src/gallium/winsys/amdgpu/drm/amdgpu_bo.c
+@@ -492,6 +492,8 @@ static struct amdgpu_winsys_bo *amdgpu_create_bo(struct amdgpu_winsys *ws,
+       bo->b.type = AMDGPU_BO_REAL;
+    }
+ 
++   if(alignment < 16384)
++      alignment = 16384;
+    request.alloc_size = size;
+    request.phys_alignment = alignment;
+
+ 
+diff --git a/src/gallium/winsys/radeon/drm/radeon_drm_bo.c b/src/gallium/winsys/radeon/drm/radeon_drm_bo.c
+index ecaea7b..c4f545f 100644
+--- a/src/gallium/winsys/radeon/drm/radeon_drm_bo.c
++++ b/src/gallium/winsys/radeon/drm/radeon_drm_bo.c
+@@ -611,6 +611,8 @@ static struct radeon_bo *radeon_create_bo(struct radeon_drm_winsys *rws,
+    assert((initial_domains &
+            ~(RADEON_GEM_DOMAIN_GTT | RADEON_GEM_DOMAIN_VRAM)) == 0);
+ 
++   if(alignment < 16384)
++      alignment = 16384;
+    args.size = size;
+    args.alignment = alignment;
+    args.initial_domain = initial_domains;
+-- 
+2.31.1
+
+ 

@@ -1,0 +1,81 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 55e9715..b409d25 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -403,7 +403,7 @@ if (ARCHITECTURE_arm64)
+     find_package(oaknut CONFIG)
+ endif()
+ 
+-if (ARCHITECTURE_x86_64 OR ARCHITECTURE_arm64)
++if (ARCHITECTURE_x86_64 OR ARCHITECTURE_arm64 OR ARCHITECTURE_GENERIC)
+     find_package(dynarmic CONFIG)
+ endif()
+ 
+@@ -681,7 +681,7 @@ if (CITRON_USE_FASTER_LD AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+         add_link_options("-fuse-ld=mold")
+     elseif (LLD)
+         message(NOTICE "Selecting lld as linker")
+-        add_link_options("-fuse-ld=lld")
++        add_link_options("-fuse-ld=bfd")
+     endif()
+ endif()
+ 
+diff --git a/externals/CMakeLists.txt b/externals/CMakeLists.txt
+index 1176834..34b28bc 100644
+--- a/externals/CMakeLists.txt
++++ b/externals/CMakeLists.txt
+@@ -25,7 +25,7 @@ if (ARCHITECTURE_arm64 AND NOT TARGET merry::oaknut)
+ endif()
+ 
+ # Dynarmic
+-if ((ARCHITECTURE_x86_64 OR ARCHITECTURE_arm64) AND NOT TARGET dynarmic::dynarmic)
++if ((ARCHITECTURE_x86_64 OR ARCHITECTURE_arm64 OR ARCHITECTURE_GENERIC) AND NOT TARGET dynarmic::dynarmic)
+     set(DYNARMIC_IGNORE_ASSERTS ON)
+     add_subdirectory(dynarmic)
+     add_library(dynarmic::dynarmic ALIAS dynarmic)
+diff --git a/externals/glad/CMakeLists.txt b/externals/glad/CMakeLists.txt
+index 0c8e285..28f7118 100644
+--- a/externals/glad/CMakeLists.txt
++++ b/externals/glad/CMakeLists.txt
+@@ -7,7 +7,8 @@ add_library(glad
+     include/glad/glad.h
+ )
+ 
+-create_target_directory_groups(glad)
++# create_target_directory_groups(glad)
++set_property(TARGET glad PROPERTY FOLDER "externals/glad")
+ target_include_directories(glad PUBLIC "include/")
+ 
+ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+diff --git a/externals/nx_tzdb/tzdb_to_nx b/externals/nx_tzdb/tzdb_to_nx
+--- a/externals/nx_tzdb/tzdb_to_nx
++++ b/externals/nx_tzdb/tzdb_to_nx
+@@ -1 +1 @@
+-Subproject commit 97929690234f2b4add36b33657fe3fe09bd57dfd
++Subproject commit 97929690234f2b4add36b33657fe3fe09bd57dfd-dirty
+diff --git a/src/input_common/drivers/udp_client.cpp b/src/input_common/drivers/udp_client.cpp
+index 553fee1..d7dba5e 100644
+--- a/src/input_common/drivers/udp_client.cpp
++++ b/src/input_common/drivers/udp_client.cpp
+@@ -113,7 +113,7 @@ private:
+     }
+ 
+     SocketCallback callback;
+-    boost::asio::io_service io_service;
++    boost::asio::io_context io_service;
+     boost::asio::basic_waitable_timer<clock> timer;
+     udp::socket socket;
+ 
+diff --git a/src/tests/input_common/calibration_configuration_job.cpp b/src/tests/input_common/calibration_configuration_job.cpp
+index 516ff1b..42b3212 100644
+--- a/src/tests/input_common/calibration_configuration_job.cpp
++++ b/src/tests/input_common/calibration_configuration_job.cpp
+@@ -82,7 +82,7 @@ public:
+     }
+ 
+ private:
+-    boost::asio::io_service io_service;
++    boost::asio::io_context io_service;
+     boost::asio::ip::udp::socket socket;
+     std::array<u8, InputCommon::CemuhookUDP::MAX_PACKET_SIZE> send_buffer;
+     std::array<u8, InputCommon::CemuhookUDP::MAX_PACKET_SIZE> receive_buffer;

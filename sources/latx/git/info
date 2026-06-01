@@ -1,0 +1,8 @@
+URL=https://github.com/lat-opensource/lat.git
+FILE=latx-git_git.tar.gz
+DIR=latx-git_git
+GIT_BRANCH=
+# GIT_BRANCH=wow
+GIT_COMMIT=
+GIT_SUBMODULE=0
+GIT_UPDATE_MODE=每次

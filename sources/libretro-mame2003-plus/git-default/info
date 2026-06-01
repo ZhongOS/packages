@@ -1,0 +1,6 @@
+URL=https://github.com/libretro/mame2003-plus-libretro.git
+FILE=libretro-mame2003-plus-git-default_git.tar.gz
+DIR=libretro-mame2003-plus-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

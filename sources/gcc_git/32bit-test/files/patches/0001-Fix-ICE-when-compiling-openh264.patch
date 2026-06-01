@@ -1,0 +1,25 @@
+From 1b2e72df382fe3e2d32cb97433825958c25c9cdc Mon Sep 17 00:00:00 2001
+From: Chenghui Pan <panchenghui@loongson.cn>
+Date: Mon, 9 Oct 2023 17:54:09 +0800
+Subject: [PATCH] Fix ICE when compiling openh264
+
+---
+ gcc/config/loongarch/loongarch.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gcc/config/loongarch/loongarch.cc b/gcc/config/loongarch/loongarch.cc
+index 3420e002efc..14dd0db1674 100644
+--- a/gcc/config/loongarch/loongarch.cc
++++ b/gcc/config/loongarch/loongarch.cc
+@@ -10206,7 +10206,8 @@ loongarch_gen_const_int_vector_shuffle (machine_mode mode, int val)
+ void
+ loongarch_expand_vector_group_init (rtx target, rtx vals)
+ {
+-  rtx ops[2] = { XVECEXP (vals, 0, 0), XVECEXP (vals, 0, 1) };
++  rtx ops[2] = { force_reg (E_V16QImode, XVECEXP (vals, 0, 0)),
++      force_reg (E_V16QImode, XVECEXP (vals, 0, 1)) };
+   emit_insn (gen_rtx_SET (target, gen_rtx_VEC_CONCAT (E_V32QImode, ops[0],
+ 						      ops[1])));
+ }
+-- 
+2.36.0

@@ -1,0 +1,14 @@
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index 5939688f69ee..961d22f9c935 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -88,6 +88,9 @@ static inline abi_ptr cpu_untagged_addr(CPUState *cs, abi_ptr x)
+ /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
+ static inline void *g2h_untagged(abi_ptr x)
+ {
++#ifdef TARGET_LOONGARCH64
++    guest_base = 0xf000000;
++#endif
+     return (void *)((uintptr_t)(x) + guest_base);
+ }
+ 

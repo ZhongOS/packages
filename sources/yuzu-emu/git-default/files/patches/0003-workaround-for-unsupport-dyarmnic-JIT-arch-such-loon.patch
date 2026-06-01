@@ -1,0 +1,105 @@
+From 6c54eefce94429cdbec3c7bade8891dcf1669cc1 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 24 Jun 2024 03:17:43 +0000
+Subject: [PATCH 3/3] workaround for unsupport dyarmnic JIT arch(such
+ loongarch).
+
+---
+ externals/CMakeLists.txt              | 10 +++++-----
+ src/core/hle/kernel/physical_core.cpp |  4 ++--
+ src/core/hle/service/service.cpp      |  2 +-
+ src/core/memory.cpp                   |  8 +++++---
+ 4 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/externals/CMakeLists.txt b/externals/CMakeLists.txt
+index 40ec20f..286a0d4 100644
+--- a/externals/CMakeLists.txt
++++ b/externals/CMakeLists.txt
+@@ -20,11 +20,11 @@ if ((ARCHITECTURE_x86 OR ARCHITECTURE_x86_64) AND NOT TARGET xbyak::xbyak)
+ endif()
+ 
+ # Dynarmic
+-if ((ARCHITECTURE_x86_64 OR ARCHITECTURE_arm64) AND NOT TARGET dynarmic::dynarmic)
+-    set(DYNARMIC_IGNORE_ASSERTS ON)
+-    add_subdirectory(dynarmic)
+-    add_library(dynarmic::dynarmic ALIAS dynarmic)
+-endif()
++# if ((ARCHITECTURE_x86_64 OR ARCHITECTURE_arm64) AND NOT TARGET dynarmic::dynarmic)
++#    set(DYNARMIC_IGNORE_ASSERTS ON)
++#    add_subdirectory(dynarmic)
++#    add_library(dynarmic::dynarmic ALIAS dynarmic)
++# endif()
+ 
+ # getopt
+ if (MSVC)
+diff --git a/src/core/hle/kernel/physical_core.cpp b/src/core/hle/kernel/physical_core.cpp
+index 5ee869f..4851f2d 100644
+--- a/src/core/hle/kernel/physical_core.cpp
++++ b/src/core/hle/kernel/physical_core.cpp
+@@ -21,7 +21,7 @@ PhysicalCore::PhysicalCore(std::size_t core_index, Core::System& system, KSchedu
+         reinterpret_cast<Core::DynarmicExclusiveMonitor&>(kernel.GetExclusiveMonitor()),
+         m_core_index);
+ #else
+-#error Platform not supported yet.
++// #error Platform not supported yet.
+ #endif
+ }
+ 
+@@ -38,7 +38,7 @@ void PhysicalCore::Initialize(bool is_64_bit) {
+             m_core_index);
+     }
+ #else
+-#error Platform not supported yet.
++// #error Platform not supported yet.
+ #endif
+ }
+ 
+diff --git a/src/core/hle/service/service.cpp b/src/core/hle/service/service.cpp
+index 0ad6073..d8def1e 100644
+--- a/src/core/hle/service/service.cpp
++++ b/src/core/hle/service/service.cpp
+@@ -222,7 +222,7 @@ Services::Services(std::shared_ptr<SM::ServiceManager>& sm, Core::System& system
+     // clang-format off
+     kernel.RunOnHostCoreProcess("audio",      [&] { Audio::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("FS",         [&] { FileSystem::LoopProcess(system); }).detach();
+-    kernel.RunOnHostCoreProcess("jit",        [&] { JIT::LoopProcess(system); }).detach();
++//    kernel.RunOnHostCoreProcess("jit",        [&] { JIT::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("ldn",        [&] { LDN::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("Loader",     [&] { LDR::LoopProcess(system); }).detach();
+     kernel.RunOnHostCoreProcess("nvservices", [&] { Nvidia::LoopProcess(*nv_flinger, system); }).detach();
+diff --git a/src/core/memory.cpp b/src/core/memory.cpp
+index a343177..177c9ea 100644
+--- a/src/core/memory.cpp
++++ b/src/core/memory.cpp
+@@ -743,6 +743,7 @@ struct Memory::Impl {
+         return true;
+     }
+ 
++#if 0
+     bool WriteExclusive128(Common::ProcessAddress vaddr, const u128 data, const u128 expected) {
+         u8* const ptr = GetPointerImpl(
+             GetInteger(vaddr),
+@@ -757,6 +758,7 @@ struct Memory::Impl {
+         }
+         return true;
+     }
++#endif
+ 
+     void HandleRasterizerDownload(VAddr address, size_t size) {
+         const size_t core = system.GetCurrentHostThreadID();
+@@ -924,9 +926,9 @@ bool Memory::WriteExclusive64(Common::ProcessAddress addr, u64 data, u64 expecte
+     return impl->WriteExclusive64(addr, data, expected);
+ }
+ 
+-bool Memory::WriteExclusive128(Common::ProcessAddress addr, u128 data, u128 expected) {
+-    return impl->WriteExclusive128(addr, data, expected);
+-}
++// bool Memory::WriteExclusive128(Common::ProcessAddress addr, u128 data, u128 expected) {
++//    return impl->WriteExclusive128(addr, data, expected);
++//}
+ 
+ std::string Memory::ReadCString(Common::ProcessAddress vaddr, std::size_t max_length) {
+     return impl->ReadCString(vaddr, max_length);
+-- 
+2.31.1
+

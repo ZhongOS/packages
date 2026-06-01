@@ -1,0 +1,8 @@
+URL=https://gitlab.com/mattbas/glaxnimate.git
+FILE=glaxnimate-git-default_git.tar.gz
+DIR=glaxnimate-git-default_git
+PKG_FORMAT=
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1
+GIT_UPDATE_MODE=手工

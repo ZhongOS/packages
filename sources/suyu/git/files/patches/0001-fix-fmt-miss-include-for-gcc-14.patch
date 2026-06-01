@@ -1,0 +1,63 @@
+From 74710f64d2b6e8b2a08d47e6facfb2a618191f02 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 25 Jun 2024 09:51:51 +0000
+Subject: [PATCH 1/3] fix fmt miss include for gcc 14.
+
+---
+ src/core/debugger/gdbstub.cpp                      | 1 +
+ src/core/hle/service/nfc/common/device.cpp         | 1 +
+ src/suyu/main.cpp                                  | 1 +
+ src/video_core/renderer_vulkan/renderer_vulkan.cpp | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/src/core/debugger/gdbstub.cpp b/src/core/debugger/gdbstub.cpp
+index 80091cc..9bd66ca 100644
+--- a/src/core/debugger/gdbstub.cpp
++++ b/src/core/debugger/gdbstub.cpp
+@@ -9,6 +9,7 @@
+ #include <thread>
+ 
+ #include <boost/algorithm/string.hpp>
++#include <fmt/xchar.h>
+ 
+ #include "common/hex_util.h"
+ #include "common/logging/log.h"
+diff --git a/src/core/hle/service/nfc/common/device.cpp b/src/core/hle/service/nfc/common/device.cpp
+index bf29bb3..23d2bc1 100644
+--- a/src/core/hle/service/nfc/common/device.cpp
++++ b/src/core/hle/service/nfc/common/device.cpp
+@@ -15,6 +15,7 @@
+ #endif
+ 
+ #include <fmt/format.h>
++#include <fmt/xchar.h>
+ 
+ #include "common/fs/file.h"
+ #include "common/fs/fs.h"
+diff --git a/src/suyu/main.cpp b/src/suyu/main.cpp
+index fbdea66..34e21db 100644
+--- a/src/suyu/main.cpp
++++ b/src/suyu/main.cpp
+@@ -70,6 +70,7 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
+ }
+ 
+ #include <fmt/ostream.h>
++#include <fmt/xchar.h>
+ #include <glad/glad.h>
+ 
+ #define QT_NO_OPENGL
+diff --git a/src/video_core/renderer_vulkan/renderer_vulkan.cpp b/src/video_core/renderer_vulkan/renderer_vulkan.cpp
+index 2ec8c08..2ea2a63 100644
+--- a/src/video_core/renderer_vulkan/renderer_vulkan.cpp
++++ b/src/video_core/renderer_vulkan/renderer_vulkan.cpp
+@@ -7,6 +7,7 @@
+ #include <vector>
+ 
+ #include <fmt/format.h>
++#include <fmt/xchar.h>
+ 
+ #include "common/logging/log.h"
+ #include "common/scope_exit.h"
+-- 
+2.31.1
+

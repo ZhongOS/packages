@@ -1,0 +1,5 @@
+URL=git://sourceware.org/git/gcc.git
+FILE=gcc-13.0.0_git.tar.gz
+DIR=gcc-13.0.0_git
+GIT_BRANCH=
+GIT_COMMIT=

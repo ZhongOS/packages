@@ -1,0 +1,25 @@
+From ef2367b802a71eea10701db09e5818f696468a5c Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 20 Aug 2025 03:12:13 +0000
+Subject: [PATCH] jdk17 fix build error for gcc 15.2
+
+---
+ src/hotspot/share/utilities/globalDefinitions.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/hotspot/share/utilities/globalDefinitions.hpp b/src/hotspot/share/utilities/globalDefinitions.hpp
+index 98d7fbc..a3e7e2f 100644
+--- a/src/hotspot/share/utilities/globalDefinitions.hpp
++++ b/src/hotspot/share/utilities/globalDefinitions.hpp
+@@ -1083,7 +1083,7 @@ static inline julong uabs(julong n) {
+   return result;
+ }
+ static inline julong uabs(jlong n) { return uabs((julong)n); }
+-static inline unsigned int uabs(int n) { return uabs((unsigned int)n); }
++inline unsigned int uabs(int n) { return uabs((unsigned int)n); }
+ 
+ // "to" should be greater than "from."
+ inline intx byte_size(void* from, void* to) {
+-- 
+2.31.1
+

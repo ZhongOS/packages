@@ -1,0 +1,25 @@
+From f011041504413a42ff13946e45f3ec14c6341dee Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 6 Nov 2024 04:12:29 +0000
+Subject: [PATCH 4/4] chromium 130 third_party protobuf add loongarch64.
+
+---
+ third_party/protobuf/src/google/protobuf/port_def.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/third_party/protobuf/src/google/protobuf/port_def.inc b/third_party/protobuf/src/google/protobuf/port_def.inc
+index f1c46c2a1..6190222fd 100644
+--- a/third_party/protobuf/src/google/protobuf/port_def.inc
++++ b/third_party/protobuf/src/google/protobuf/port_def.inc
+@@ -257,7 +257,7 @@
+ #if __has_cpp_attribute(clang::musttail) && !defined(__arm__) && \
+     !defined(_ARCH_PPC) && !defined(__wasm__) &&                 \
+     !(defined(_MSC_VER) && defined(_M_IX86)) &&                  \
+-    !(defined(__NDK_MAJOR__) && __NDK_MAJOR__ <= 24)
++    !(defined(__NDK_MAJOR__) && __NDK_MAJOR__ <= 24) && !defined(__loongarch__)
+ #  ifndef PROTO2_OPENSOURCE
+ // Compilation fails on ARM32: b/195943306
+ // Compilation fails on powerpc64le: b/187985113
+-- 
+2.31.1
+

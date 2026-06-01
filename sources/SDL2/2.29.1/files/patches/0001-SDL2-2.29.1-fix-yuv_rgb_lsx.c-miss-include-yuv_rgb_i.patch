@@ -1,0 +1,25 @@
+From ec26b7ed9d83b244d46ecc13fa0d9d3e77b34875 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 23 Jan 2024 01:22:15 +0000
+Subject: [PATCH] SDL2 2.29.1 fix yuv_rgb_lsx.c miss include yuv_rgb_internal.h
+ .
+
+---
+ src/video/yuv2rgb/yuv_rgb_lsx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/video/yuv2rgb/yuv_rgb_lsx.c b/src/video/yuv2rgb/yuv_rgb_lsx.c
+index 8d84dd1..b15929e 100644
+--- a/src/video/yuv2rgb/yuv_rgb_lsx.c
++++ b/src/video/yuv2rgb/yuv_rgb_lsx.c
+@@ -4,6 +4,7 @@
+ 
+ #if SDL_HAVE_YUV
+ #include "yuv_rgb.h"
++#include "yuv_rgb_internal.h"
+ 
+ #include "SDL_cpuinfo.h"
+ 
+-- 
+2.31.1
+

@@ -1,0 +1,115 @@
+From ad967326489fea396fb82072ebf06c5e152c5045 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 19 Aug 2025 12:43:29 +0000
+Subject: [PATCH] Fix the issue of errors in libsanitizer when building using
+ musl.
+
+Backport from GCC 15
+---
+ .../interception/interception_type_test.cpp        |  2 +-
+ libsanitizer/sanitizer_common/sanitizer_linux.cpp  | 14 +++++++++++++-
+ .../sanitizer_platform_limits_linux.cpp            |  6 ------
+ .../sanitizer_platform_limits_posix.cpp            | 10 +++++-----
+ 4 files changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/libsanitizer/interception/interception_type_test.cpp b/libsanitizer/interception/interception_type_test.cpp
+index a611604..37bcafb 100644
+--- a/libsanitizer/interception/interception_type_test.cpp
++++ b/libsanitizer/interception/interception_type_test.cpp
+@@ -24,7 +24,7 @@ COMPILER_CHECK(sizeof(::SSIZE_T) == sizeof(ssize_t));
+ COMPILER_CHECK(sizeof(::PTRDIFF_T) == sizeof(ptrdiff_t));
+ COMPILER_CHECK(sizeof(::INTMAX_T) == sizeof(intmax_t));
+ 
+-#if !SANITIZER_MAC
++#if SANITIZER_GLIBC || SANITIZER_ANDROID
+ COMPILER_CHECK(sizeof(::OFF64_T) == sizeof(off64_t));
+ #endif
+ 
+diff --git a/libsanitizer/sanitizer_common/sanitizer_linux.cpp b/libsanitizer/sanitizer_common/sanitizer_linux.cpp
+index a3c90bc..40bbe5a 100644
+--- a/libsanitizer/sanitizer_common/sanitizer_linux.cpp
++++ b/libsanitizer/sanitizer_common/sanitizer_linux.cpp
+@@ -1967,7 +1967,19 @@ SignalContext::WriteFlag SignalContext::GetWriteFlag() const {
+   u64 esr;
+   if (!Aarch64GetESR(ucontext, &esr)) return UNKNOWN;
+   return esr & ESR_ELx_WNR ? WRITE : READ;
+-#elif defined(__loongarch__)                                                                                                                                                                  
++#elif defined(__loongarch__)
++  // In the musl environment, the Linux kernel uapi sigcontext.h is not
++  // included in signal.h. To avoid missing the SC_ADDRERR_{RD,WR} macros,
++  // copy them here. The LoongArch Linux kernel uapi is already stable,
++  // so there's no need to worry about the value changing.
++#    ifndef SC_ADDRERR_RD
++  // Address error was due to memory load
++#      define SC_ADDRERR_RD (1 << 30)
++#    endif
++#    ifndef SC_ADDRERR_WR
++  // Address error was due to memory store
++#      define SC_ADDRERR_WR (1 << 31)
++#    endif
+   u32 flags = ucontext->uc_mcontext.__flags;
+   if (flags & SC_ADDRERR_RD)
+     return SignalContext::READ;
+diff --git a/libsanitizer/sanitizer_common/sanitizer_platform_limits_linux.cpp b/libsanitizer/sanitizer_common/sanitizer_platform_limits_linux.cpp
+index 5962df7..c278c87 100644
+--- a/libsanitizer/sanitizer_common/sanitizer_platform_limits_linux.cpp
++++ b/libsanitizer/sanitizer_common/sanitizer_platform_limits_linux.cpp
+@@ -60,12 +60,6 @@
+ 
+ using namespace __sanitizer;
+ 
+-namespace __sanitizer {
+-#if !SANITIZER_ANDROID
+-  unsigned struct_statfs64_sz = sizeof(struct statfs64);
+-#endif
+-}  // namespace __sanitizer
+-
+ #  if !defined(__powerpc64__) && !defined(__x86_64__) &&                   \
+       !defined(__aarch64__) && !defined(__mips__) && !defined(__s390__) && \
+       !defined(__sparc__) && !defined(__riscv) && !defined(__hexagon__) && \
+diff --git a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
+index f5d7758..a9fd392 100644
+--- a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
++++ b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
+@@ -178,9 +178,9 @@ typedef struct user_fpregs elf_fpregset_t;
+ namespace __sanitizer {
+   unsigned struct_utsname_sz = sizeof(struct utsname);
+   unsigned struct_stat_sz = sizeof(struct stat);
+-#if !SANITIZER_IOS && !(SANITIZER_MAC && TARGET_CPU_ARM64)
++#if SANITIZER_HAS_STAT64
+   unsigned struct_stat64_sz = sizeof(struct stat64);
+-#endif // !SANITIZER_IOS && !(SANITIZER_MAC && TARGET_CPU_ARM64)
++#endif // SANITIZER_HAS_STAT64
+   unsigned struct_rusage_sz = sizeof(struct rusage);
+   unsigned struct_tm_sz = sizeof(struct tm);
+   unsigned struct_passwd_sz = sizeof(struct passwd);
+@@ -237,7 +237,7 @@ namespace __sanitizer {
+   unsigned struct_itimerspec_sz = sizeof(struct itimerspec);
+ #endif // SANITIZER_LINUX
+ 
+-#if SANITIZER_LINUX && !SANITIZER_ANDROID
++#if SANITIZER_GLIBC
+   // Use pre-computed size of struct ustat to avoid <sys/ustat.h> which
+   // has been removed from glibc 2.28.
+ #if defined(__aarch64__) || defined(__s390x__) || defined(__mips64) ||     \
+@@ -259,7 +259,7 @@ namespace __sanitizer {
+   unsigned struct_rlimit64_sz = sizeof(struct rlimit64);
+   unsigned struct_statvfs64_sz = sizeof(struct statvfs64);
+   unsigned struct_crypt_data_sz = sizeof(struct crypt_data);
+-#endif // SANITIZER_LINUX && !SANITIZER_ANDROID
++#endif // SANITIZER_GLIBC
+ 
+ #if SANITIZER_LINUX && !SANITIZER_ANDROID
+   unsigned struct_timex_sz = sizeof(struct timex);
+@@ -1058,7 +1058,7 @@ CHECK_SIZE_AND_OFFSET(dirent, d_off);
+ #endif
+ CHECK_SIZE_AND_OFFSET(dirent, d_reclen);
+ 
+-#if SANITIZER_LINUX && !SANITIZER_ANDROID
++#if SANITIZER_GLIBC
+ COMPILER_CHECK(sizeof(__sanitizer_dirent64) <= sizeof(dirent64));
+ CHECK_SIZE_AND_OFFSET(dirent64, d_ino);
+ CHECK_SIZE_AND_OFFSET(dirent64, d_off);
+-- 
+2.31.1
+

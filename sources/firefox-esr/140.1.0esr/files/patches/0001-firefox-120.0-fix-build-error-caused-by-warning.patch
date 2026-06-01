@@ -1,0 +1,52 @@
+From 8de57323ee251107c414a0848019bf83b6632b09 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 21 Nov 2023 09:14:54 +0000
+Subject: [PATCH] firefox 120.0 fix build error caused by warning .
+
+---
+ toolkit/components/cookiebanners/metrics.yaml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/toolkit/components/cookiebanners/metrics.yaml b/toolkit/components/cookiebanners/metrics.yaml
+index 340f46f..023fec7 100644
+--- a/toolkit/components/cookiebanners/metrics.yaml
++++ b/toolkit/components/cookiebanners/metrics.yaml
+@@ -258,7 +258,7 @@ cookie.banners.click:
+     bugs:
+       - https://bugzilla.mozilla.org/show_bug.cgi?id=1855495
+     data_reviews:
+-      - TODO
++      - nothing
+     notification_emails:
+       - pbz@mozilla.com
+       - tihuang@mozilla.com
+@@ -274,7 +274,7 @@ cookie.banners.click:
+     bugs:
+       - https://bugzilla.mozilla.org/show_bug.cgi?id=1855495
+     data_reviews:
+-      - TODO
++      - nothing
+     notification_emails:
+       - pbz@mozilla.com
+       - tihuang@mozilla.com
+@@ -290,7 +290,7 @@ cookie.banners.click:
+     bugs:
+       - https://bugzilla.mozilla.org/show_bug.cgi?id=1855495
+     data_reviews:
+-      - TODO
++      - nothing
+     notification_emails:
+       - pbz@mozilla.com
+       - tihuang@mozilla.com
+@@ -306,7 +306,7 @@ cookie.banners.click:
+     bugs:
+       - https://bugzilla.mozilla.org/show_bug.cgi?id=1855495
+     data_reviews:
+-      - TODO
++      - nothing
+     notification_emails:
+       - pbz@mozilla.com
+       - tihuang@mozilla.com
+-- 
+2.31.1
+

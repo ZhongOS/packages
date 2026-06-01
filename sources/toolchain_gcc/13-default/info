@@ -1,0 +1,6 @@
+URL=https://gcc.gnu.org/git/gcc.git
+FILE=toolchain_gcc-13-default_git.tar.gz
+DIR=toolchain_gcc-13-default_git
+GIT_BRANCH=
+GIT_COMMIT=5d4389dc913269cc6a6fd6ee38abc78b1fb7dbe8
+GIT_SUBMODULE=0

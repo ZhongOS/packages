@@ -1,0 +1,6 @@
+URL=https://github.com/loongson/gcc.git
+FILE=gcc_git-13.1.0-default_git.tar.gz
+DIR=gcc_git-13.1.0-default_git
+GIT_BRANCH=loongarch-gcc-vector
+GIT_COMMIT=
+GIT_SUBMODULE=0

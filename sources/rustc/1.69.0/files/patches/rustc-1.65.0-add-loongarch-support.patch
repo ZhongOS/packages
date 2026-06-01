@@ -1,0 +1,244 @@
+diff -Nurp rustc-1.65.0-src.orig/compiler/rustc_codegen_ssa/src/back/metadata.rs rustc-1.65.0-src/compiler/rustc_codegen_ssa/src/back/metadata.rs
+--- rustc-1.65.0-src.orig/compiler/rustc_codegen_ssa/src/back/metadata.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/compiler/rustc_codegen_ssa/src/back/metadata.rs	2022-11-17 05:57:34.698307043 +0000
+@@ -116,6 +116,7 @@ pub(crate) fn create_object_file(sess: &
+         "powerpc64" => Architecture::PowerPc64,
+         "riscv32" => Architecture::Riscv32,
+         "riscv64" => Architecture::Riscv64,
++        "loongarch64" => Architecture::LoongArch64,
+         "sparc64" => Architecture::Sparc64,
+         "avr" => Architecture::Avr,
+         "msp430" => Architecture::Msp430,
+@@ -172,6 +172,10 @@ pub(crate) fn create_object_file(sess: &Session) -> Option<write::Object<'static
+                 };
+             e_flags
+         }
++	Architecture::LoongArch64 => {
++	    let e_flags = elf::EF_LARCH_ABI_DOUBLE_FLOAT;
++	    e_flags
++	}
+         Architecture::Riscv32 | Architecture::Riscv64 => {
+             // Source: https://github.com/riscv-non-isa/riscv-elf-psabi-doc/blob/079772828bd10933d34121117a222b4cc0ee2200/riscv-elf.adoc
+             let mut e_flags: u32 = 0x0;
+diff -Nurp rustc-1.65.0-src.orig/compiler/rustc_llvm/build.rs rustc-1.65.0-src/compiler/rustc_llvm/build.rs
+--- rustc-1.65.0-src.orig/compiler/rustc_llvm/build.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/compiler/rustc_llvm/build.rs	2022-11-17 05:57:34.698307043 +0000
+@@ -10,6 +10,7 @@ const OPTIONAL_COMPONENTS: &[&str] = &[
+     "aarch64",
+     "amdgpu",
+     "avr",
++    "loongarch",
+     "m68k",
+     "mips",
+     "powerpc",
+diff -Nurp rustc-1.65.0-src.orig/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp rustc-1.65.0-src/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+--- rustc-1.65.0-src.orig/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp	2022-11-17 05:57:34.699307043 +0000
+@@ -319,6 +318,12 @@ void LLVMRustAddLastExtensionPasses(
+ #define SUBTARGET_RISCV
+ #endif
+ 
++#ifdef LLVM_COMPONENT_LOONGARCH
++#define SUBTARGET_LOONGARCH SUBTARGET(LoongArch)
++#else
++#define SUBTARGET_LOONGARCH
++#endif
++
+ #ifdef LLVM_COMPONENT_SPARC
+ #define SUBTARGET_SPARC SUBTARGET(Sparc)
+ #else
+@@ -344,6 +349,7 @@ void LLVMRustAddLastExtensionPasses(
+   SUBTARGET_SPARC                                                              \
+   SUBTARGET_HEXAGON                                                            \
+   SUBTARGET_RISCV                                                              \
++  SUBTARGET_LOONGARCH                                                          \
+ 
+ #define SUBTARGET(x)                                                           \
+   namespace llvm {                                                             \
+diff -Nurp rustc-1.65.0-src.orig/compiler/rustc_llvm/src/lib.rs rustc-1.65.0-src/compiler/rustc_llvm/src/lib.rs
+--- rustc-1.65.0-src.orig/compiler/rustc_llvm/src/lib.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/compiler/rustc_llvm/src/lib.rs	2022-11-17 05:57:34.699307043 +0000
+@@ -103,6 +103,14 @@ pub fn initialize_available_targets() {
+         LLVMInitializeM68kAsmParser
+     );
+     init_target!(
++        llvm_component = "loongarch",
++        LLVMInitializeLoongArchTargetInfo,
++        LLVMInitializeLoongArchTarget,
++        LLVMInitializeLoongArchTargetMC,
++        LLVMInitializeLoongArchAsmPrinter,
++        LLVMInitializeLoongArchAsmParser
++    );
++    init_target!(
+         llvm_component = "mips",
+         LLVMInitializeMipsTargetInfo,
+         LLVMInitializeMipsTarget,
+diff -Nurp rustc-1.65.0-src.orig/compiler/rustc_target/src/spec/loongarch64_unknown_linux_gnu.rs rustc-1.65.0-src/compiler/rustc_target/src/spec/loongarch64_unknown_linux_gnu.rs
+--- rustc-1.65.0-src.orig/compiler/rustc_target/src/spec/loongarch64_unknown_linux_gnu.rs	1970-01-01 00:00:00.000000000 +0000
++++ rustc-1.65.0-src/compiler/rustc_target/src/spec/loongarch64_unknown_linux_gnu.rs	2022-11-17 05:57:34.706307043 +0000
+@@ -0,0 +1,20 @@
++use crate::spec::{Target, TargetOptions};
++
++pub fn target() -> Target {
++    Target {
++        llvm_target: "loongarch64-unknown-linux-gnu".into(),
++        pointer_width: 64,
++        data_layout: "e-m:e-p:64:64-i64:64-i128:128-n64-S128"
++            .into(),
++        arch: "loongarch64".into(),
++        options: TargetOptions {
++            cpu: "la464".into(),
++            features: "+f,+d".into(),
++            llvm_abiname: "lp64d".into(),
++            max_atomic_width: Some(64),
++
++            ..super::linux_gnu_base::opts()
++        }
++    }
++}
++
+diff -Nurp rustc-1.65.0-src.orig/compiler/rustc_target/src/spec/mod.rs rustc-1.65.0-src/compiler/rustc_target/src/spec/mod.rs
+--- rustc-1.65.0-src.orig/compiler/rustc_target/src/spec/mod.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/compiler/rustc_target/src/spec/mod.rs	2022-11-17 05:57:34.707307043 +0000
+@@ -919,6 +919,7 @@ supported_targets! {
+     ("mipsisa64r6-unknown-linux-gnuabi64", mipsisa64r6_unknown_linux_gnuabi64),
+     ("mipsisa64r6el-unknown-linux-gnuabi64", mipsisa64r6el_unknown_linux_gnuabi64),
+     ("mipsel-unknown-linux-gnu", mipsel_unknown_linux_gnu),
++    ("loongarch64-unknown-linux-gnu", loongarch64_unknown_linux_gnu),
+     ("powerpc-unknown-linux-gnu", powerpc_unknown_linux_gnu),
+     ("powerpc-unknown-linux-gnuspe", powerpc_unknown_linux_gnuspe),
+     ("powerpc-unknown-linux-musl", powerpc_unknown_linux_musl),
+diff -Nurp rustc-1.65.0-src.orig/library/std/src/env.rs rustc-1.65.0-src/library/std/src/env.rs
+--- rustc-1.65.0-src.orig/library/std/src/env.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/library/std/src/env.rs	2022-11-17 05:57:34.707307043 +0000
+@@ -888,6 +888,7 @@ pub mod consts {
+     /// - x86_64
+     /// - arm
+     /// - aarch64
++    /// - loongarch64 
+     /// - m68k
+     /// - mips
+     /// - mips64
+diff -Nurp rustc-1.65.0-src.orig/library/std/src/os/linux/raw.rs rustc-1.65.0-src/library/std/src/os/linux/raw.rs
+--- rustc-1.65.0-src.orig/library/std/src/os/linux/raw.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/library/std/src/os/linux/raw.rs	2022-11-17 05:57:34.707307043 +0000
+@@ -236,7 +236,8 @@ mod arch {
+     target_arch = "s390x",
+     target_arch = "sparc64",
+     target_arch = "riscv64",
+-    target_arch = "riscv32"
++    target_arch = "riscv32",
++    target_arch = "loongarch64"
+ ))]
+ mod arch {
+     #[stable(feature = "raw_ext", since = "1.1.0")]
+diff -Nurp rustc-1.65.0-src.orig/library/std/src/sys/common/alloc.rs rustc-1.65.0-src/library/std/src/sys/common/alloc.rs
+--- rustc-1.65.0-src.orig/library/std/src/sys/common/alloc.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/library/std/src/sys/common/alloc.rs	2022-11-17 05:57:34.707307043 +0000
+@@ -21,6 +21,7 @@ pub const MIN_ALIGN: usize = 8;
+ #[cfg(all(any(
+     target_arch = "x86_64",
+     target_arch = "aarch64",
++    target_arch = "loongarch64",
+     target_arch = "mips64",
+     target_arch = "s390x",
+     target_arch = "sparc64",
+diff -Nurp rustc-1.65.0-src.orig/library/unwind/src/libunwind.rs rustc-1.65.0-src/library/unwind/src/libunwind.rs
+--- rustc-1.65.0-src.orig/library/unwind/src/libunwind.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/library/unwind/src/libunwind.rs	2022-11-17 05:57:34.708307043 +0000
+@@ -45,6 +45,9 @@ pub const unwinder_private_data_size: us
+ #[cfg(target_arch = "m68k")]
+ pub const unwinder_private_data_size: usize = 2;
+ 
++#[cfg(target_arch = "loongarch64")]
++pub const unwinder_private_data_size: usize = 2;
++
+ #[cfg(target_arch = "mips")]
+ pub const unwinder_private_data_size: usize = 2;
+ 
+diff -Nurp rustc-1.65.0-src.orig/src/bootstrap/bootstrap.py rustc-1.65.0-src/src/bootstrap/bootstrap.py
+--- rustc-1.65.0-src.orig/src/bootstrap/bootstrap.py	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/src/bootstrap/bootstrap.py	2022-11-17 05:57:34.708307043 +0000
+@@ -303,6 +303,7 @@ def default_build_triple(verbose):
+         'i486': 'i686',
+         'i686': 'i686',
+         'i786': 'i686',
++        'loongarch64': 'loongarch64',        
+         'm68k': 'm68k',
+         'powerpc': 'powerpc',
+         'powerpc64': 'powerpc64',
+diff -Nurp rustc-1.65.0-src.orig/src/bootstrap/native.rs rustc-1.65.0-src/src/bootstrap/native.rs
+--- rustc-1.65.0-src.orig/src/bootstrap/native.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/src/bootstrap/native.rs	2022-11-17 05:57:34.708307043 +0000
+@@ -348,7 +348,7 @@ impl Step for Llvm {
+         let llvm_targets = match &builder.config.llvm_targets {
+             Some(s) => s,
+             None => {
+-                "AArch64;ARM;BPF;Hexagon;MSP430;Mips;NVPTX;PowerPC;RISCV;\
++                "AArch64;ARM;BPF;Hexagon;LoongArch;MSP430;Mips;NVPTX;PowerPC;RISCV;\
+                      Sparc;SystemZ;WebAssembly;X86"
+             }
+         };
+diff -Nurp rustc-1.65.0-src.orig/src/librustdoc/clean/cfg.rs rustc-1.65.0-src/src/librustdoc/clean/cfg.rs
+--- rustc-1.65.0-src.orig/src/librustdoc/clean/cfg.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/src/librustdoc/clean/cfg.rs	2022-11-17 05:57:34.708307043 +0000
+@@ -515,6 +515,8 @@ impl<'a> fmt::Display for Display<'a> {
+                         "aarch64" => "AArch64",
+                         "arm" => "ARM",
+                         "asmjs" => "JavaScript",
++                        "loongarch" => "LoongArch",
++                        "loongarch64" => "LoongArch64",
+                         "m68k" => "M68k",
+                         "mips" => "MIPS",
+                         "mips64" => "MIPS-64",
+diff -Nurp rustc-1.65.0-src.orig/vendor/cc/src/lib.rs rustc-1.65.0-src/vendor/cc/src/lib.rs
+--- rustc-1.65.0-src.orig/vendor/cc/src/lib.rs	2022-11-02 16:21:40.000000000 +0000
++++ rustc-1.65.0-src/vendor/cc/src/lib.rs	2022-11-17 05:57:34.709307043 +0000
+@@ -2581,6 +2581,8 @@ impl Build {
+             ]), // explicit None if not found, so caller knows to fall back
+             "i686-unknown-linux-musl" => Some("musl"),
+             "i686-unknown-netbsd" => Some("i486--netbsdelf"),
++            "loongarch-unknown-linux-gnu" => Some("loongarch-linux-gnu"),
++            "loongarch64-unknown-linux-gnu" => Some("loongarch64-linux-gnu"),
+             "mips-unknown-linux-gnu" => Some("mips-linux-gnu"),
+             "mips-unknown-linux-musl" => Some("mips-linux-musl"),
+             "mipsel-unknown-linux-gnu" => Some("mipsel-linux-gnu"),
+diff -Nurp rustc-1.65.0-src.orig/vendor/object/src/elf.rs rustc-1.65.0-src/vendor/object/src/elf.rs
+--- rustc-1.65.0-src.orig/vendor/object/src/elf.rs	2022-11-02 16:21:42.000000000 +0000
++++ rustc-1.65.0-src/vendor/object/src/elf.rs	2022-11-17 05:57:34.710307043 +0000
+@@ -6373,6 +6373,23 @@ pub const R_LARCH_GNU_VTINHERIT: u32 = 5
+ /// GNU C++ vtable member usage
+ pub const R_LARCH_GNU_VTENTRY: u32 = 58;
+ 
++// LoongArch values `FileHeader*::e_flags`.
++#[allow(missing_docs)]
++pub const EF_LOONGARCH_ABI_LP64_SOFT_FLOAT: u32 = 0x0001;
++#[allow(missing_docs)]
++pub const EF_LOONGARCH_ABI_LP64_SINGLE_FLOAT: u32 = 0x0002;
++#[allow(missing_docs)]
++pub const EF_LOONGARCH_ABI_LP64_DOUBLE_FLOAT: u32 = 0x0003;
++#[allow(missing_docs)]
++pub const EF_LOONGARCH_ABI_ILP32_SOFT_FLOAT: u32 = 0x0005;
++#[allow(missing_docs)]
++pub const EF_LOONGARCH_ABI_ILP32_SINGLE_FLOAT: u32 = 0x0006;
++#[allow(missing_docs)]
++pub const EF_LOONGARCH_ABI_ILP32_DOUBLE_FLOAT: u32 = 0x0007;
++
++
++
++
+ unsafe_impl_endian_pod!(
+     FileHeader32,
+     FileHeader64,
+--- rustc-1.65.0-src.orig/library/std/src/personality/gcc.rs	2022-11-02 14:36:24.000000000 +0000
++++ rustc-1.65.0-src/library/std/src/personality/gcc.rs	2022-11-17 07:06:56.859132161 +0000
+@@ -76,6 +76,9 @@ const UNWIND_DATA_REG: (i32, i32) = (0,
+ #[cfg(any(target_arch = "riscv64", target_arch = "riscv32"))]
+ const UNWIND_DATA_REG: (i32, i32) = (10, 11); // x10, x11
+ 
++#[cfg(target_arch = "loongarch64")]
++const UNWIND_DATA_REG: (i32, i32) = (4, 5); // A0, A1
++
+ // The following code is based on GCC's C and C++ personality routines.  For reference, see:
+ // https://github.com/gcc-mirror/gcc/blob/master/libstdc++-v3/libsupc++/eh_personality.cc
+ // https://github.com/gcc-mirror/gcc/blob/trunk/libgcc/unwind-c.c

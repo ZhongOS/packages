@@ -1,0 +1,63 @@
+From 8ec1b69cc7f04925b088f90a710c328ca45ecf5a Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 15 Apr 2024 14:23:45 +0000
+Subject: [PATCH] qtwebengine 6.7.0 libvpx fix for loongarch64.
+
+---
+ .../src/3rdparty/chromium/third_party/libvpx/BUILD.gn       | 6 +++---
+ .../libvpx/source/config/linux/loongarch/vp8_rtcd.h         | 2 ++
+ .../libvpx/source/config/linux/loongarch/vpx_dsp_rtcd.h     | 1 +
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/qtwebengine/src/3rdparty/chromium/third_party/libvpx/BUILD.gn b/qtwebengine/src/3rdparty/chromium/third_party/libvpx/BUILD.gn
+index 159473390..66e258ad7 100644
+--- a/qtwebengine/src/3rdparty/chromium/third_party/libvpx/BUILD.gn
++++ b/qtwebengine/src/3rdparty/chromium/third_party/libvpx/BUILD.gn
+@@ -462,9 +462,9 @@ static_library("bundled_libvpx") {
+   if (current_cpu == "arm" && arm_assembly_sources != []) {
+     deps += [ ":libvpx_assembly_arm" ]
+   }
+-  if (current_cpu == "loong64") {
+-    deps += [ ":libvpx_loongarch_lsx" ]
+-  }
++#  if (current_cpu == "loong64") {
++#    deps += [ ":libvpx_loongarch_lsx" ]
++#  }
+ 
+   public_configs = [ ":libvpx_external_config" ]
+ }
+diff --git a/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vp8_rtcd.h b/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vp8_rtcd.h
+index a9ee12391..83f26471f 100644
+--- a/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vp8_rtcd.h
++++ b/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vp8_rtcd.h
+@@ -443,6 +443,7 @@ static void setup_rtcd_internal(void) {
+   int flags = loongarch_cpu_caps();
+ 
+   (void)flags;
++/*
+   vp8_block_error = vp8_block_error_c;
+   if (flags & HAS_LSX)
+     vp8_block_error = vp8_block_error_lsx;
+@@ -491,6 +492,7 @@ static void setup_rtcd_internal(void) {
+   vp8_sixtap_predict8x8 = vp8_sixtap_predict8x8_c;
+   if (flags & HAS_LSX)
+     vp8_sixtap_predict8x8 = vp8_sixtap_predict8x8_lsx;
++*/
+ }
+ #endif
+ 
+diff --git a/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vpx_dsp_rtcd.h b/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vpx_dsp_rtcd.h
+index cd8e6a7a1..a37f32dd0 100644
+--- a/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vpx_dsp_rtcd.h
++++ b/qtwebengine/src/3rdparty/chromium/third_party/libvpx/source/config/linux/loongarch/vpx_dsp_rtcd.h
+@@ -1104,6 +1104,7 @@ void vpx_quantize_b_lsx(const tran_low_t* coeff_ptr,
+                         const int16_t* dequant_ptr,
+                         uint16_t* eob_ptr,
+                         const struct ScanOrder* const scan_order);
++
+ RTCD_EXTERN void (*vpx_quantize_b)(
+     const tran_low_t* coeff_ptr,
+     intptr_t n_coeffs,
+-- 
+2.31.1
+

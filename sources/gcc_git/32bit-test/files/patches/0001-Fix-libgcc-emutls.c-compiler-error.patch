@@ -1,0 +1,24 @@
+From 9010b80a683b0ee6b1a061f7ad1eeb7ac64a7525 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 1 Dec 2023 12:58:50 +0000
+Subject: [PATCH] Fix libgcc/emutls.c compiler error.
+
+---
+ libgcc/emutls.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libgcc/emutls.c b/libgcc/emutls.c
+index 0fea1f1..2c24470 100644
+--- a/libgcc/emutls.c
++++ b/libgcc/emutls.c
+@@ -29,6 +29,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ #include "tm.h"
+ #include "libgcc_tm.h"
+ #include "gthr.h"
++#include <stdlib.h>
+ 
+ typedef unsigned int word __attribute__((mode(word)));
+ typedef unsigned int pointer __attribute__((mode(pointer)));
+-- 
+2.31.1
+

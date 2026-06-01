@@ -1,0 +1,25 @@
+From ebf2ed445f04f55b2f708cd34ce820a264185bdc Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 24 Jun 2024 03:16:31 +0000
+Subject: [PATCH 2/3] fix vulkan header miss define.
+
+---
+ src/video_core/vulkan_common/vulkan_wrapper.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/video_core/vulkan_common/vulkan_wrapper.cpp b/src/video_core/vulkan_common/vulkan_wrapper.cpp
+index 70cf14a..c603502 100644
+--- a/src/video_core/vulkan_common/vulkan_wrapper.cpp
++++ b/src/video_core/vulkan_common/vulkan_wrapper.cpp
+@@ -385,6 +385,8 @@ const char* ToString(VkResult result) noexcept {
+         return "VK_ERROR_COMPRESSION_EXHAUSTED_EXT";
+     case VkResult::VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT:
+         return "VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT";
++    case VkResult::VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR:
++        return "VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR";
+     }
+     return "Unknown";
+ }
+-- 
+2.31.1
+

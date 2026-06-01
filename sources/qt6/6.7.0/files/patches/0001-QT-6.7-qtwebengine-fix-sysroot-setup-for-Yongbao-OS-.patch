@@ -1,0 +1,43 @@
+From 442652e6bbb7d99dfec80409dff4b86ff241435d Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 15 Apr 2024 09:37:33 +0000
+Subject: [PATCH] QT 6.7 qtwebengine fix sysroot setup for Yongbao OS or CLFS.
+
+---
+ .../src/3rdparty/chromium/build/config/linux/pkg_config.gni | 2 +-
+ .../chromium/build/linux/sysroot_scripts/sysroots.json      | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/qtwebengine/src/3rdparty/chromium/build/config/linux/pkg_config.gni b/qtwebengine/src/3rdparty/chromium/build/config/linux/pkg_config.gni
+index 0d87390..c8a1111 100644
+--- a/qtwebengine/src/3rdparty/chromium/build/config/linux/pkg_config.gni
++++ b/qtwebengine/src/3rdparty/chromium/build/config/linux/pkg_config.gni
+@@ -44,7 +44,7 @@ declare_args() {
+   # chrome build scheme. This variable permits controlling this for GN builds
+   # in similar fashion by setting the `system_libdir` variable in the build's
+   # args.gn file to 'lib' or 'lib64' as appropriate for the target architecture.
+-  system_libdir = "lib"
++  system_libdir = "lib64"
+ }
+ 
+ pkg_config_script = "//build/config/linux/pkg-config.py"
+diff --git a/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/sysroots.json b/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/sysroots.json
+index 156d4c6..60a2594 100644
+--- a/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/sysroots.json
++++ b/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/sysroots.json
+@@ -34,6 +34,12 @@
+         "Tarball": "debian_bullseye_i386_sysroot.tar.xz",
+         "URL": "https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain"
+     },
++    "bullseye_loong64": {
++        "Key": "20221105T211506Z-0",
++        "Sha1Sum": "6f27b4f65d8e190864e7c18fa281ffb418cf2e43",
++        "SysrootDir": "debian_bullseye_loong64-sysroot",
++        "Tarball": "debian_bullseye_loong64_sysroot.tar.xz"
++    },
+     "bullseye_mips64el": {
+         "Key": "20230611T210420Z-2",
+         "Sha1Sum": "3ce49d1c6b5fef17ad512f2d663a175829ae0b72",
+-- 
+2.31.1
+

@@ -1,0 +1,26 @@
+diff -Nurp dolphin-emu-git.orig/Externals/zlib-ng/zlib-ng/cmake/detect-arch.c dolphin-emu-git/Externals/zlib-ng/zlib-ng/cmake/detect-arch.c
+--- dolphin-emu-git.orig/Externals/zlib-ng/zlib-ng/cmake/detect-arch.c	2022-08-08 09:44:14.000000000 +0000
++++ dolphin-emu-git/Externals/zlib-ng/zlib-ng/cmake/detect-arch.c	2022-08-08 11:25:50.432642937 +0000
+@@ -65,6 +65,9 @@
+ #elif defined(__m68k__)
+     #error archfound m68k
+ 
++#elif defined(__loongarch64)
++    #error archfound loongarch64
++
+ // SuperH
+ #elif defined(__sh__)
+     #error archfound sh
+diff -Nurp dolphin-emu-git.orig/Externals/zlib-ng/zlib-ng/cmake/detect-arch.cmake dolphin-emu-git/Externals/zlib-ng/zlib-ng/cmake/detect-arch.cmake
+--- dolphin-emu-git.orig/Externals/zlib-ng/zlib-ng/cmake/detect-arch.cmake	2022-08-08 09:44:14.000000000 +0000
++++ dolphin-emu-git/Externals/zlib-ng/zlib-ng/cmake/detect-arch.cmake	2022-08-08 11:15:48.737668219 +0000
+@@ -88,6 +88,9 @@ elseif("${ARCH}" MATCHES "rs6000")
+ elseif("${ARCH}" MATCHES "riscv(32|64)")
+     set(BASEARCH "riscv")
+     set(BASEARCH_RISCV_FOUND TRUE)
++elseif("${ARCH}" MATCHES "loongarch64")
++    set(BASEARCH "loongarch")
++    set(BASEARCH_LOONGARCH_FOUND TRUE)
+ else()
+     set(BASEARCH "x86")
+     set(BASEARCH_X86_FOUND TRUE)

@@ -1,0 +1,43 @@
+From d61c72f97420d3874d23db847a14db1cc1e40d98 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 29 Oct 2024 12:58:34 +0000
+Subject: [PATCH] pyside6 remove QHelpContentItem for Qt 6.8.0
+
+---
+ sources/pyside6/PySide6/QtHelp/typesystem_help.xml | 7 -------
+ tools/snippets_translate/module_classes.py         | 1 -
+ 2 files changed, 8 deletions(-)
+
+diff --git a/sources/pyside6/PySide6/QtHelp/typesystem_help.xml b/sources/pyside6/PySide6/QtHelp/typesystem_help.xml
+index 5fa30e0..9a0386b 100644
+--- a/sources/pyside6/PySide6/QtHelp/typesystem_help.xml
++++ b/sources/pyside6/PySide6/QtHelp/typesystem_help.xml
+@@ -9,13 +9,6 @@
+     <load-typesystem name="QtWidgets/typesystem_widgets.xml" generate="no"/>
+ 
+     <value-type name="QCompressedHelpInfo"/>
+-    <value-type name="QHelpContentItem">
+-      <modify-function signature="parent()const">
+-        <modify-argument index="return">
+-          <define-ownership owner="default"/>
+-        </modify-argument>
+-      </modify-function>
+-    </value-type>
+     <object-type name="QHelpContentModel" polymorphic-id-expression="qobject_cast&lt;QHelpContentModel*&gt;(%B)"/>
+     <object-type name="QHelpContentWidget"/>
+     <value-type name="QHelpGlobal"/>
+diff --git a/tools/snippets_translate/module_classes.py b/tools/snippets_translate/module_classes.py
+index df4c755..9d1139a 100644
+--- a/tools/snippets_translate/module_classes.py
++++ b/tools/snippets_translate/module_classes.py
+@@ -716,7 +716,6 @@ module_classes = {
+     ],
+     "QtHelp": [
+         "QCompressedHelpInfo",
+-        "QHelpContentItem",
+         "QHelpContentModel",
+         "QHelpContentWidget",
+         "QHelpEngine",
+-- 
+2.31.1
+

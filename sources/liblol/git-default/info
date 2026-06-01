@@ -1,0 +1,6 @@
+URL=https://github.com/AOSC-Dev/glibc-loongarch-oldworld.git
+FILE=liblol-git-default_git.tar.gz
+DIR=liblol-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

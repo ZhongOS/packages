@@ -1,0 +1,6 @@
+URL=https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git
+FILE=SPIRV-LLVM-Translator-16.0.0-default_git.tar.gz
+DIR=SPIRV-LLVM-Translator-16.0.0-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

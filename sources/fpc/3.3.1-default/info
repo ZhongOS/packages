@@ -1,0 +1,13 @@
+URL=https://gitlab.com/freepascal.org/fpc/source.git
+FILE=fpc-3.3.1-default_git.tar.gz
+DIR=fpc-3.3.1-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0
+GIT_UPDATE_MODE=手工
+# 手工：不主动更新，除非用户强制
+# 每次：每次进行编译前都会强制更新
+# 每天：每天第一次构建时会进行更新
+# 每周：每周第一次构建时会进行更新
+# 每月：每月第一次构建时会进行更新
+# <数字>: 代表天数，即上次更新超过指定天数后构建时会进行更新

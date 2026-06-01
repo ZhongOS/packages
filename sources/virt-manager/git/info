@@ -1,0 +1,6 @@
+URL=https://github.com/virt-manager/virt-manager.git
+FILE=virt-manager-git_git.tar.gz
+DIR=virt-manager-git_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

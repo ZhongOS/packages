@@ -1,0 +1,6 @@
+URL=https://git.ffmpeg.org/ffmpeg.git
+FILE=ffmpeg-git-default_git.tar.gz
+DIR=ffmpeg-git-default_git
+GIT_BRANCH=master
+GIT_COMMIT=
+GIT_SUBMODULE=0

@@ -1,0 +1,25 @@
+From 0311882ce2204686ee7a99061113d2647c4b5938 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 21 Dec 2024 01:32:07 +0000
+Subject: [PATCH] webkitgtk thirdparty skia disable lsx for loongarch64.
+
+---
+ Source/ThirdParty/skia/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Source/ThirdParty/skia/CMakeLists.txt b/Source/ThirdParty/skia/CMakeLists.txt
+index 2f20123e..5cce9701 100644
+--- a/Source/ThirdParty/skia/CMakeLists.txt
++++ b/Source/ThirdParty/skia/CMakeLists.txt
+@@ -1008,6 +1008,8 @@ target_compile_definitions(Skia PUBLIC
+ 
+     SK_ENABLE_PRECOMPILE
+ 
++    SK_ENABLE_OPTIMIZE_SIZE
++
+     SK_R32_SHIFT=16
+ 
+     $<IF:$<BOOL:${SKIA_DEBUG}>,SK_DEBUG,SK_RELEASE>
+-- 
+2.31.1
+

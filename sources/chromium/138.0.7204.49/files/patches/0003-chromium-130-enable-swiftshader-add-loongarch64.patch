@@ -1,0 +1,23 @@
+From 8842ef123658990f0c941f83674e476b271ec91e Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 6 Nov 2024 04:11:42 +0000
+Subject: [PATCH 3/4] chromium 130 enable swiftshader add loongarch64.
+
+---
+ ui/gl/features.gni | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ui/gl/features.gni b/ui/gl/features.gni
+index 245959e90..ae6c992df 100644
+--- a/ui/gl/features.gni
++++ b/ui/gl/features.gni
+@@ -30,5 +30,5 @@ declare_args() {
+        is_fuchsia) &&
+       (target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm" ||
+        target_cpu == "arm64" || target_cpu == "mipsel" ||
+-       target_cpu == "mips64el" || target_cpu == "riscv64")
++       target_cpu == "mips64el" || target_cpu == "riscv64"  || target_cpu == "loong64")
+ }
+-- 
+2.31.1
+

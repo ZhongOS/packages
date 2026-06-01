@@ -1,0 +1,6 @@
+URL=https://github.com/loongson/qemu.git
+FILE=qemu-7.1_git.tar.gz
+DIR=qemu-7.1_git
+GIT_BRANCH=tcg-lsx-dev
+GIT_COMMIT=
+GIT_SUBMODULE=1

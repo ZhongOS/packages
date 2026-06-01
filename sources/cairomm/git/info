@@ -1,0 +1,6 @@
+URL=https://gitlab.freedesktop.org/cairo/cairomm.git
+FILE=cairomm-git_git.tar.gz
+DIR=cairomm-git_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

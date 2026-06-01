@@ -1,0 +1,28 @@
+From 9ab81dfedce04ea195ac057e6f64dbf7a486362f Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 25 Nov 2023 14:00:11 +0000
+Subject: [PATCH] c-shquote set version-scripts to yes for default.
+
+---
+ src/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 7211681..a373046 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -19,9 +19,9 @@ libcshquote_both = both_libraries(
+         ],
+         dependencies: libcshquote_deps,
+         install: not meson.is_subproject(),
+-        link_args: dep_cstdaux.get_variable('version-scripts') == 'yes' ? [
++        link_args: [
+                 '-Wl,--version-script=@0@'.format(libcshquote_symfile),
+-        ] : [],
++        ],
+         link_depends: libcshquote_symfile,
+         soversion: 0,
+ )
+-- 
+2.31.1
+

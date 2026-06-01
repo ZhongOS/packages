@@ -1,0 +1,25 @@
+From d4821c8a51a7df1e19e1977bf42ff95c7253a10e Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 25 Jun 2024 09:53:52 +0000
+Subject: [PATCH 3/3] fix cmake error for glad.
+
+---
+ externals/glad/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/externals/glad/CMakeLists.txt b/externals/glad/CMakeLists.txt
+index 0c8e285..bf7d529 100644
+--- a/externals/glad/CMakeLists.txt
++++ b/externals/glad/CMakeLists.txt
+@@ -7,7 +7,7 @@ add_library(glad
+     include/glad/glad.h
+ )
+ 
+-create_target_directory_groups(glad)
++# create_target_directory_groups(glad)
+ target_include_directories(glad PUBLIC "include/")
+ 
+ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+-- 
+2.31.1
+

@@ -1,0 +1,25 @@
+From a3bb57e836a0935246e56a0e9943a4381b031d60 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 31 Jan 2026 11:57:09 +0000
+Subject: [PATCH] kstars 3.8.0 fix for eigen3 3.4.1
+
+---
+ .../internalguide/MPI_IS_gaussian_process/src/math_tools.cpp    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kstars/ekos/guide/internalguide/MPI_IS_gaussian_process/src/math_tools.cpp b/kstars/ekos/guide/internalguide/MPI_IS_gaussian_process/src/math_tools.cpp
+index 9f8b2b7..82cfb32 100644
+--- a/kstars/ekos/guide/internalguide/MPI_IS_gaussian_process/src/math_tools.cpp
++++ b/kstars/ekos/guide/internalguide/MPI_IS_gaussian_process/src/math_tools.cpp
+@@ -72,7 +72,7 @@ Eigen::MatrixXd squareDistance(const Eigen::MatrixXd &a, const Eigen::MatrixXd &
+     return
+         ((am.array().square().colwise().sum().transpose().rowwise().replicate(bCols).matrix()
+           + bm.array().square().colwise().sum().colwise().replicate(aCols).matrix())
+-         - 2 * (am.transpose()) * bm).array().max(0);
++         - 2 * (am.transpose()) * bm).array().max(0.0);
+ 
+     /* // verbose version
+     Eigen::MatrixXd a_square =
+-- 
+2.31.1
+

@@ -1,0 +1,24 @@
+From 7bea976c6f795b1b87df9886af9d75cc42cb5fe6 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 25 Aug 2024 11:16:13 +0000
+Subject: [PATCH] lldb fix for gcc 15.
+
+---
+ lldb/include/lldb/Utility/AddressableBits.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lldb/include/lldb/Utility/AddressableBits.h b/lldb/include/lldb/Utility/AddressableBits.h
+index 13c2132..7c25379 100644
+--- a/lldb/include/lldb/Utility/AddressableBits.h
++++ b/lldb/include/lldb/Utility/AddressableBits.h
+@@ -10,6 +10,7 @@
+ #define LLDB_UTILITY_ADDRESSABLEBITS_H
+ 
+ #include "lldb/lldb-forward.h"
++#include <cstdint>
+ 
+ namespace lldb_private {
+ 
+-- 
+2.31.1
+

@@ -1,0 +1,20 @@
+--- rustc-1.65.0-src/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp	2022-11-29 02:20:46.689182352 +0000
++++ rustc-1.65.0-src.ok/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp	2022-11-29 02:13:00.224341492 +0000
+@@ -860,7 +860,7 @@ LLVMRustOptimizeWithNewPassManager(
+   bool DebugPassManager = false;
+ 
+   PassInstrumentationCallbacks PIC;
+-  StandardInstrumentations SI(DebugPassManager);
++  StandardInstrumentations SI(TheModule->getContext(), DebugPassManager);
+   SI.registerCallbacks(PIC);
+ 
+   if (LlvmSelfProfiler){
+@@ -1288,7 +1288,7 @@ extern "C" void LLVMRustSetModulePIELeve
+ extern "C" void LLVMRustSetModuleCodeModel(LLVMModuleRef M,
+                                            LLVMRustCodeModel Model) {
+   auto CM = fromRust(Model);
+-  if (!CM.hasValue())
++  if (!CM.has_value())
+     return;
+   unwrap(M)->setCodeModel(*CM);
+ }

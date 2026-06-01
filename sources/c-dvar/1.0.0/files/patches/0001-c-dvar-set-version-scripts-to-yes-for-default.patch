@@ -1,0 +1,28 @@
+From 76083ca30874c7910b184aad3ecb5da33c5159dd Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sat, 25 Nov 2023 13:25:35 +0000
+Subject: [PATCH] c-dvar set version-scripts to yes for default.
+
+---
+ src/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 251b0a1..921db20 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -24,9 +24,9 @@ libcdvar_both = both_libraries(
+         ],
+         dependencies: libcdvar_deps,
+         install: not meson.is_subproject(),
+-        link_args: dep_cstdaux.get_variable('version-scripts') == 'yes' ? [
++        link_args: [
+                 '-Wl,--version-script=@0@'.format(libcdvar_symfile),
+-        ] : [],
++        ],
+         link_depends: libcdvar_symfile,
+         soversion: 0,
+ )
+-- 
+2.31.1
+

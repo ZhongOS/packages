@@ -1,0 +1,111 @@
+From d381b59714a88dd40012dc633e1351c6a3b4266f Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 15 Apr 2024 09:55:34 +0000
+Subject: [PATCH] qtwebengine 6.7.0 chromium add some define for loongarch64.
+
+---
+ .../src/3rdparty/chromium/build/detect_host_arch.py        | 2 ++
+ .../build/linux/sysroot_scripts/install-sysroot.py         | 3 ++-
+ qtwebengine/src/3rdparty/chromium/skia/BUILD.gn            | 2 ++
+ .../src/3rdparty/chromium/third_party/libgav1/options.gni  | 2 +-
+ .../third_party/swiftshader/third_party/llvm-10.0/BUILD.gn | 7 +++++++
+ qtwebengine/src/3rdparty/chromium/ui/gl/features.gni       | 2 +-
+ 6 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/qtwebengine/src/3rdparty/chromium/build/detect_host_arch.py b/qtwebengine/src/3rdparty/chromium/build/detect_host_arch.py
+index c9d47e9..6d76f27 100755
+--- a/qtwebengine/src/3rdparty/chromium/build/detect_host_arch.py
++++ b/qtwebengine/src/3rdparty/chromium/build/detect_host_arch.py
+@@ -24,6 +24,8 @@ def HostArch():
+     host_arch = 'arm'
+   elif host_arch.startswith('aarch64'):
+     host_arch = 'arm64'
++  elif host_arch.startswith('loongarch64'):
++    host_arch = 'loong64'
+   elif host_arch.startswith('mips64'):
+     host_arch = 'mips64'
+   elif host_arch.startswith('mips'):
+diff --git a/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/install-sysroot.py b/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/install-sysroot.py
+index a2ac830..678d462 100755
+--- a/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/install-sysroot.py
++++ b/qtwebengine/src/3rdparty/chromium/build/linux/sysroot_scripts/install-sysroot.py
+@@ -35,7 +35,7 @@ from urllib.request import urlopen
+ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ SRC_DIR = os.path.dirname(os.path.dirname(os.path.dirname(SCRIPT_DIR)))
+ 
+-VALID_ARCHS = ('amd64', 'i386', 'armhf', 'arm64', 'armel', 'mipsel', 'mips64el')
++VALID_ARCHS = ('amd64', 'i386', 'armhf', 'arm64', 'armel', 'mipsel', 'mips64el', 'loong64')
+ 
+ ARCH_TRANSLATIONS = {
+     'x64': 'amd64',
+@@ -43,6 +43,7 @@ ARCH_TRANSLATIONS = {
+     'arm': 'armhf',
+     'mips': 'mipsel',
+     'mips64': 'mips64el',
++    'loongarch64': 'loong64',
+ }
+ 
+ DEFAULT_SYSROOTS_PATH = os.path.join(os.path.relpath(SCRIPT_DIR, SRC_DIR),
+diff --git a/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn b/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn
+index bedc83f..6bea390 100644
+--- a/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn
++++ b/qtwebengine/src/3rdparty/chromium/skia/BUILD.gn
+@@ -783,6 +783,8 @@ skia_source_set("skia_opts") {
+     # Conditional and empty body needed to avoid assert() below.
+   } else if (current_cpu == "riscv64") {
+     # Conditional and empty body needed to avoid assert() below.
++  } else if (current_cpu == "loong64") {
++    # Conditional and empty body needed to avoid assert() below.
+   } else {
+     assert(false, "Unknown cpu target")
+   }
+diff --git a/qtwebengine/src/3rdparty/chromium/third_party/libgav1/options.gni b/qtwebengine/src/3rdparty/chromium/third_party/libgav1/options.gni
+index 0aab011..22b8add 100644
+--- a/qtwebengine/src/3rdparty/chromium/third_party/libgav1/options.gni
++++ b/qtwebengine/src/3rdparty/chromium/third_party/libgav1/options.gni
+@@ -9,5 +9,5 @@ declare_args() {
+   use_libgav1_parser =
+       (is_chromeos || is_linux || is_win) &&
+       (target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm" ||
+-       target_cpu == "arm64" || target_cpu == "ppc64")
++       target_cpu == "arm64" || target_cpu == "ppc64" || target_cpu == "loong64")
+ }
+diff --git a/qtwebengine/src/3rdparty/chromium/third_party/swiftshader/third_party/llvm-10.0/BUILD.gn b/qtwebengine/src/3rdparty/chromium/third_party/swiftshader/third_party/llvm-10.0/BUILD.gn
+index 59e5230..a60a42f 100644
+--- a/qtwebengine/src/3rdparty/chromium/third_party/swiftshader/third_party/llvm-10.0/BUILD.gn
++++ b/qtwebengine/src/3rdparty/chromium/third_party/swiftshader/third_party/llvm-10.0/BUILD.gn
+@@ -154,6 +154,8 @@ swiftshader_llvm_source_set("swiftshader_llvm") {
+     deps += [ ":swiftshader_llvm_mips" ]
+   } else if (current_cpu == "ppc64") {
+     deps += [ ":swiftshader_llvm_ppc" ]
++  } else if (current_cpu == "loong64") {
++    deps += [ ":swiftshader_llvm_loongarch64" ]
+   } else if (current_cpu == "riscv64") {
+     deps += [ ":swiftshader_llvm_riscv64" ]
+   } else if (current_cpu == "x86" || current_cpu == "x64") {
+@@ -1330,6 +1332,11 @@ swiftshader_llvm_source_set("swiftshader_llvm_x86") {
+   ]
+ }
+ 
++swiftshader_llvm_source_set("swiftshader_llvm_loongarch64") {
++  sources = [
++  ]
++}
++
+ swiftshader_llvm_source_set("swiftshader_llvm_riscv64") {
+   sources = [
+     "llvm/lib/Target/RISCV/AsmParser/RISCVAsmParser.cpp",
+diff --git a/qtwebengine/src/3rdparty/chromium/ui/gl/features.gni b/qtwebengine/src/3rdparty/chromium/ui/gl/features.gni
+index 8326661..0dcdf36 100644
+--- a/qtwebengine/src/3rdparty/chromium/ui/gl/features.gni
++++ b/qtwebengine/src/3rdparty/chromium/ui/gl/features.gni
+@@ -37,5 +37,5 @@ declare_args() {
+        is_chromeos_ash || is_fuchsia) &&
+       (target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm" ||
+        target_cpu == "arm64" || target_cpu == "mipsel" ||
+-       target_cpu == "mips64el" || target_cpu == "riscv64")
++       target_cpu == "mips64el" || target_cpu == "riscv64" || target_cpu == "loongarch64")
+ }
+-- 
+2.31.1
+

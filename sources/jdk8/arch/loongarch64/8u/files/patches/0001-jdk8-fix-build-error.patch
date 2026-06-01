@@ -1,0 +1,25 @@
+From 23a91124a7392bf35d036e2edbf28d78bb19e815 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Thu, 21 Aug 2025 09:18:57 +0000
+Subject: [PATCH] jdk8 fix build error.
+
+---
+ hotspot/src/share/vm/c1/c1_LIRAssembler.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hotspot/src/share/vm/c1/c1_LIRAssembler.cpp b/hotspot/src/share/vm/c1/c1_LIRAssembler.cpp
+index a18c5300..501e6950 100644
+--- a/hotspot/src/share/vm/c1/c1_LIRAssembler.cpp
++++ b/hotspot/src/share/vm/c1/c1_LIRAssembler.cpp
+@@ -608,7 +608,7 @@ void LIR_Assembler::emit_op1(LIR_Op1* op) {
+         add_debug_info_for_null_check_here(op->info());
+ 
+         if (op->in_opr()->is_single_cpu()) {
+-          _masm->null_check(op->in_opr()->as_register());
++          _masm->null_check(op->in_opr()->as_register(), 0);
+         } else {
+           Unimplemented();
+         }
+-- 
+2.31.1
+

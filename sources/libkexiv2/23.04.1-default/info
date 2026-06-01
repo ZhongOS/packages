@@ -1,0 +1,6 @@
+URL=https://invent.kde.org/graphics/libkexiv2.git
+FILE=libkexiv2-23.04.1-default_git.tar.gz
+DIR=libkexiv2-23.04.1-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

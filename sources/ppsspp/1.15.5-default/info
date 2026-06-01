@@ -1,0 +1,6 @@
+URL=https://github.com/hrydgard/ppsspp.git
+FILE=ppsspp-1.15.5-default_git.tar.gz
+DIR=ppsspp-1.15.5-default_git
+GIT_BRANCH=
+GIT_COMMIT=f3d95a2cef1158b6fd02d8d99d6da1cc84ea3d8e
+GIT_SUBMODULE=1

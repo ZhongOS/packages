@@ -1,0 +1,8 @@
+URL=@rpm_git@/libxcrypt.git
+FILE=libxcrypt-rpm_git_git.tar.gz
+DIR=libxcrypt-rpm_git_git
+PKG_FORMAT=@rpm_git@
+GIT_BRANCH=@rpm_git@
+GIT_COMMIT=
+GIT_SUBMODULE=0
+GIT_UPDATE_MODE=手工

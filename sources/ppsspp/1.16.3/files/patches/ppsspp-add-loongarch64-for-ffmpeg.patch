@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c788dde..374f1eb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -119,6 +118,7 @@ option(ARMV7 "Set to ON if targeting an ARMv7 processor" ${ARMV7_DEVICE})
+ option(ARM "Set to ON if targeting an ARM processor" ${ARM_DEVICE})
+ option(MIPS "Set to ON if targeting a MIPS processor" ${MIPS_DEVICE})
+ option(RISCV64 "Set to ON if targeting a RISCV64 processor" ${RISCV64_DEVICE})
++option(LOONGARCH64 "Set to ON if targeting a LOONGARCH64 processor" ${LOONGARCH64_DEVICE})
+ option(X86 "Set to ON if targeting an X86 processor" ${X86_DEVICE})
+ option(X86_64 "Set to ON if targeting an X86_64 processor" ${X86_64_DEVICE})
+ # :: Environments
+@@ -738,6 +738,8 @@ if(USE_FFMPEG)
+ 					set(PLATFORM_ARCH "linux/mips32")
+ 				elseif(RISCV64)
+ 					set(PLATFORM_ARCH "linux/riscv64")
++                                elseif(LOONGARCH64)
++                                        set(PLATFORM_ARCH "linux/loongarch64")
+ 				elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+ 					set(PLATFORM_ARCH "linux/x86_64")
+ 				elseif(X86)

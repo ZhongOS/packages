@@ -1,0 +1,25 @@
+From 2e6dcefa88456f821f8f41d51b44bfde890fdd46 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 24 Mar 2025 07:40:34 +0000
+Subject: [PATCH] fix adler2 not found for rust.
+
+---
+ build/rust/std/BUILD.gn | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/rust/std/BUILD.gn b/build/rust/std/BUILD.gn
+index 6b996aa..68b085b 100644
+--- a/build/rust/std/BUILD.gn
++++ b/build/rust/std/BUILD.gn
+@@ -89,7 +89,7 @@ if (toolchain_has_rust) {
+     # These are no longer present in the Windows toolchain.
+     stdlib_files += [
+       "addr2line",
+-      "adler2",
++      "adler",
+       "gimli",
+       "libc",
+       "memchr",
+-- 
+2.31.1
+

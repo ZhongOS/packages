@@ -1,0 +1,6 @@
+URL=https://invent.kde.org/network/kdenetwork-filesharing.git
+FILE=KDE6-kdenetwork-filesharing-git-default_git.tar.gz
+DIR=KDE6-kdenetwork-filesharing-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

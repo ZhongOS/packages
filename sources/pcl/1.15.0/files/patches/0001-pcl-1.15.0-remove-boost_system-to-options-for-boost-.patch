@@ -1,0 +1,28 @@
+From f9fb18e58c539423aff56cd483ed7f2098f6ecc3 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 24 Aug 2025 03:15:35 +0000
+Subject: [PATCH] pcl 1.15.0 remove boost_system to options for boost 1.89
+
+---
+ cmake/pcl_find_boost.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/pcl_find_boost.cmake b/cmake/pcl_find_boost.cmake
+index 5d5c785..d0c5314 100644
+--- a/cmake/pcl_find_boost.cmake
++++ b/cmake/pcl_find_boost.cmake
+@@ -20,9 +20,9 @@ if(CMAKE_CXX_STANDARD MATCHES "14")
+   set(BOOST_REQUIRED_MODULES filesystem iostreams system)
+ else()
+   # Optional boost modules
+-  set(BOOST_OPTIONAL_MODULES filesystem serialization mpi)
++  set(BOOST_OPTIONAL_MODULES system filesystem serialization mpi)
+   # Required boost modules
+-  set(BOOST_REQUIRED_MODULES iostreams system)
++  set(BOOST_REQUIRED_MODULES iostreams)
+ endif()
+ 
+ find_package(Boost 1.71.0 QUIET COMPONENTS ${BOOST_OPTIONAL_MODULES} CONFIG)
+-- 
+2.31.1
+

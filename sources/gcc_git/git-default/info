@@ -1,0 +1,11 @@
+URL=https://gcc.gnu.org/git/gcc.git
+URL_SAVE=git://sourceware.org/git/gcc.git
+FILE=gcc_git-git-default_git.tar.gz
+DIR=gcc_git-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+COMMIT_SAVE=1e74ce8983fd4926903537414b8b37777af1ae54
+COMMIT_SAVE=b1fe98dee21773b9d908469effe2580567b903fb
+COMMIT_SAVE=8f4bbdc28df6e87a7ad5ec5ca191a7a836a4f016
+COMMIT_SAVE=efafa66c294d261a4d964383674ab9ee51feaf88
+GIT_SUBMODULE=0

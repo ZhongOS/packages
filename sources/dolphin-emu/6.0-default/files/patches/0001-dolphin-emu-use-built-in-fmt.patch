@@ -1,0 +1,25 @@
+From ce1819c39e58ba5b65d63c16a94dc84202ab51f0 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 21 Aug 2023 09:41:00 +0000
+Subject: [PATCH] dolphin-emu use built-in fmt.
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2cff081..a60ed46 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -630,7 +630,7 @@ if (_M_X86)
+ endif()
+ add_subdirectory(Externals/cpp-optparse)
+ 
+-dolphin_find_optional_system_library(fmt Externals/fmt 8)
++add_subdirectory(Externals/fmt)
+ 
+ add_subdirectory(Externals/imgui)
+ add_subdirectory(Externals/implot)
+-- 
+2.31.1
+

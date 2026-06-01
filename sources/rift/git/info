@@ -1,0 +1,6 @@
+URL=https://github.com/PipeRift/rift.git
+FILE=rift-git_git.tar.gz
+DIR=rift-git_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1

@@ -1,0 +1,26 @@
+From dd3eed6b7f9f79b7ad6ecb38299f1d763a9ca58b Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 25 Oct 2024 14:32:15 +0000
+Subject: [PATCH] chromium 129.0.6668.100 fix loongarch define miss in rust
+ config.
+
+---
+ build/rust/cargo_crate.gni | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/rust/cargo_crate.gni b/build/rust/cargo_crate.gni
+index e5d1b2f..8ddea13 100644
+--- a/build/rust/cargo_crate.gni
++++ b/build/rust/cargo_crate.gni
+@@ -429,7 +429,7 @@ template("cargo_crate") {
+           rust_abi_target,
+         ]
+       }
+-      if (current_cpu == "arm64" || current_cpu == "x64") {
++      if (current_cpu == "arm64" || current_cpu == "x64" || current_cpu == "loong64") {
+         args += [
+           "--pointer-width",
+           "64",
+-- 
+2.31.1
+

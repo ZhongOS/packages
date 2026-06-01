@@ -1,0 +1,39 @@
+From 4aa46eb05de8aa03e4055746bffdd00685fedd56 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 10 Jul 2023 01:34:42 +0000
+Subject: [PATCH 2/2] remove cpu_features support for loongarch64.
+
+---
+ CMakeLists.txt     | 2 +-
+ ext/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 02529a5..8d2084e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -824,7 +824,7 @@ add_library(Common STATIC
+ include_directories(Common)
+ setup_target_project(Common Common)
+ 
+-target_link_libraries(Common Ext::Snappy cpu_features)
++target_link_libraries(Common Ext::Snappy)
+ 
+ if(USING_GLES2 OR (USING_EGL AND NOT USING_FBDEV))
+ 	find_package(X11)
+diff --git a/ext/CMakeLists.txt b/ext/CMakeLists.txt
+index 8fc0581..598d201 100644
+--- a/ext/CMakeLists.txt
++++ b/ext/CMakeLists.txt
+@@ -22,7 +22,7 @@ endif()
+ 
+ # This works around a bug in cpu_features when ${CMAKE_BINARY_DIR} != ${CMAKE_CURRENT_BINRARY_DIR}.
+ # We also disable the list_cpu_features binary.
+-add_subdirectory(cmake/cpu_features EXCLUDE_FROM_ALL)
++# add_subdirectory(cmake/cpu_features EXCLUDE_FROM_ALL)
+ 
+ set(SKIP_GLSLANG_INSTALL ON CACHE BOOL "" FORCE)
+ set(ENABLE_GLSLANG_INSTALL OFF)
+-- 
+2.31.1
+

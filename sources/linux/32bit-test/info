@@ -1,0 +1,9 @@
+# URL=https://github.com/FlyGoat/linux.git
+URL=https://github.com/loongson-community/linux.git
+FILE=linux-32bit-test_git.tar.gz
+DIR=linux-32bit-test_git
+# GIT_BRANCH=b4/la32
+# GIT_BRANCH=la32s
+GIT_BRANCH=master
+GIT_COMMIT=
+GIT_SUBMODULE=0

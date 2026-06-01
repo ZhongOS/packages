@@ -1,0 +1,11 @@
+--- ppsspp-loongarch64-git/Core/Config.cpp.orig	2021-10-16 08:15:25.765066065 +0000
++++ ppsspp-loongarch64-git/Core/Config.cpp	2021-10-16 08:16:03.637064474 +0000
+@@ -611,7 +611,7 @@ static ConfigSetting cpuSettings[] = {
+ 
+ static int DefaultInternalResolution() {
+ 	// Auto on Windows and Linux, 2x on large screens, 1x elsewhere.
+-#if defined(USING_WIN_UI) || defined(USING_QT_UI)
++#if defined(USING_WIN_UI) || defined(USING_QT_UI) || defined(SDL)
+ 	return 0;
+ #else
+ 	int longestDisplaySide = std::max(System_GetPropertyInt(SYSPROP_DISPLAY_XRES), System_GetPropertyInt(SYSPROP_DISPLAY_YRES));

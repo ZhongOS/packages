@@ -1,0 +1,6 @@
+URL=https://sourceware.org/git/elfutils.git
+FILE=elfutils-git-default_git.tar.gz
+DIR=elfutils-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

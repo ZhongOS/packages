@@ -1,0 +1,6 @@
+URL=https://gitlab.com/inkscape/inkscape.git
+FILE=inkscape-git-default_git.tar.gz
+DIR=inkscape-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1

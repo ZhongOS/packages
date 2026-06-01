@@ -1,0 +1,6 @@
+URL=https://code.qt.io/pyside/shiboken.git
+FILE=shiboken6-git-default_git.tar.gz
+DIR=shiboken6-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

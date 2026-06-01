@@ -1,0 +1,24 @@
+From 802cde10a7b02d9527112571878d21c47df437e1 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 2 May 2025 00:22:08 +0000
+Subject: [PATCH] ppsspp fix for gcc 15.
+
+---
+ ext/glslang/SPIRV/SpvBuilder.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ext/glslang/SPIRV/SpvBuilder.h b/ext/glslang/SPIRV/SpvBuilder.h
+index 02e9cf4..e6e407e 100644
+--- a/ext/glslang/SPIRV/SpvBuilder.h
++++ b/ext/glslang/SPIRV/SpvBuilder.h
+@@ -63,6 +63,7 @@ namespace spv {
+ #include <stack>
+ #include <unordered_map>
+ #include <map>
++#include <cstdint>
+ 
+ namespace spv {
+ 
+-- 
+2.31.1
+

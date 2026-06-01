@@ -1,0 +1,6 @@
+URL=https://github.com/loongson/LuaJIT.git
+FILE=luajit2-2.1-default_git.tar.gz
+DIR=luajit2-2.1-default_git
+GIT_BRANCH=v2.1-loongarch64
+GIT_COMMIT=
+GIT_SUBMODULE=0

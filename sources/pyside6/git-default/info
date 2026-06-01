@@ -1,0 +1,13 @@
+URL=https://code.qt.io/pyside/pyside-setup.git
+FILE=pyside6-git-default_git.tar.gz
+DIR=pyside6-git-default_git
+GIT_BRANCH=6.10.1
+# GIT_BRANCH=6.9.3
+# GIT_BRANCH=6.8.3
+GIT_COMMIT=42be1cc7d9973b7da44c048981001b823b329704
+GIT_SUBMODULE=1
+
+# GIT_BRANCH=
+# GIT_BRANCH_SAVE=6.7.2
+# GIT_COMMIT=c907725a574cbd4ab69dcc3843c7d31bfddc4be2
+# GIT_SUBMODULE=0

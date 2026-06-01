@@ -1,0 +1,8 @@
+URL=https://gitee.com/src-anolis-os/clang.git
+FILE=llvm-project_git-clang-rpm_git_git.tar.gz
+DIR=llvm-project_git-clang-rpm_git_git
+PKG_FORMAT=rpm
+GIT_BRANCH=a23.3
+GIT_COMMIT=
+GIT_SUBMODULE=0
+GIT_UPDATE_MODE=手工

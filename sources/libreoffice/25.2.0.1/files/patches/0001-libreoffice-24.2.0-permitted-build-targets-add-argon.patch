@@ -1,0 +1,24 @@
+From a03b203c81673aed8f4c0272f806d0ece3c4c6cf Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 14 Jan 2024 07:56:52 +0000
+Subject: [PATCH] libreoffice 24.2.0 permitted build targets add argon2.
+
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 06d93b473..8b75e5a2a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5880,6 +5880,7 @@ if test "$cross_compiling" = "yes"; then
+ 
+     # filter permitted build targets
+     PERMITTED_BUILD_TARGETS="
++        ARGON2
+         AVMEDIA
+         BOOST
+         BZIP2
+-- 
+2.31.1
+

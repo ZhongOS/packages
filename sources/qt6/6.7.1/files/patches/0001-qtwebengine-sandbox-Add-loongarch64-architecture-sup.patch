@@ -1,0 +1,2588 @@
+From 4d19bb2f8aec01dd06eecb798cbd5c4d1f9f5334 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 15 Apr 2024 14:12:44 +0000
+Subject: [PATCH] qtwebengine sandbox Add loongarch64 architecture support.
+
+---
+ .../3rdparty/chromium/sandbox/linux/BUILD.gn  |   2 +-
+ .../seccomp_broker_process_unittest.cc        |  19 +-
+ .../baseline_policy_unittest.cc               |   4 +-
+ .../baseline_policy_unittest.cc.orig          | 509 ------------------
+ .../syscall_parameters_restrictions.cc.orig   | 498 -----------------
+ .../sandbox/linux/seccomp-bpf/syscall.cc      |   4 +-
+ .../linux/seccomp-bpf/syscall_unittest.cc     |   1 +
+ .../sandbox/linux/services/credentials.cc     |   2 +-
+ .../linux/services/syscall_wrappers.cc        |   2 +-
+ .../linux/syscall_broker/broker_client.cc     |   4 +-
+ .../syscall_broker/broker_command.h.orig      | 120 -----
+ .../syscall_broker/broker_process_unittest.cc |  11 +-
+ .../linux/system_headers/linux_signal.h       |   2 +-
+ .../linux/system_headers/linux_syscalls.h     |   2 +-
+ ...yscalls.h => loongarch64_linux_syscalls.h} | 286 +---------
+ .../policy/linux/bpf_network_policy_linux.cc  |   2 +-
+ 16 files changed, 33 insertions(+), 1435 deletions(-)
+ delete mode 100644 qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc.orig
+ delete mode 100644 qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc.orig
+ delete mode 100644 qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_command.h.orig
+ rename qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/{loong64_linux_syscalls.h => loongarch64_linux_syscalls.h} (97%)
+
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/BUILD.gn b/qtwebengine/src/3rdparty/chromium/sandbox/linux/BUILD.gn
+index d6036efbc..72d2f08cd 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/BUILD.gn
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/BUILD.gn
+@@ -396,7 +396,7 @@ source_set("sandbox_services_headers") {
+     "system_headers/linux_stat.h",
+     "system_headers/linux_syscalls.h",
+     "system_headers/linux_time.h",
+-    "system_headers/loong64_linux_syscalls.h",
++    "system_headers/loongarch64_linux_syscalls.h",
+     "system_headers/mips64_linux_syscalls.h",
+     "system_headers/mips_linux_syscalls.h",
+     "system_headers/x86_32_linux_syscalls.h",
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/integration_tests/seccomp_broker_process_unittest.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/integration_tests/seccomp_broker_process_unittest.cc
+index 9e583ed30..db2c1cf08 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/integration_tests/seccomp_broker_process_unittest.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/integration_tests/seccomp_broker_process_unittest.cc
+@@ -224,7 +224,7 @@ const int kFakeErrnoSentinel = 254;
+ 
+ void ConvertKernelStatToLibcStat(default_stat_struct& in_stat,
+                                  struct stat& out_stat) {
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+   out_stat.st_dev = in_stat.st_dev;
+   out_stat.st_ino = in_stat.st_ino;
+   out_stat.st_mode = in_stat.st_mode;
+@@ -431,7 +431,7 @@ class DirectSyscaller : public Syscaller {
+ };
+ #endif  // defined(DIRECT_SYSCALLER_ENABLED)
+ 
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+ class LibcSyscaller : public Syscaller {
+  public:
+   ~LibcSyscaller() override = default;
+@@ -654,7 +654,12 @@ class BPFTesterBrokerDelegate : public BPFTesterDelegate {
+ #endif
+         break;
+       case SyscallerType::LibcSyscaller:
++#if !defined(ARCH_CPU_LOONGARCH64)
+         syscaller_ = std::make_unique<LibcSyscaller>();
++#else
++        CHECK(false) << "Requested instantiation of LibcSyscaller on a "
++                        "platform that doesn't support it";
++#endif
+         break;
+       case SyscallerType::NoSyscaller:
+         syscaller_ = nullptr;
+@@ -688,7 +693,7 @@ const std::vector<BrokerTestConfiguration> broker_test_configs = {
+     {"FastCheckInClient_DirectSyscaller", true, SyscallerType::DirectSyscaller,
+      BrokerType::SIGNAL_BASED},
+ #endif
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+     {"FastCheckInClient_LibcSyscaller", true, SyscallerType::LibcSyscaller,
+      BrokerType::SIGNAL_BASED},
+ #endif
+@@ -698,7 +703,7 @@ const std::vector<BrokerTestConfiguration> broker_test_configs = {
+     {"NoFastCheckInClient_DirectSyscaller", false,
+      SyscallerType::DirectSyscaller, BrokerType::SIGNAL_BASED},
+ #endif
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+     {"NoFastCheckInClient_LibcSyscaller", false, SyscallerType::LibcSyscaller,
+      BrokerType::SIGNAL_BASED}
+ #endif
+@@ -1424,7 +1429,7 @@ class StatNonexistentFileWithPermissionsDelegate final
+   }
+ 
+   void RunTestInSandboxedChild(Syscaller* syscaller) override {
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+     BPF_ASSERT_EQ(-ENOENT, syscaller->Stat(nonesuch_name, follow_links, &sb_));
+ 
+     // Gets denied all the way back to root since no create permission.
+@@ -1478,7 +1483,7 @@ class StatNonexistentFileWithCreatePermissionsDelegate final
+   }
+ 
+   void RunTestInSandboxedChild(Syscaller* syscaller) override {
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+     BPF_ASSERT_EQ(-ENOENT, syscaller->Stat(nonesuch_name, follow_links, &sb_));
+ 
+     // Gets ENOENT all the way back to root since it has create permission.
+@@ -1530,7 +1535,7 @@ class StatFileWithPermissionsDelegate final : public StatFileDelegate {
+   }
+ 
+   void RunTestInSandboxedChild(Syscaller* syscaller) override {
+-#if !defined(ARCH_CPU_LOONG64)
++#if !defined(ARCH_CPU_LOONGARCH64)
+     BPF_ASSERT_EQ(0, syscaller->Stat(tempfile_name_, follow_links, &sb_));
+ 
+     // Following fields may never be consistent but should be non-zero.
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc
+index 9200ed49e..3972f9e7b 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc
+@@ -54,8 +54,8 @@ namespace {
+ 
+ // This also tests that read(), write(), fstat(), and fstatat(.., "", ..,
+ // AT_EMPTY_PATH) are allowed.
+-// Use statx instead of stat,lstat and fstatat on loongarch_lp64 architecture,
+-// So not test fstat(), and fstatat on loongarch_lp64.
++// Use statx instead of stat,lstat and fstatat on loongarch64 architecture,
++// So not test fstat(), and fstatat on loongarch64.
+ void TestPipeOrSocketPair(base::ScopedFD read_end, base::ScopedFD write_end) {
+   BPF_ASSERT_LE(0, read_end.get());
+   BPF_ASSERT_LE(0, write_end.get());
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc.orig b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc.orig
+deleted file mode 100644
+index dbbf1fb51..000000000
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc.orig
++++ /dev/null
+@@ -1,509 +0,0 @@
+-// Copyright 2014 The Chromium Authors
+-// Use of this source code is governed by a BSD-style license that can be
+-// found in the LICENSE file.
+-
+-#include "sandbox/linux/seccomp-bpf-helpers/baseline_policy.h"
+-
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <netinet/in.h>
+-#include <sched.h>
+-#include <signal.h>
+-#include <stddef.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <sys/mman.h>
+-#include <sys/prctl.h>
+-#include <sys/resource.h>
+-#include <sys/socket.h>
+-#include <sys/stat.h>
+-#include <sys/syscall.h>
+-#include <sys/time.h>
+-#include <sys/types.h>
+-#include <sys/wait.h>
+-#include <time.h>
+-#include <unistd.h>
+-
+-#include <tuple>
+-
+-#include "base/clang_profiling_buildflags.h"
+-#include "base/files/scoped_file.h"
+-#include "base/posix/eintr_wrapper.h"
+-#include "base/threading/thread.h"
+-#include "build/build_config.h"
+-#include "build/chromeos_buildflags.h"
+-#include "sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.h"
+-#include "sandbox/linux/seccomp-bpf/bpf_tests.h"
+-#include "sandbox/linux/seccomp-bpf/sandbox_bpf.h"
+-#include "sandbox/linux/seccomp-bpf/syscall.h"
+-#include "sandbox/linux/services/syscall_wrappers.h"
+-#include "sandbox/linux/services/thread_helpers.h"
+-#include "sandbox/linux/system_headers/linux_futex.h"
+-#include "sandbox/linux/system_headers/linux_syscalls.h"
+-#include "sandbox/linux/system_headers/linux_time.h"
+-#include "sandbox/linux/tests/test_utils.h"
+-#include "sandbox/linux/tests/unit_tests.h"
+-
+-#if !defined(SO_PEEK_OFF)
+-#define SO_PEEK_OFF 42
+-#endif
+-
+-namespace sandbox {
+-
+-namespace {
+-
+-// This also tests that read(), write(), fstat(), and fstatat(.., "", ..,
+-// AT_EMPTY_PATH) are allowed.
+-void TestPipeOrSocketPair(base::ScopedFD read_end, base::ScopedFD write_end) {
+-  BPF_ASSERT_LE(0, read_end.get());
+-  BPF_ASSERT_LE(0, write_end.get());
+-  struct stat stat_buf;
+-  int sys_ret = fstat(read_end.get(), &stat_buf);
+-  BPF_ASSERT_EQ(0, sys_ret);
+-  BPF_ASSERT(S_ISFIFO(stat_buf.st_mode) || S_ISSOCK(stat_buf.st_mode));
+-
+-  sys_ret = fstatat(read_end.get(), "", &stat_buf, AT_EMPTY_PATH);
+-  BPF_ASSERT_EQ(0, sys_ret);
+-  BPF_ASSERT(S_ISFIFO(stat_buf.st_mode) || S_ISSOCK(stat_buf.st_mode));
+-
+-  // Make sure fstatat with anything other than an empty string is denied.
+-  sys_ret = fstatat(read_end.get(), "/", &stat_buf, AT_EMPTY_PATH);
+-  BPF_ASSERT_EQ(sys_ret, -1);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-
+-  // Make sure fstatat without AT_EMPTY_PATH is denied.
+-  sys_ret = fstatat(read_end.get(), "", &stat_buf, 0);
+-  BPF_ASSERT_EQ(sys_ret, -1);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-
+-  const ssize_t kTestTransferSize = 4;
+-  static const char kTestString[kTestTransferSize] = {'T', 'E', 'S', 'T'};
+-  ssize_t transfered = 0;
+-
+-  transfered =
+-      HANDLE_EINTR(write(write_end.get(), kTestString, kTestTransferSize));
+-  BPF_ASSERT_EQ(kTestTransferSize, transfered);
+-  char read_buf[kTestTransferSize + 1] = {0};
+-  transfered = HANDLE_EINTR(read(read_end.get(), read_buf, sizeof(read_buf)));
+-  BPF_ASSERT_EQ(kTestTransferSize, transfered);
+-  BPF_ASSERT_EQ(0, memcmp(kTestString, read_buf, kTestTransferSize));
+-}
+-
+-// Test that a few easy-to-test system calls are allowed.
+-BPF_TEST_C(BaselinePolicy, BaselinePolicyBasicAllowed, BaselinePolicy) {
+-  BPF_ASSERT_EQ(0, sched_yield());
+-
+-  int pipefd[2];
+-  int sys_ret = pipe(pipefd);
+-  BPF_ASSERT_EQ(0, sys_ret);
+-  TestPipeOrSocketPair(base::ScopedFD(pipefd[0]), base::ScopedFD(pipefd[1]));
+-
+-  BPF_ASSERT_LE(1, getpid());
+-  BPF_ASSERT_LE(0, getuid());
+-}
+-
+-BPF_TEST_C(BaselinePolicy, FchmodErrno, BaselinePolicy) {
+-  int ret = fchmod(-1, 07777);
+-  BPF_ASSERT_EQ(-1, ret);
+-  // Without the sandbox, this would EBADF instead.
+-  BPF_ASSERT_EQ(EPERM, errno);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, ForkErrno, BaselinePolicy) {
+-  errno = 0;
+-  pid_t pid = fork();
+-  const int fork_errno = errno;
+-  TestUtils::HandlePostForkReturn(pid);
+-
+-  BPF_ASSERT_EQ(-1, pid);
+-  BPF_ASSERT_EQ(EPERM, fork_errno);
+-}
+-
+-pid_t ForkX86Glibc() {
+-  static pid_t ptid;
+-  return sys_clone(CLONE_PARENT_SETTID | SIGCHLD, nullptr, &ptid, nullptr,
+-                   nullptr);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, ForkX86Eperm, BaselinePolicy) {
+-  errno = 0;
+-  pid_t pid = ForkX86Glibc();
+-  const int fork_errno = errno;
+-  TestUtils::HandlePostForkReturn(pid);
+-
+-  BPF_ASSERT_EQ(-1, pid);
+-  BPF_ASSERT_EQ(EPERM, fork_errno);
+-}
+-
+-pid_t ForkARMGlibc() {
+-  static pid_t ctid;
+-  return sys_clone(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID | SIGCHLD, nullptr,
+-                   nullptr, &ctid, nullptr);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, ForkArmEperm, BaselinePolicy) {
+-  errno = 0;
+-  pid_t pid = ForkARMGlibc();
+-  const int fork_errno = errno;
+-  TestUtils::HandlePostForkReturn(pid);
+-
+-  BPF_ASSERT_EQ(-1, pid);
+-  BPF_ASSERT_EQ(EPERM, fork_errno);
+-}
+-
+-// system() calls into vfork() on old Android builds and returns when vfork is
+-// blocked. This causes undefined behavior on x86 Android builds on versions
+-// prior to Q, which causes the stack to get corrupted, so this test cannot be
+-// made to pass.
+-#if BUILDFLAG(IS_ANDROID) && defined(__i386__)
+-#define MAYBE_SystemEperm DISABLED_SystemEperm
+-#else
+-#define MAYBE_SystemEperm SystemEperm
+-#endif
+-BPF_TEST_C(BaselinePolicy, MAYBE_SystemEperm, BaselinePolicy) {
+-  errno = 0;
+-  int ret_val = system("echo SHOULD NEVER RUN");
+-  // glibc >= 2.33 changed the ret code: 127 is now expected on bits 15-8
+-  // previously it was simply -1, so check for not zero
+-  BPF_ASSERT_NE(0, ret_val);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, CloneVforkEperm, BaselinePolicy) {
+-  errno = 0;
+-  // Allocate a couple pages for the child's stack even though the child should
+-  // never start.
+-  constexpr size_t kStackSize = 4096 * 4;
+-  void* child_stack = mmap(nullptr, kStackSize, PROT_READ | PROT_WRITE,
+-                           MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+-  BPF_ASSERT_NE(child_stack, nullptr);
+-  pid_t pid = syscall(__NR_clone, CLONE_VM | CLONE_VFORK | SIGCHLD,
+-                      static_cast<char*>(child_stack) + kStackSize, nullptr,
+-                      nullptr, nullptr);
+-  const int clone_errno = errno;
+-  TestUtils::HandlePostForkReturn(pid);
+-
+-  munmap(child_stack, kStackSize);
+-
+-  BPF_ASSERT_EQ(-1, pid);
+-  BPF_ASSERT_EQ(EPERM, clone_errno);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, CreateThread, BaselinePolicy) {
+-  base::Thread thread("sandbox_tests");
+-  BPF_ASSERT(thread.Start());
+-}
+-
+-// Rseq should be enabled if it exists (i.e. shouldn't receive EPERM).
+-#if !BUILDFLAG(IS_ANDROID)
+-BPF_TEST_C(BaselinePolicy, RseqEnabled, BaselinePolicy) {
+-  errno = 0;
+-  int res = syscall(__NR_rseq, 0, 0, 0, 0);
+-
+-  BPF_ASSERT_EQ(-1, res);
+-  // The parameters above are invalid so the system call should fail with
+-  // EINVAL, or ENOSYS if the kernel is too old to recognize the system call.
+-  BPF_ASSERT(EINVAL == errno || ENOSYS == errno);
+-}
+-#endif  // !BUILDFLAG(IS_ANDROID)
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 DisallowedCloneFlagCrashes,
+-                 DEATH_SEGV_MESSAGE(GetCloneErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  pid_t pid = sys_clone(CLONE_THREAD | SIGCHLD);
+-  TestUtils::HandlePostForkReturn(pid);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 DisallowedKillCrashes,
+-                 DEATH_SEGV_MESSAGE(GetKillErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  BPF_ASSERT_NE(1, getpid());
+-  kill(1, 0);
+-  _exit(0);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, CanKillSelf, BaselinePolicy) {
+-  int sys_ret = kill(getpid(), 0);
+-  BPF_ASSERT_EQ(0, sys_ret);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, Socketpair, BaselinePolicy) {
+-  int sv[2];
+-  int sys_ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, sv);
+-  BPF_ASSERT_EQ(0, sys_ret);
+-  TestPipeOrSocketPair(base::ScopedFD(sv[0]), base::ScopedFD(sv[1]));
+-
+-  sys_ret = socketpair(AF_UNIX, SOCK_SEQPACKET, 0, sv);
+-  BPF_ASSERT_EQ(0, sys_ret);
+-  TestPipeOrSocketPair(base::ScopedFD(sv[0]), base::ScopedFD(sv[1]));
+-}
+-
+-#if !defined(GRND_NONBLOCK)
+-#define GRND_NONBLOCK 1
+-#endif
+-
+-BPF_TEST_C(BaselinePolicy, GetRandom, BaselinePolicy) {
+-  char buf[1];
+-
+-  // Many systems do not yet support getrandom(2) so ENOSYS is a valid result
+-  // here.
+-  int ret = HANDLE_EINTR(syscall(__NR_getrandom, buf, sizeof(buf), 0));
+-  BPF_ASSERT((ret == -1 && errno == ENOSYS) || ret == 1);
+-  ret = HANDLE_EINTR(syscall(__NR_getrandom, buf, sizeof(buf), GRND_NONBLOCK));
+-  BPF_ASSERT((ret == -1 && (errno == ENOSYS || errno == EAGAIN)) || ret == 1);
+-}
+-
+-// Not all architectures can restrict the domain for socketpair().
+-#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__)
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 SocketpairWrongDomain,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  int sv[2];
+-  std::ignore = socketpair(AF_INET, SOCK_STREAM, 0, sv);
+-  _exit(1);
+-}
+-#endif  // defined(__x86_64__) || defined(__arm__) || defined(__aarch64__)
+-
+-BPF_TEST_C(BaselinePolicy, EPERM_open, BaselinePolicy) {
+-  errno = 0;
+-  int sys_ret = open("/proc/cpuinfo", O_RDONLY);
+-  BPF_ASSERT_EQ(-1, sys_ret);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, EPERM_access, BaselinePolicy) {
+-  errno = 0;
+-  int sys_ret = access("/proc/cpuinfo", R_OK);
+-  BPF_ASSERT_EQ(-1, sys_ret);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-}
+-
+-BPF_TEST_C(BaselinePolicy, EPERM_getcwd, BaselinePolicy) {
+-  errno = 0;
+-  char buf[1024];
+-  char* cwd = getcwd(buf, sizeof(buf));
+-  BPF_ASSERT_EQ(nullptr, cwd);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 SIGSYS_InvalidSyscall,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  Syscall::InvalidCall();
+-}
+-
+-// A failing test using this macro could be problematic since we perform
+-// system calls by passing "0" as every argument.
+-// The kernel could SIGSEGV the process or the system call itself could reboot
+-// the machine. Some thoughts have been given when hand-picking the system
+-// calls below to limit any potential side effects outside of the current
+-// process.
+-#define TEST_BASELINE_SIGSYS(sysno)                                      \
+-  BPF_DEATH_TEST_C(BaselinePolicy,                                       \
+-                   SIGSYS_##sysno,                                       \
+-                   DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()), \
+-                   BaselinePolicy) {                                     \
+-    syscall(sysno, 0, 0, 0, 0, 0, 0);                                    \
+-    _exit(1);                                                            \
+-  }
+-
+-TEST_BASELINE_SIGSYS(__NR_acct)
+-TEST_BASELINE_SIGSYS(__NR_chroot)
+-TEST_BASELINE_SIGSYS(__NR_fanotify_init)
+-TEST_BASELINE_SIGSYS(__NR_fgetxattr)
+-TEST_BASELINE_SIGSYS(__NR_getcpu)
+-TEST_BASELINE_SIGSYS(__NR_getitimer)
+-TEST_BASELINE_SIGSYS(__NR_init_module)
+-TEST_BASELINE_SIGSYS(__NR_io_cancel)
+-TEST_BASELINE_SIGSYS(__NR_keyctl)
+-TEST_BASELINE_SIGSYS(__NR_mq_open)
+-TEST_BASELINE_SIGSYS(__NR_ptrace)
+-TEST_BASELINE_SIGSYS(__NR_sched_setaffinity)
+-TEST_BASELINE_SIGSYS(__NR_setpgid)
+-TEST_BASELINE_SIGSYS(__NR_swapon)
+-TEST_BASELINE_SIGSYS(__NR_sysinfo)
+-TEST_BASELINE_SIGSYS(__NR_syslog)
+-TEST_BASELINE_SIGSYS(__NR_timer_create)
+-
+-#if !defined(__aarch64__)
+-TEST_BASELINE_SIGSYS(__NR_inotify_init)
+-TEST_BASELINE_SIGSYS(__NR_vserver)
+-#endif
+-
+-#if defined(LIBC_GLIBC) && !BUILDFLAG(IS_CHROMEOS_ASH)
+-BPF_TEST_C(BaselinePolicy, FutexEINVAL, BaselinePolicy) {
+-  int ops[] = {
+-      FUTEX_CMP_REQUEUE_PI, FUTEX_CMP_REQUEUE_PI_PRIVATE,
+-      FUTEX_UNLOCK_PI_PRIVATE,
+-  };
+-
+-  for (int op : ops) {
+-    BPF_ASSERT_EQ(-1, syscall(__NR_futex, nullptr, op, 0, nullptr, nullptr, 0));
+-    BPF_ASSERT_EQ(EINVAL, errno);
+-  }
+-}
+-#else
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 FutexWithRequeuePriorityInheritence,
+-                 DEATH_SEGV_MESSAGE(GetFutexErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  syscall(__NR_futex, nullptr, FUTEX_CMP_REQUEUE_PI, 0, nullptr, nullptr, 0);
+-  _exit(1);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 FutexWithRequeuePriorityInheritencePrivate,
+-                 DEATH_SEGV_MESSAGE(GetFutexErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  syscall(__NR_futex, nullptr, FUTEX_CMP_REQUEUE_PI_PRIVATE, 0, nullptr,
+-          nullptr, 0);
+-  _exit(1);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 FutexWithUnlockPIPrivate,
+-                 DEATH_SEGV_MESSAGE(GetFutexErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  syscall(__NR_futex, nullptr, FUTEX_UNLOCK_PI_PRIVATE, 0, nullptr, nullptr, 0);
+-  _exit(1);
+-}
+-#endif  // defined(LIBC_GLIBC) && !BUILDFLAG(IS_CHROMEOS_ASH)
+-
+-BPF_TEST_C(BaselinePolicy, PrctlDumpable, BaselinePolicy) {
+-  const int is_dumpable = prctl(PR_GET_DUMPABLE, 0, 0, 0, 0);
+-  BPF_ASSERT(is_dumpable == 1 || is_dumpable == 0);
+-  const int prctl_ret = prctl(PR_SET_DUMPABLE, is_dumpable, 0, 0, 0, 0);
+-  BPF_ASSERT_EQ(0, prctl_ret);
+-}
+-
+-// Workaround incomplete Android headers.
+-#if !defined(PR_CAPBSET_READ)
+-#define PR_CAPBSET_READ 23
+-#endif
+-
+-#if !BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 PrctlSigsys,
+-                 DEATH_SEGV_MESSAGE(GetPrctlErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  prctl(PR_CAPBSET_READ, 0, 0, 0, 0);
+-  _exit(1);
+-}
+-#endif
+-
+-BPF_TEST_C(BaselinePolicy, GetOrSetPriority, BaselinePolicy) {
+-  errno = 0;
+-  const int original_prio = getpriority(PRIO_PROCESS, 0);
+-  // Check errno instead of the return value since this system call can return
+-  // -1 as a valid value.
+-  BPF_ASSERT_EQ(0, errno);
+-
+-  errno = 0;
+-  int rc = getpriority(PRIO_PROCESS, getpid());
+-  BPF_ASSERT_EQ(0, errno);
+-
+-  rc = getpriority(PRIO_PROCESS, getpid() + 1);
+-  BPF_ASSERT_EQ(-1, rc);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-
+-  rc = setpriority(PRIO_PROCESS, 0, original_prio);
+-  BPF_ASSERT_EQ(0, rc);
+-
+-  rc = setpriority(PRIO_PROCESS, getpid(), original_prio);
+-  BPF_ASSERT_EQ(0, rc);
+-
+-  errno = 0;
+-  rc = setpriority(PRIO_PROCESS, getpid() + 1, original_prio);
+-  BPF_ASSERT_EQ(-1, rc);
+-  BPF_ASSERT_EQ(EPERM, errno);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 GetPrioritySigsys,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  getpriority(PRIO_USER, 0);
+-  _exit(1);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 ClockGettimeWithDisallowedClockCrashes,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  struct timespec ts;
+-  syscall(SYS_clock_gettime, (~0) | CLOCKFD, &ts);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 ClockNanosleepWithDisallowedClockCrashes,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  struct timespec ts;
+-  struct timespec out_ts;
+-  ts.tv_sec = 0;
+-  ts.tv_nsec = 0;
+-  syscall(SYS_clock_nanosleep, (~0) | CLOCKFD, 0, &ts, &out_ts);
+-}
+-
+-#if !defined(GRND_RANDOM)
+-#define GRND_RANDOM 2
+-#endif
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 GetRandomOfDevRandomCrashes,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  syscall(__NR_getrandom, nullptr, 0, GRND_RANDOM);
+-}
+-
+-#if !defined(__i386__)
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 GetSockOptWrongLevelSigsys,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  int fds[2];
+-  PCHECK(socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == 0);
+-  int id;
+-  socklen_t peek_off_size = sizeof(id);
+-  getsockopt(fds[0], IPPROTO_TCP, SO_PEEK_OFF, &id, &peek_off_size);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 GetSockOptWrongOptionSigsys,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  int fds[2];
+-  PCHECK(socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == 0);
+-  int id;
+-  socklen_t peek_off_size = sizeof(id);
+-  getsockopt(fds[0], SOL_SOCKET, SO_DEBUG, &id, &peek_off_size);
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 SetSockOptWrongLevelSigsys,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  int fds[2];
+-  PCHECK(socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == 0);
+-  int id;
+-  setsockopt(fds[0], IPPROTO_TCP, SO_PEEK_OFF, &id, sizeof(id));
+-}
+-
+-BPF_DEATH_TEST_C(BaselinePolicy,
+-                 SetSockOptWrongOptionSigsys,
+-                 DEATH_SEGV_MESSAGE(GetErrorMessageContentForTests()),
+-                 BaselinePolicy) {
+-  int fds[2];
+-  PCHECK(socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == 0);
+-  int id;
+-  setsockopt(fds[0], SOL_SOCKET, SO_DEBUG, &id, sizeof(id));
+-}
+-#endif
+-
+-}  // namespace
+-
+-}  // namespace sandbox
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc.orig b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc.orig
+deleted file mode 100644
+index ba995ace6..000000000
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc.orig
++++ /dev/null
+@@ -1,498 +0,0 @@
+-// Copyright 2013 The Chromium Authors
+-// Use of this source code is governed by a BSD-style license that can be
+-// found in the LICENSE file.
+-
+-#include "sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h"
+-
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <linux/net.h>
+-#include <sched.h>
+-#include <signal.h>
+-#include <stdint.h>
+-#include <sys/ioctl.h>
+-#include <sys/mman.h>
+-#include <sys/prctl.h>
+-#include <sys/ptrace.h>
+-#include <sys/resource.h>
+-#include <sys/stat.h>
+-#include <sys/time.h>
+-#include <sys/types.h>
+-#include <time.h>
+-#include <unistd.h>
+-
+-#include "base/notreached.h"
+-#include "base/synchronization/synchronization_buildflags.h"
+-#include "build/build_config.h"
+-#include "build/chromeos_buildflags.h"
+-#include "sandbox/linux/bpf_dsl/bpf_dsl.h"
+-#include "sandbox/linux/bpf_dsl/seccomp_macros.h"
+-#include "sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.h"
+-#include "sandbox/linux/seccomp-bpf/sandbox_bpf.h"
+-#include "sandbox/linux/system_headers/linux_futex.h"
+-#include "sandbox/linux/system_headers/linux_prctl.h"
+-#include "sandbox/linux/system_headers/linux_ptrace.h"
+-#include "sandbox/linux/system_headers/linux_syscalls.h"
+-#include "sandbox/linux/system_headers/linux_time.h"
+-
+-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)) && \
+-    !defined(__arm__) && !defined(__aarch64__) &&             \
+-    !defined(PTRACE_GET_THREAD_AREA)
+-// Also include asm/ptrace-abi.h since ptrace.h in older libc (for instance
+-// the one in Ubuntu 16.04 LTS) is missing PTRACE_GET_THREAD_AREA.
+-// asm/ptrace-abi.h doesn't exist on arm32 and PTRACE_GET_THREAD_AREA isn't
+-// defined on aarch64, so don't try to include this on those platforms.
+-#include <asm/ptrace-abi.h>
+-#endif
+-
+-#if BUILDFLAG(IS_ANDROID)
+-
+-#if !defined(F_DUPFD_CLOEXEC)
+-#define F_DUPFD_CLOEXEC (F_LINUX_SPECIFIC_BASE + 6)
+-#endif
+-
+-#endif  // BUILDFLAG(IS_ANDROID)
+-
+-#if defined(__arm__) && !defined(MAP_STACK)
+-#define MAP_STACK 0x20000  // Daisy build environment has old headers.
+-#endif
+-
+-#if defined(__mips__) && !defined(MAP_STACK)
+-#define MAP_STACK 0x40000
+-#endif
+-
+-// Temporary definitions for Arm's Memory Tagging Extension (MTE) and Branch
+-// Target Identification (BTI).
+-#if defined(ARCH_CPU_ARM64)
+-#define PROT_MTE 0x20
+-#define PROT_BTI 0x10
+-#endif
+-
+-namespace {
+-
+-inline bool IsArchitectureX86_64() {
+-#if defined(__x86_64__)
+-  return true;
+-#else
+-  return false;
+-#endif
+-}
+-
+-inline bool IsArchitectureI386() {
+-#if defined(__i386__)
+-  return true;
+-#else
+-  return false;
+-#endif
+-}
+-
+-inline bool IsAndroid() {
+-#if BUILDFLAG(IS_ANDROID)
+-  return true;
+-#else
+-  return false;
+-#endif
+-}
+-
+-inline bool IsArchitectureMips() {
+-#if defined(__mips__)
+-  return true;
+-#else
+-  return false;
+-#endif
+-}
+-
+-// Ubuntu's version of glibc has a race condition in sem_post that can cause
+-// it to call futex(2) with bogus op arguments. To workaround this, we need
+-// to allow those futex(2) calls to fail with EINVAL, instead of crashing the
+-// process. See crbug.com/598471.
+-inline bool IsBuggyGlibcSemPost() {
+-#if defined(LIBC_GLIBC) && !BUILDFLAG(IS_CHROMEOS_ASH)
+-  return true;
+-#else
+-  return false;
+-#endif
+-}
+-
+-}  // namespace.
+-
+-using sandbox::bpf_dsl::Allow;
+-using sandbox::bpf_dsl::Arg;
+-using sandbox::bpf_dsl::BoolExpr;
+-using sandbox::bpf_dsl::Error;
+-using sandbox::bpf_dsl::If;
+-using sandbox::bpf_dsl::ResultExpr;
+-
+-namespace sandbox {
+-
+-// Allow Glibc's and Android pthread creation flags, crash on any other
+-// thread creation attempts and EPERM attempts to use neither
+-// CLONE_VM nor CLONE_THREAD (all fork implementations), unless CLONE_VFORK is
+-// present (as in newer versions of posix_spawn).
+-ResultExpr RestrictCloneToThreadsAndEPERMFork() {
+-  const Arg<unsigned long> flags(0);
+-
+-  // TODO(mdempsky): Extend DSL to support (flags & ~mask1) == mask2.
+-  const uint64_t kAndroidCloneMask = CLONE_VM | CLONE_FS | CLONE_FILES |
+-                                     CLONE_SIGHAND | CLONE_THREAD |
+-                                     CLONE_SYSVSEM;
+-  const uint64_t kObsoleteAndroidCloneMask = kAndroidCloneMask | CLONE_DETACHED;
+-
+-  const uint64_t kGlibcPthreadFlags =
+-      CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_THREAD |
+-      CLONE_SYSVSEM | CLONE_SETTLS | CLONE_PARENT_SETTID | CLONE_CHILD_CLEARTID;
+-  const BoolExpr glibc_test = flags == kGlibcPthreadFlags;
+-
+-  const BoolExpr android_test =
+-      AnyOf(flags == kAndroidCloneMask, flags == kObsoleteAndroidCloneMask,
+-            flags == kGlibcPthreadFlags);
+-
+-  // The following two flags are the two important flags in any vfork-emulating
+-  // clone call. EPERM any clone call that contains both of them.
+-  const uint64_t kImportantCloneVforkFlags = CLONE_VFORK | CLONE_VM;
+-
+-  const BoolExpr is_fork_or_clone_vfork =
+-      AnyOf((flags & (CLONE_VM | CLONE_THREAD)) == 0,
+-            (flags & kImportantCloneVforkFlags) == kImportantCloneVforkFlags);
+-
+-  return If(IsAndroid() ? android_test : glibc_test, Allow())
+-      .ElseIf(is_fork_or_clone_vfork, Error(EPERM))
+-      .Else(CrashSIGSYSClone());
+-}
+-
+-#ifndef PR_PAC_RESET_KEYS
+-#define PR_PAC_RESET_KEYS 54
+-#endif
+-
+-ResultExpr RestrictPrctl() {
+-  // Will need to add seccomp compositing in the future. PR_SET_PTRACER is
+-  // used by breakpad but not needed anymore.
+-  const Arg<int> option(0), arg(1);
+-  return Switch(option)
+-      .Cases({PR_GET_NAME, PR_SET_NAME, PR_GET_DUMPABLE, PR_SET_DUMPABLE
+-#if BUILDFLAG(IS_ANDROID)
+-              , PR_SET_PTRACER, PR_SET_TIMERSLACK
+-              , PR_GET_NO_NEW_PRIVS
+-#if defined(ARCH_CPU_ARM64)
+-                ,
+-                PR_PAC_RESET_KEYS
+-                // PR_GET_TAGGED_ADDR_CTRL is used by debuggerd to report
+-                // whether memory tagging is active.
+-                ,
+-                PR_GET_TAGGED_ADDR_CTRL
+-                // PR_PAC_GET_ENABLED_KEYS is used by debuggerd to report
+-                // whether pointer authentication is enabled and which keys (A
+-                // or B) are active.
+-                ,
+-                PR_PAC_GET_ENABLED_KEYS
+-#endif
+-
+-// Enable PR_SET_TIMERSLACK_PID, an Android custom prctl which is used in:
+-// https://android.googlesource.com/platform/system/core/+/lollipop-release/libcutils/sched_policy.c.
+-// Depending on the Android kernel version, this prctl may have different
+-// values. Since we don't know the correct value for the running kernel, we must
+-// allow them all.
+-//
+-// The effect is:
+-// On 3.14 kernels, this allows PR_SET_TIMERSLACK_PID and 43 and 127 (invalid
+-// prctls which will return EINVAL)
+-// On 3.18 kernels, this allows PR_SET_TIMERSLACK_PID, PR_SET_THP_DISABLE, and
+-// 127 (invalid).
+-// On 4.1 kernels and up, this allows PR_SET_TIMERSLACK_PID, PR_SET_THP_DISABLE,
+-// and PR_MPX_ENABLE_MANAGEMENT.
+-
+-// https://android.googlesource.com/kernel/common/+/android-3.14/include/uapi/linux/prctl.h
+-#define PR_SET_TIMERSLACK_PID_1 41
+-
+-// https://android.googlesource.com/kernel/common/+/android-3.18/include/uapi/linux/prctl.h
+-#define PR_SET_TIMERSLACK_PID_2 43
+-
+-// https://android.googlesource.com/kernel/common/+/android-4.1/include/uapi/linux/prctl.h and up
+-#define PR_SET_TIMERSLACK_PID_3 127
+-
+-              , PR_SET_TIMERSLACK_PID_1
+-              , PR_SET_TIMERSLACK_PID_2
+-              , PR_SET_TIMERSLACK_PID_3
+-#endif  // BUILDFLAG(IS_ANDROID)
+-              },
+-             Allow())
+-      .Cases({PR_SET_VMA},
+-             If(arg == PR_SET_VMA_ANON_NAME, Allow()).Else(CrashSIGSYSPrctl()))
+-      .Default(
+-          If(option == PR_SET_PTRACER, Error(EPERM)).Else(CrashSIGSYSPrctl()));
+-}
+-
+-ResultExpr RestrictIoctl() {
+-  const Arg<int> request(1);
+-  return Switch(request).Cases({TCGETS, FIONREAD}, Allow()).Default(
+-      CrashSIGSYSIoctl());
+-}
+-
+-ResultExpr RestrictMmapFlags() {
+-#if BUILDFLAG(IS_ANDROID) && defined(__x86_64__)
+-  const uint64_t kArchSpecificAllowedMask = MAP_32BIT;
+-#else
+-  const uint64_t kArchSpecificAllowedMask = 0;
+-#endif
+-  // The flags MAP_HUGETLB and MAP_POPULATE are specifically not permitted.
+-  // TODO(davidung), remove MAP_DENYWRITE with updated Tegra libraries.
+-  const uint64_t kAllowedMask = MAP_SHARED | MAP_PRIVATE | MAP_ANONYMOUS |
+-                                MAP_STACK | MAP_NORESERVE | MAP_FIXED |
+-                                MAP_DENYWRITE | MAP_LOCKED |
+-                                kArchSpecificAllowedMask;
+-  const Arg<int> flags(3);
+-  return If((flags & ~kAllowedMask) == 0, Allow()).Else(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictMprotectFlags() {
+-  // The flags you see are actually the allowed ones, and the variable is a
+-  // "denied" mask because of the negation operator.
+-  // Significantly, we don't permit weird undocumented flags such as
+-  // PROT_GROWSDOWN.
+-#if defined(ARCH_CPU_ARM64)
+-  // Allows PROT_MTE and PROT_BTI (as explained higher up) on only Arm
+-  // platforms.
+-  const uint64_t kArchSpecificFlags = PROT_MTE | PROT_BTI;
+-#else
+-  const uint64_t kArchSpecificFlags = 0;
+-#endif
+-  const uint64_t kAllowedMask =
+-      PROT_READ | PROT_WRITE | PROT_EXEC | kArchSpecificFlags;
+-  const Arg<int> prot(2);
+-  return If((prot & ~kAllowedMask) == 0, Allow()).Else(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictFcntlCommands() {
+-  // We also restrict the flags in F_SETFL. We don't want to permit flags with
+-  // a history of trouble such as O_DIRECT. The flags you see are actually the
+-  // allowed ones, and the variable is a "denied" mask because of the negation
+-  // operator.
+-  // Glibc overrides the kernel's O_LARGEFILE value. Account for this.
+-  uint64_t kOLargeFileFlag = O_LARGEFILE;
+-  if (IsArchitectureX86_64() || IsArchitectureI386() || IsArchitectureMips())
+-    kOLargeFileFlag = 0100000;
+-
+-  const Arg<int> cmd(1);
+-  const Arg<long> long_arg(2);
+-
+-  const uint64_t kAllowedMask = O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
+-                                kOLargeFileFlag | O_CLOEXEC | O_NOATIME;
+-#if BUILDFLAG(IS_ANDROID)
+-  const uint64_t kOsSpecificSeals = F_SEAL_FUTURE_WRITE;
+-#else
+-  const uint64_t kOsSpecificSeals = 0;
+-#endif
+-  const uint64_t kAllowedSeals = F_SEAL_SEAL | F_SEAL_GROW | F_SEAL_SHRINK |
+-                                 kOsSpecificSeals;
+-  // clang-format off
+-  return Switch(cmd)
+-      .Cases({F_GETFL,
+-              F_GETFD,
+-              F_GET_SEALS,
+-              F_SETFD,
+-              F_SETLK,
+-              F_SETLKW,
+-              F_GETLK,
+-              F_DUPFD,
+-              F_DUPFD_CLOEXEC},
+-             Allow())
+-      .Case(F_SETFL,
+-            If((long_arg & ~kAllowedMask) == 0, Allow()).Else(CrashSIGSYS()))
+-      .Case(F_ADD_SEALS,
+-            If((long_arg & ~kAllowedSeals) == 0, Allow()).Else(CrashSIGSYS()))
+-      .Default(CrashSIGSYS());
+-  // clang-format on
+-}
+-
+-#if defined(__i386__) || defined(__mips__)
+-ResultExpr RestrictSocketcallCommand() {
+-  // Unfortunately, we are unable to restrict the first parameter to
+-  // socketpair(2). Whilst initially sounding bad, it's noteworthy that very
+-  // few protocols actually support socketpair(2). The scary call that we're
+-  // worried about, socket(2), remains blocked.
+-  const Arg<int> call(0);
+-  return Switch(call)
+-      .Cases({SYS_SOCKETPAIR,
+-              SYS_SHUTDOWN,
+-              SYS_RECV,
+-              SYS_SEND,
+-              SYS_RECVFROM,
+-              SYS_SENDTO,
+-              SYS_RECVMSG,
+-              SYS_SENDMSG},
+-             Allow())
+-      .Default(Error(EPERM));
+-}
+-#endif
+-
+-ResultExpr RestrictKillTarget(pid_t target_pid, int sysno) {
+-  switch (sysno) {
+-    case __NR_kill:
+-    case __NR_tgkill: {
+-      const Arg<pid_t> pid(0);
+-      return If(pid == target_pid, Allow()).Else(CrashSIGSYSKill());
+-    }
+-    case __NR_tkill:
+-      return CrashSIGSYSKill();
+-    default:
+-      NOTREACHED();
+-      return CrashSIGSYS();
+-  }
+-}
+-
+-ResultExpr RestrictFutex() {
+-  const uint64_t kAllowedFutexFlags = FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME;
+-  const Arg<int> op(1);
+-  return Switch(op & ~kAllowedFutexFlags)
+-      .Cases({FUTEX_WAIT, FUTEX_WAKE, FUTEX_REQUEUE, FUTEX_CMP_REQUEUE,
+-#if BUILDFLAG(ENABLE_MUTEX_PRIORITY_INHERITANCE)
+-              // Enable priority-inheritance operations.
+-              FUTEX_LOCK_PI, FUTEX_UNLOCK_PI, FUTEX_TRYLOCK_PI,
+-              FUTEX_WAIT_REQUEUE_PI, FUTEX_CMP_REQUEUE_PI,
+-#endif  // BUILDFLAG(ENABLE_MUTEX_PRIORITY_INHERITANCE)
+-              FUTEX_WAKE_OP, FUTEX_WAIT_BITSET, FUTEX_WAKE_BITSET},
+-             Allow())
+-      .Default(IsBuggyGlibcSemPost() ? Error(EINVAL) : CrashSIGSYSFutex());
+-}
+-
+-ResultExpr RestrictGetSetpriority(pid_t target_pid) {
+-  const Arg<int> which(0);
+-  const Arg<int> who(1);
+-  return If(which == PRIO_PROCESS,
+-            Switch(who).Cases({0, target_pid}, Allow()).Default(Error(EPERM)))
+-      .Else(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictSchedTarget(pid_t target_pid, int sysno) {
+-  switch (sysno) {
+-    case __NR_sched_getaffinity:
+-    case __NR_sched_getattr:
+-    case __NR_sched_getparam:
+-    case __NR_sched_getscheduler:
+-    case __NR_sched_rr_get_interval:
+-#if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
+-    case __NR_sched_rr_get_interval_time64:
+-#endif
+-    case __NR_sched_setaffinity:
+-    case __NR_sched_setattr:
+-    case __NR_sched_setparam:
+-    case __NR_sched_setscheduler: {
+-      const Arg<pid_t> pid(0);
+-      return Switch(pid)
+-          .Cases({0, target_pid}, Allow())
+-          .Default(RewriteSchedSIGSYS());
+-    }
+-    default:
+-      NOTREACHED();
+-      return CrashSIGSYS();
+-  }
+-}
+-
+-ResultExpr RestrictPrlimit64(pid_t target_pid) {
+-  const Arg<pid_t> pid(0);
+-  return Switch(pid).Cases({0, target_pid}, Allow()).Default(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictGetrusage() {
+-  const Arg<int> who(0);
+-  return If(AnyOf(who == RUSAGE_SELF, who == RUSAGE_THREAD), Allow())
+-         .Else(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictClockID() {
+-  static_assert(4 == sizeof(clockid_t), "clockid_t is not 32bit");
+-  const Arg<clockid_t> clockid(0);
+-
+-  // Clock IDs < 0 are per pid/tid or are clockfds.
+-  const unsigned int kIsPidBit = 1u<<31;
+-
+-  return
+-    If((clockid & kIsPidBit) == 0,
+-      Switch(clockid).Cases({
+-              CLOCK_BOOTTIME,
+-              CLOCK_MONOTONIC,
+-              CLOCK_MONOTONIC_COARSE,
+-              CLOCK_MONOTONIC_RAW,
+-              CLOCK_PROCESS_CPUTIME_ID,
+-              CLOCK_REALTIME,
+-              CLOCK_REALTIME_COARSE,
+-              CLOCK_THREAD_CPUTIME_ID},
+-             Allow())
+-      .Default(CrashSIGSYS()))
+-#if BUILDFLAG(IS_ANDROID)
+-    // Allow per-pid and per-tid clocks.
+-    .ElseIf((clockid & CPUCLOCK_CLOCK_MASK) != CLOCKFD, Allow())
+-#endif
+-    .Else(CrashSIGSYS());
+-}
+-
+-#if !defined(GRND_NONBLOCK)
+-#define GRND_NONBLOCK 1
+-#endif
+-
+-ResultExpr RestrictGetRandom() {
+-  const Arg<unsigned int> flags(2);
+-  const unsigned int kGoodFlags = GRND_NONBLOCK;
+-  return If((flags & ~kGoodFlags) == 0, Allow()).Else(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictPrlimit(pid_t target_pid) {
+-  const Arg<pid_t> pid(0);
+-  // Only allow operations for the current process.
+-  return If(AnyOf(pid == 0, pid == target_pid), Allow()).Else(Error(EPERM));
+-}
+-
+-ResultExpr RestrictPrlimitToGetrlimit(pid_t target_pid) {
+-  const Arg<pid_t> pid(0);
+-  const Arg<uintptr_t> new_limit(2);
+-  // Only allow operations for the current process, and only with |new_limit|
+-  // set to null.
+-  return If(AllOf(new_limit == 0, AnyOf(pid == 0, pid == target_pid)), Allow())
+-      .Else(Error(EPERM));
+-}
+-
+-ResultExpr RestrictPtrace() {
+-  const Arg<int> request(0);
+-#if defined(__aarch64__)
+-  const Arg<uintptr_t> addr(2);
+-#endif
+-  return Switch(request)
+-      .Cases({
+-#if !defined(__aarch64__)
+-                 PTRACE_GETREGS, PTRACE_GETFPREGS, PTRACE_GET_THREAD_AREA,
+-                 PTRACE_GETREGSET,
+-#endif
+-#if defined(__arm__)
+-                 PTRACE_GETVFPREGS,
+-#endif
+-                 PTRACE_PEEKDATA, PTRACE_ATTACH, PTRACE_DETACH},
+-             Allow())
+-#if defined(__aarch64__)
+-      .Case(
+-          PTRACE_GETREGSET,
+-          If(AllOf(addr != NT_ARM_PACA_KEYS, addr != NT_ARM_PACG_KEYS), Allow())
+-              .Else(CrashSIGSYSPtrace()))
+-#endif
+-      .Default(CrashSIGSYSPtrace());
+-}
+-
+-ResultExpr RestrictPkeyAllocFlags() {
+-  const Arg<int> flags(0);
+-  return If(flags == 0, Allow()).Else(CrashSIGSYS());
+-}
+-
+-ResultExpr RestrictGoogle3Threading(int sysno) {
+-  DCHECK(sysno == __NR_getitimer || sysno == __NR_setitimer);
+-
+-  const Arg<int> which(0);
+-  return If(which == ITIMER_PROF, Allow()).Else(Error(EPERM));
+-}
+-
+-ResultExpr RestrictPipe2() {
+-  const Arg<int> flags(1);
+-  return If((flags & ~(O_CLOEXEC|O_DIRECT|O_NONBLOCK)) == 0, Allow())
+-      .Else(CrashSIGSYS());
+-}
+-
+-}  // namespace sandbox.
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall.cc
+index ed31848be..733e48b0c 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall.cc
+@@ -18,7 +18,7 @@ namespace sandbox {
+ namespace {
+ 
+ #if defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY) || \
+-    defined(ARCH_CPU_MIPS_FAMILY) || defined(ARCH_CPU_LOONG_FAMILY)
++    defined(ARCH_CPU_MIPS_FAMILY) || defined(ARCH_CPU_LOONGARCH_FAMILY)
+ // Number that's not currently used by any Linux kernel ABIs.
+ const int kInvalidSyscallNumber = 0x351d3;
+ #else
+@@ -314,7 +314,7 @@ asm(// We need to be able to tell the kernel exactly where we made a
+     ".type SyscallAsm, %function\n"
+     "SyscallAsm:\n"
+     "bge $a0, $zero, 1f\n"
+-    "la.pcrel $a0, 2f\n"
++    "la $a0, 2f\n"
+     "b 2f\n"
+     "1:ld.d $a5, $a6, 40\n"
+     "ld.d $a4, $a6, 32\n"
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall_unittest.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall_unittest.cc
+index 9667feaae..80403a2f6 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall_unittest.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/seccomp-bpf/syscall_unittest.cc
+@@ -65,6 +65,7 @@ TEST(Syscall, WellKnownEntryPoint) {
+   EXPECT_EQ(0x0cu, (((uint32_t*)Syscall::Call(-1))[-1]) & 0x0000FFFF);
+ #elif defined(__aarch64__)
+   EXPECT_EQ(0xD4000001u, ((uint32_t*)Syscall::Call(-1))[-1]);  // SVC 0
++#elif defined(__loongarch_lp64)
+ #else
+ #warning Incomplete test case; need port for target platform
+ #endif
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/credentials.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/credentials.cc
+index 5257bddc7..ea30f3627 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/credentials.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/credentials.cc
+@@ -80,7 +80,7 @@ bool ChrootToSafeEmptyDir() {
+   pid_t pid = -1;
+   alignas(16) char stack_buf[PTHREAD_STACK_MIN];
+ #if defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY) || \
+-    defined(ARCH_CPU_MIPS_FAMILY) || defined(ARCH_CPU_LOONG_FAMILY)
++    defined(ARCH_CPU_MIPS_FAMILY) || defined(ARCH_CPU_LOONGARCH_FAMILY)
+   // The stack grows downward.
+   void* stack = stack_buf + sizeof(stack_buf);
+ #else
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/syscall_wrappers.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/syscall_wrappers.cc
+index 71bd5a5b2..bfed1c20f 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/syscall_wrappers.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/services/syscall_wrappers.cc
+@@ -58,7 +58,7 @@ long sys_clone(unsigned long flags,
+   if (ctid) MSAN_UNPOISON(ctid, sizeof(*ctid));
+   // See kernel/fork.c in Linux. There is different ordering of sys_clone
+   // parameters depending on CONFIG_CLONE_BACKWARDS* configuration options.
+-#if defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_LOONG64)
++#if defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_LOONGARCH64)
+   return syscall(__NR_clone, flags, child_stack, ptid, ctid, tls);
+ #elif defined(ARCH_CPU_X86) || defined(ARCH_CPU_ARM_FAMILY) || \
+     defined(ARCH_CPU_MIPS_FAMILY)
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_client.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_client.cc
+index d406c2228..95113afb0 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_client.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_client.cc
+@@ -200,8 +200,8 @@ int BrokerClient::Statx(const char* pathname,
+     return -EFAULT;
+ 
+   if (fast_check_in_client_ &&
+-      !CommandStatIsSafe(policy_->allowed_command_set, *policy_->file_permissions,
+-                         pathname)) {
++      !CommandStatIsSafe(policy_->allowed_command_set,
++                         *policy_->file_permissions, pathname)) {
+     return -policy_->file_permissions->denied_errno();
+   }
+   return StatFamilySyscall(COMMAND_STATX, pathname, follow_links, sb,
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_command.h.orig b/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_command.h.orig
+deleted file mode 100644
+index d44c42fe2..000000000
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_command.h.orig
++++ /dev/null
+@@ -1,120 +0,0 @@
+-// Copyright 2014 The Chromium Authors
+-// Use of this source code is governed by a BSD-style license that can be
+-// found in the LICENSE file.
+-
+-#ifndef SANDBOX_LINUX_SYSCALL_BROKER_BROKER_COMMAND_H_
+-#define SANDBOX_LINUX_SYSCALL_BROKER_BROKER_COMMAND_H_
+-
+-#include <fcntl.h>
+-#include <stddef.h>
+-#include <stdint.h>
+-
+-#include <bitset>
+-#include <initializer_list>
+-#include <utility>
+-
+-namespace sandbox {
+-namespace syscall_broker {
+-
+-class BrokerPermissionList;
+-
+-// Some flags are local to the current process and cannot be sent over a Unix
+-// socket. They need special treatment from the client.
+-// O_CLOEXEC is tricky because in theory another thread could call execve()
+-// before special treatment is made on the client, so a client needs to call
+-// recvmsg(2) with MSG_CMSG_CLOEXEC.
+-// To make things worse, there are two CLOEXEC related flags, FD_CLOEXEC (see
+-// F_GETFD in fcntl(2)) and O_CLOEXEC (see F_GETFL in fcntl(2)). O_CLOEXEC
+-// doesn't affect the semantics on execve(), it's merely a note that the
+-// descriptor was originally opened with O_CLOEXEC as a flag. And it is sent
+-// over unix sockets just fine, so a receiver that would (incorrectly) look at
+-// O_CLOEXEC instead of FD_CLOEXEC may be tricked in thinking that the file
+-// descriptor will or won't be closed on execve().
+-constexpr int kCurrentProcessOpenFlagsMask = O_CLOEXEC;
+-
+-enum BrokerCommand {
+-  COMMAND_INVALID = 0,
+-  COMMAND_ACCESS,
+-  COMMAND_MKDIR,
+-  COMMAND_OPEN,
+-  COMMAND_READLINK,
+-  COMMAND_RENAME,
+-  COMMAND_RMDIR,
+-  COMMAND_STAT,
+-  COMMAND_STAT64,
+-  COMMAND_UNLINK,
+-  COMMAND_INOTIFY_ADD_WATCH,
+-
+-  // NOTE: update when adding new commands.
+-  COMMAND_MAX = COMMAND_INOTIFY_ADD_WATCH
+-};
+-
+-using BrokerCommandSet = std::bitset<COMMAND_MAX + 1>;
+-
+-// Helper function since std::bitset lacks an initializer list constructor.
+-inline BrokerCommandSet MakeBrokerCommandSet(
+-    const std::initializer_list<BrokerCommand>& args) {
+-  BrokerCommandSet result;
+-  for (const auto& arg : args)
+-    result.set(arg);
+-  return result;
+-}
+-
+-// Helper functions to perform the same permissions test on either side
+-// (client or broker process) of a broker IPC command. The implementations
+-// must be safe when called from an async signal handler.
+-// They all return nullptr when permission checks fail.
+-[[nodiscard]] const char* CommandAccessIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename,
+-    int requested_mode  // e.g. F_OK, R_OK, W_OK.
+-);
+-
+-[[nodiscard]] const char* CommandMkdirIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename);
+-
+-[[nodiscard]] std::pair<const char*, bool> CommandOpenIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename,
+-    int requested_flags  // e.g. O_RDONLY, O_RDWR.
+-);
+-
+-[[nodiscard]] const char* CommandReadlinkIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename);
+-
+-[[nodiscard]] std::pair<const char*, const char*> CommandRenameIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* old_filename,
+-    const char* new_filename);
+-
+-[[nodiscard]] const char* CommandRmdirIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename);
+-
+-[[nodiscard]] const char* CommandStatIsSafe(const BrokerCommandSet& command_set,
+-                                            const BrokerPermissionList& policy,
+-                                            const char* requested_filename);
+-
+-[[nodiscard]] const char* CommandUnlinkIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename);
+-
+-[[nodiscard]] const char* CommandInotifyAddWatchIsSafe(
+-    const BrokerCommandSet& command_set,
+-    const BrokerPermissionList& policy,
+-    const char* requested_filename,
+-    uint32_t mask);
+-
+-}  // namespace syscall_broker
+-}  // namespace sandbox
+-
+-#endif  // SANDBOX_LINUX_SYSCALL_BROKER_BROKER_COMMAND_H_
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_process_unittest.cc b/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_process_unittest.cc
+index 802f4a543..58164652c 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_process_unittest.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/syscall_broker/broker_process_unittest.cc
+@@ -880,8 +880,8 @@ TEST(BrokerProcess, CreateFile) {
+   unlink(permfile_name);
+ }
+ 
+-// Use statx instead of stat,lstat and fstatat on loongarch_lp64 architecture,
+-// So not test run TestStatHelper on loongarch_lp64.
++// Use statx instead of stat,lstat and fstatat on loongarch64 architecture,
++// So not test run TestStatHelper on loongarch64.
+ #if !defined(__loongarch_lp64)
+ void TestStatHelper(bool fast_check_in_client, bool follow_links) {
+   ScopedTemporaryFile tmp_file;
+@@ -1978,7 +1978,7 @@ TEST(BrokerProcess, IsSyscallAllowed) {
+       {COMMAND_ACCESS,
+        {__NR_faccessat,
+ #if !defined(__loongarch_lp64)
+-        __NR_faccessat2,
++	__NR_faccessat2,
+ #endif
+ #if defined(__NR_access) && !BUILDFLAG(IS_ANDROID)
+         __NR_access
+@@ -1996,12 +1996,14 @@ TEST(BrokerProcess, IsSyscallAllowed) {
+         __NR_open
+ #endif
+        }},
++#if !defined(__loongarch_lp64)
+       {COMMAND_READLINK,
+        {__NR_readlinkat,
+ #if defined(__NR_readlink) && !BUILDFLAG(IS_ANDROID)
+         __NR_readlink
+ #endif
+        }},
++#endif
+       {COMMAND_RENAME,
+        {__NR_renameat,
+ #if defined(__NR_rename) && !BUILDFLAG(IS_ANDROID)
+@@ -2040,9 +2042,6 @@ TEST(BrokerProcess, IsSyscallAllowed) {
+ #if defined(__NR_stat64)
+            __NR_stat64,
+ #endif
+-#if defined(__NR_statx)
+-           __NR_statx,
+-#endif
+ #if defined(__NR_lstat64)
+            __NR_lstat64,
+ #endif
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_signal.h b/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_signal.h
+index e3996b0ce..12593316e 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_signal.h
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_signal.h
+@@ -105,7 +105,7 @@ struct LinuxSigSet {
+ struct LinuxSigSet {
+   unsigned long sig[_NSIG_WORDS];
+ };
+-#elif defined(ARCH_CPU_LOONG_FAMILY)
++#elif defined(ARCH_CPU_LOONGARCH_FAMILY)
+ #if !defined(_NSIG_WORDS)
+ #define _NSIG_WORDS 1
+ #endif
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_syscalls.h b/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_syscalls.h
+index 5ad6ac5e5..1353b081a 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_syscalls.h
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/linux_syscalls.h
+@@ -36,7 +36,7 @@
+ #endif
+ 
+ #if defined(__loongarch_lp64)
+-#include "sandbox/linux/system_headers/loong64_linux_syscalls.h"
++#include "sandbox/linux/system_headers/loongarch64_linux_syscalls.h"
+ #endif
+ 
+ #endif  // SANDBOX_LINUX_SYSTEM_HEADERS_LINUX_SYSCALLS_H_
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/loong64_linux_syscalls.h b/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/loongarch64_linux_syscalls.h
+similarity index 97%
+rename from qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/loong64_linux_syscalls.h
+rename to qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/loongarch64_linux_syscalls.h
+index 7a531f6c1..65bd0ac8e 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/loong64_linux_syscalls.h
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/linux/system_headers/loongarch64_linux_syscalls.h
+@@ -2,1130 +2,850 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-#ifndef SANDBOX_LINUX_SYSTEM_HEADERS_LOONG64_LINUX_SYSCALLS_H_
+-#define SANDBOX_LINUX_SYSTEM_HEADERS_LOONG64_LINUX_SYSCALLS_H_
++#ifndef SANDBOX_LINUX_SYSTEM_HEADERS_LOONGARCH64_LINUX_SYSCALLS_H_
++#define SANDBOX_LINUX_SYSTEM_HEADERS_LOONGARCH64_LINUX_SYSCALLS_H_
+ 
+ #if !defined(__loongarch__)
+ #error "Including header on wrong architecture"
+ #endif
+ #include <asm/unistd.h>
+-
+ #if !defined(__NR_io_setup)
+ #define __NR_io_setup 0
+ #endif
+-
+ #if !defined(__NR_io_destroy)
+ #define __NR_io_destroy 1
+ #endif
+-
+ #if !defined(__NR_io_submit)
+ #define __NR_io_submit 2
+ #endif
+-
+ #if !defined(__NR_io_cancel)
+ #define __NR_io_cancel 3
+ #endif
+-
+ #if !defined(__NR_io_getevents)
+ #define __NR_io_getevents 4
+ #endif
+-
+ #if !defined(__NR_setxattr)
+ #define __NR_setxattr 5
+ #endif
+-
+ #if !defined(__NR_lsetxattr)
+ #define __NR_lsetxattr 6
+ #endif
+-
+ #if !defined(__NR_fsetxattr)
+ #define __NR_fsetxattr 7
+ #endif
+-
+ #if !defined(__NR_getxattr)
+ #define __NR_getxattr 8
+ #endif
+-
+ #if !defined(__NR_lgetxattr)
+ #define __NR_lgetxattr 9
+ #endif
+-
+ #if !defined(__NR_fgetxattr)
+ #define __NR_fgetxattr 10
+ #endif
+-
+ #if !defined(__NR_listxattr)
+ #define __NR_listxattr 11
+ #endif
+-
+ #if !defined(__NR_llistxattr)
+ #define __NR_llistxattr 12
+ #endif
+-
+ #if !defined(__NR_flistxattr)
+ #define __NR_flistxattr 13
+ #endif
+-
+ #if !defined(__NR_removexattr)
+ #define __NR_removexattr 14
+ #endif
+-
+ #if !defined(__NR_lremovexattr)
+ #define __NR_lremovexattr 15
+ #endif
+-
+ #if !defined(__NR_fremovexattr)
+ #define __NR_fremovexattr 16
+ #endif
+-
+ #if !defined(__NR_getcwd)
+ #define __NR_getcwd 17
+ #endif
+-
+ #if !defined(__NR_lookup_dcookie)
+ #define __NR_lookup_dcookie 18
+ #endif
+-
+ #if !defined(__NR_eventfd2)
+ #define __NR_eventfd2 19
+ #endif
+-
+ #if !defined(__NR_epoll_create1)
+ #define __NR_epoll_create1 20
+ #endif
+-
+ #if !defined(__NR_epoll_ctl)
+ #define __NR_epoll_ctl 21
+ #endif
+-
+ #if !defined(__NR_epoll_pwait)
+ #define __NR_epoll_pwait 22
+ #endif
+-
+ #if !defined(__NR_dup)
+ #define __NR_dup 23
+ #endif
+-
+ #if !defined(__NR_dup3)
+ #define __NR_dup3 24
+ #endif
+-
+ #if !defined(__NR_fcntl)
+ #define __NR_fcntl 25
+ #endif
+-
+ #if !defined(__NR_inotify_init1)
+ #define __NR_inotify_init1 26
+ #endif
+-
+ #if !defined(__NR_inotify_add_watch)
+ #define __NR_inotify_add_watch 27
+ #endif
+-
+ #if !defined(__NR_inotify_rm_watch)
+ #define __NR_inotify_rm_watch 28
+ #endif
+-
+ #if !defined(__NR_ioctl)
+ #define __NR_ioctl 29
+ #endif
+-
+ #if !defined(__NR_ioprio_set)
+ #define __NR_ioprio_set 30
+ #endif
+-
+ #if !defined(__NR_ioprio_get)
+ #define __NR_ioprio_get 31
+ #endif
+-
+ #if !defined(__NR_flock)
+ #define __NR_flock 32
+ #endif
+-
+ #if !defined(__NR_mknodat)
+ #define __NR_mknodat 33
+ #endif
+-
+ #if !defined(__NR_mkdirat)
+ #define __NR_mkdirat 34
+ #endif
+-
+ #if !defined(__NR_unlinkat)
+ #define __NR_unlinkat 35
+ #endif
+-
+ #if !defined(__NR_symlinkat)
+ #define __NR_symlinkat 36
+ #endif
+-
+ #if !defined(__NR_linkat)
+ #define __NR_linkat 37
+ #endif
+-
+ #if !defined(__NR_renameat)
+ #define __NR_renameat 38
+ #endif
+-
+ #if !defined(__NR_umount2)
+ #define __NR_umount2 39
+ #endif
+-
+ #if !defined(__NR_mount)
+ #define __NR_mount 40
+ #endif
+-
+ #if !defined(__NR_pivot_root)
+ #define __NR_pivot_root 41
+ #endif
+-
+ #if !defined(__NR_nfsservctl)
+ #define __NR_nfsservctl 42
+ #endif
+-
+ #if !defined(__NR_statfs)
+ #define __NR_statfs 43
+ #endif
+-
+ #if !defined(__NR_fstatfs)
+ #define __NR_fstatfs 44
+ #endif
+-
+ #if !defined(__NR_truncate)
+ #define __NR_truncate 45
+ #endif
+-
+ #if !defined(__NR_ftruncate)
+ #define __NR_ftruncate 46
+ #endif
+-
+ #if !defined(__NR_fallocate)
+ #define __NR_fallocate 47
+ #endif
+-
+ #if !defined(__NR_faccessat)
+ #define __NR_faccessat 48
+ #endif
+-
+ #if !defined(__NR_chdir)
+ #define __NR_chdir 49
+ #endif
+-
+ #if !defined(__NR_fchdir)
+ #define __NR_fchdir 50
+ #endif
+-
+ #if !defined(__NR_chroot)
+ #define __NR_chroot 51
+ #endif
+-
+ #if !defined(__NR_fchmod)
+ #define __NR_fchmod 52
+ #endif
+-
+ #if !defined(__NR_fchmodat)
+ #define __NR_fchmodat 53
+ #endif
+-
+ #if !defined(__NR_fchownat)
+ #define __NR_fchownat 54
+ #endif
+-
+ #if !defined(__NR_fchown)
+ #define __NR_fchown 55
+ #endif
+-
+ #if !defined(__NR_openat)
+ #define __NR_openat 56
+ #endif
+-
+ #if !defined(__NR_close)
+ #define __NR_close 57
+ #endif
+-
+ #if !defined(__NR_vhangup)
+ #define __NR_vhangup 58
+ #endif
+-
+ #if !defined(__NR_pipe2)
+ #define __NR_pipe2 59
+ #endif
+-
+ #if !defined(__NR_quotactl)
+ #define __NR_quotactl 60
+ #endif
+-
+ #if !defined(__NR_getdents64)
+ #define __NR_getdents64 61
+ #endif
+-
+ #if !defined(__NR_lseek)
+ #define __NR_lseek 62
+ #endif
+-
+ #if !defined(__NR_read)
+ #define __NR_read 63
+ #endif
+-
+ #if !defined(__NR_write)
+ #define __NR_write 64
+ #endif
+-
+ #if !defined(__NR_readv)
+ #define __NR_readv 65
+ #endif
+-
+ #if !defined(__NR_writev)
+ #define __NR_writev 66
+ #endif
+-
+ #if !defined(__NR_pread64)
+ #define __NR_pread64 67
+ #endif
+-
+ #if !defined(__NR_pwrite64)
+ #define __NR_pwrite64 68
+ #endif
+-
+ #if !defined(__NR_preadv)
+ #define __NR_preadv 69
+ #endif
+-
+ #if !defined(__NR_pwritev)
+ #define __NR_pwritev 70
+ #endif
+-
+ #if !defined(__NR_sendfile)
+ #define __NR_sendfile 71
+ #endif
+-
+ #if !defined(__NR_pselect6)
+ #define __NR_pselect6 72
+ #endif
+-
+ #if !defined(__NR_ppoll)
+ #define __NR_ppoll 73
+ #endif
+-
+ #if !defined(__NR_signalfd4)
+ #define __NR_signalfd4 74
+ #endif
+-
+ #if !defined(__NR_vmsplice)
+ #define __NR_vmsplice 75
+ #endif
+-
+ #if !defined(__NR_splice)
+ #define __NR_splice 76
+ #endif
+-
+ #if !defined(__NR_tee)
+ #define __NR_tee 77
+ #endif
+-
+ #if !defined(__NR_readlinkat)
+ #define __NR_readlinkat 78
+ #endif
+-
+ #if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
+ #if !defined(__NR_newfstatat)
+ #define __NR_newfstatat 79
+ #endif
+-
+ #if !defined(__NR_fstat)
+ #define __NR_fstat 80
+ #endif
+ #endif
+-
+ #if !defined(__NR_sync)
+ #define __NR_sync 81
+ #endif
+-
+ #if !defined(__NR_fsync)
+ #define __NR_fsync 82
+ #endif
+-
+ #if !defined(__NR_fdatasync)
+ #define __NR_fdatasync 83
+ #endif
+-
+ #if !defined(__NR_sync_file_range)
+ #define __NR_sync_file_range 84
+ #endif
+-
+ #if !defined(__NR_timerfd_create)
+ #define __NR_timerfd_create 85
+ #endif
+-
+ #if !defined(__NR_timerfd_settime)
+ #define __NR_timerfd_settime 86
+ #endif
+-
+ #if !defined(__NR_timerfd_gettime)
+ #define __NR_timerfd_gettime 87
+ #endif
+-
+ #if !defined(__NR_utimensat)
+ #define __NR_utimensat 88
+ #endif
+-
+ #if !defined(__NR_acct)
+ #define __NR_acct 89
+ #endif
+-
+ #if !defined(__NR_capget)
+ #define __NR_capget 90
+ #endif
+-
+ #if !defined(__NR_capset)
+ #define __NR_capset 91
+ #endif
+-
+ #if !defined(__NR_personality)
+ #define __NR_personality 92
+ #endif
+-
+ #if !defined(__NR_exit)
+ #define __NR_exit 93
+ #endif
+-
+ #if !defined(__NR_exit_group)
+ #define __NR_exit_group 94
+ #endif
+-
+ #if !defined(__NR_waitid)
+ #define __NR_waitid 95
+ #endif
+-
+ #if !defined(__NR_set_tid_address)
+ #define __NR_set_tid_address 96
+ #endif
+-
+ #if !defined(__NR_unshare)
+ #define __NR_unshare 97
+ #endif
+-
+ #if !defined(__NR_futex)
+ #define __NR_futex 98
+ #endif
+-
+ #if !defined(__NR_set_robust_list)
+ #define __NR_set_robust_list 99
+ #endif
+-
+ #if !defined(__NR_get_robust_list)
+ #define __NR_get_robust_list 100
+ #endif
+-
+ #if !defined(__NR_nanosleep)
+ #define __NR_nanosleep 101
+ #endif
+-
+ #if !defined(__NR_getitimer)
+ #define __NR_getitimer 102
+ #endif
+-
+ #if !defined(__NR_setitimer)
+ #define __NR_setitimer 103
+ #endif
+-
+ #if !defined(__NR_kexec_load)
+ #define __NR_kexec_load 104
+ #endif
+-
+ #if !defined(__NR_init_module)
+ #define __NR_init_module 105
+ #endif
+-
+ #if !defined(__NR_delete_module)
+ #define __NR_delete_module 106
+ #endif
+-
+ #if !defined(__NR_timer_create)
+ #define __NR_timer_create 107
+ #endif
+-
+ #if !defined(__NR_timer_gettime)
+ #define __NR_timer_gettime 108
+ #endif
+-
+ #if !defined(__NR_timer_getoverrun)
+ #define __NR_timer_getoverrun 109
+ #endif
+-
+ #if !defined(__NR_timer_settime)
+ #define __NR_timer_settime 110
+ #endif
+-
+ #if !defined(__NR_timer_delete)
+ #define __NR_timer_delete 111
+ #endif
+-
+ #if !defined(__NR_clock_settime)
+ #define __NR_clock_settime 112
+ #endif
+-
+ #if !defined(__NR_clock_gettime)
+ #define __NR_clock_gettime 113
+ #endif
+-
+ #if !defined(__NR_clock_getres)
+ #define __NR_clock_getres 114
+ #endif
+-
+ #if !defined(__NR_clock_nanosleep)
+ #define __NR_clock_nanosleep 115
+ #endif
+-
+ #if !defined(__NR_syslog)
+ #define __NR_syslog 116
+ #endif
+-
+ #if !defined(__NR_ptrace)
+ #define __NR_ptrace 117
+ #endif
+-
+ #if !defined(__NR_sched_setparam)
+ #define __NR_sched_setparam 118
+ #endif
+-
+ #if !defined(__NR_sched_setscheduler)
+ #define __NR_sched_setscheduler 119
+ #endif
+-
+ #if !defined(__NR_sched_getscheduler)
+ #define __NR_sched_getscheduler 120
+ #endif
+-
+ #if !defined(__NR_sched_getparam)
+ #define __NR_sched_getparam 121
+ #endif
+-
+ #if !defined(__NR_sched_setaffinity)
+ #define __NR_sched_setaffinity 122
+ #endif
+-
+ #if !defined(__NR_sched_getaffinity)
+ #define __NR_sched_getaffinity 123
+ #endif
+-
+ #if !defined(__NR_sched_yield)
+ #define __NR_sched_yield 124
+ #endif
+-
+ #if !defined(__NR_sched_get_priority_max)
+ #define __NR_sched_get_priority_max 125
+ #endif
+-
+ #if !defined(__NR_sched_get_priority_min)
+ #define __NR_sched_get_priority_min 126
+ #endif
+-
+ #if !defined(__NR_sched_rr_get_interval)
+ #define __NR_sched_rr_get_interval 127
+ #endif
+-
+ #if !defined(__NR_restart_syscall)
+ #define __NR_restart_syscall 128
+ #endif
+-
+ #if !defined(__NR_kill)
+ #define __NR_kill 129
+ #endif
+-
+ #if !defined(__NR_tkill)
+ #define __NR_tkill 130
+ #endif
+-
+ #if !defined(__NR_tgkill)
+ #define __NR_tgkill 131
+ #endif
+-
+ #if !defined(__NR_sigaltstack)
+ #define __NR_sigaltstack 132
+ #endif
+-
+ #if !defined(__NR_rt_sigsuspend)
+ #define __NR_rt_sigsuspend 133
+ #endif
+-
+ #if !defined(__NR_rt_sigaction)
+ #define __NR_rt_sigaction 134
+ #endif
+-
+ #if !defined(__NR_rt_sigprocmask)
+ #define __NR_rt_sigprocmask 135
+ #endif
+-
+ #if !defined(__NR_rt_sigpending)
+ #define __NR_rt_sigpending 136
+ #endif
+-
+ #if !defined(__NR_rt_sigtimedwait)
+ #define __NR_rt_sigtimedwait 137
+ #endif
+-
+ #if !defined(__NR_rt_sigqueueinfo)
+ #define __NR_rt_sigqueueinfo 138
+ #endif
+-
+ #if !defined(__NR_rt_sigreturn)
+ #define __NR_rt_sigreturn 139
+ #endif
+-
+ #if !defined(__NR_setpriority)
+ #define __NR_setpriority 140
+ #endif
+-
+ #if !defined(__NR_getpriority)
+ #define __NR_getpriority 141
+ #endif
+-
+ #if !defined(__NR_reboot)
+ #define __NR_reboot 142
+ #endif
+-
+ #if !defined(__NR_setregid)
+ #define __NR_setregid 143
+ #endif
+-
+ #if !defined(__NR_setgid)
+ #define __NR_setgid 144
+ #endif
+-
+ #if !defined(__NR_setreuid)
+ #define __NR_setreuid 145
+ #endif
+-
+ #if !defined(__NR_setuid)
+ #define __NR_setuid 146
+ #endif
+-
+ #if !defined(__NR_setresuid)
+ #define __NR_setresuid 147
+ #endif
+-
+ #if !defined(__NR_getresuid)
+ #define __NR_getresuid 148
+ #endif
+-
+ #if !defined(__NR_setresgid)
+ #define __NR_setresgid 149
+ #endif
+-
+ #if !defined(__NR_getresgid)
+ #define __NR_getresgid 150
+ #endif
+-
+ #if !defined(__NR_setfsuid)
+ #define __NR_setfsuid 151
+ #endif
+-
+ #if !defined(__NR_setfsgid)
+ #define __NR_setfsgid 152
+ #endif
+-
+ #if !defined(__NR_times)
+ #define __NR_times 153
+ #endif
+-
+ #if !defined(__NR_setpgid)
+ #define __NR_setpgid 154
+ #endif
+-
+ #if !defined(__NR_getpgid)
+ #define __NR_getpgid 155
+ #endif
+-
+ #if !defined(__NR_getsid)
+ #define __NR_getsid 156
+ #endif
+-
+ #if !defined(__NR_setsid)
+ #define __NR_setsid 157
+ #endif
+-
+ #if !defined(__NR_getgroups)
+ #define __NR_getgroups 158
+ #endif
+-
+ #if !defined(__NR_setgroups)
+ #define __NR_setgroups 159
+ #endif
+-
+ #if !defined(__NR_uname)
+ #define __NR_uname 160
+ #endif
+-
+ #if !defined(__NR_sethostname)
+ #define __NR_sethostname 161
+ #endif
+-
+ #if !defined(__NR_setdomainname)
+ #define __NR_setdomainname 162
+ #endif
+-
+ #if !defined(__NR_getrlimit)
+ #define __NR_getrlimit 163
+ #endif
+-
+ #if !defined(__NR_setrlimit)
+ #define __NR_setrlimit 164
+ #endif
+-
+ #if !defined(__NR_getrusage)
+ #define __NR_getrusage 165
+ #endif
+-
+ #if !defined(__NR_umask)
+ #define __NR_umask 166
+ #endif
+-
+ #if !defined(__NR_prctl)
+ #define __NR_prctl 167
+ #endif
+-
+ #if !defined(__NR_getcpu)
+ #define __NR_getcpu 168
+ #endif
+-
+ #if !defined(__NR_gettimeofday)
+ #define __NR_gettimeofday 169
+ #endif
+-
+ #if !defined(__NR_settimeofday)
+ #define __NR_settimeofday 170
+ #endif
+-
+ #if !defined(__NR_adjtimex)
+ #define __NR_adjtimex 171
+ #endif
+-
+ #if !defined(__NR_getpid)
+ #define __NR_getpid 172
+ #endif
+-
+ #if !defined(__NR_getppid)
+ #define __NR_getppid 173
+ #endif
+-
+ #if !defined(__NR_getuid)
+ #define __NR_getuid 174
+ #endif
+-
+ #if !defined(__NR_geteuid)
+ #define __NR_geteuid 175
+ #endif
+-
+ #if !defined(__NR_getgid)
+ #define __NR_getgid 176
+ #endif
+-
+ #if !defined(__NR_getegid)
+ #define __NR_getegid 177
+ #endif
+-
+ #if !defined(__NR_gettid)
+ #define __NR_gettid 178
+ #endif
+-
+ #if !defined(__NR_sysinfo)
+ #define __NR_sysinfo 179
+ #endif
+-
+ #if !defined(__NR_mq_open)
+ #define __NR_mq_open 180
+ #endif
+-
+ #if !defined(__NR_mq_unlink)
+ #define __NR_mq_unlink 181
+ #endif
+-
+ #if !defined(__NR_mq_timedsend)
+ #define __NR_mq_timedsend 182
+ #endif
+-
+ #if !defined(__NR_mq_timedreceive)
+ #define __NR_mq_timedreceive 183
+ #endif
+-
+ #if !defined(__NR_mq_notify)
+ #define __NR_mq_notify 184
+ #endif
+-
+ #if !defined(__NR_mq_getsetattr)
+ #define __NR_mq_getsetattr 185
+ #endif
+-
+ #if !defined(__NR_msgget)
+ #define __NR_msgget 186
+ #endif
+-
+ #if !defined(__NR_msgctl)
+ #define __NR_msgctl 187
+ #endif
+-
+ #if !defined(__NR_msgrcv)
+ #define __NR_msgrcv 188
+ #endif
+-
+ #if !defined(__NR_msgsnd)
+ #define __NR_msgsnd 189
+ #endif
+-
+ #if !defined(__NR_semget)
+ #define __NR_semget 190
+ #endif
+-
+ #if !defined(__NR_semctl)
+ #define __NR_semctl 191
+ #endif
+-
+ #if !defined(__NR_semtimedop)
+ #define __NR_semtimedop 192
+ #endif
+-
+ #if !defined(__NR_semop)
+ #define __NR_semop 193
+ #endif
+-
+ #if !defined(__NR_shmget)
+ #define __NR_shmget 194
+ #endif
+-
+ #if !defined(__NR_shmctl)
+ #define __NR_shmctl 195
+ #endif
+-
+ #if !defined(__NR_shmat)
+ #define __NR_shmat 196
+ #endif
+-
+ #if !defined(__NR_shmdt)
+ #define __NR_shmdt 197
+ #endif
+-
+ #if !defined(__NR_socket)
+ #define __NR_socket 198
+ #endif
+-
+ #if !defined(__NR_socketpair)
+ #define __NR_socketpair 199
+ #endif
+-
+ #if !defined(__NR_bind)
+ #define __NR_bind 200
+ #endif
+-
+ #if !defined(__NR_listen)
+ #define __NR_listen 201
+ #endif
+-
+ #if !defined(__NR_accept)
+ #define __NR_accept 202
+ #endif
+-
+ #if !defined(__NR_connect)
+ #define __NR_connect 203
+ #endif
+-
+ #if !defined(__NR_getsockname)
+ #define __NR_getsockname 204
+ #endif
+-
+ #if !defined(__NR_getpeername)
+ #define __NR_getpeername 205
+ #endif
+-
+ #if !defined(__NR_sendto)
+ #define __NR_sendto 206
+ #endif
+-
+ #if !defined(__NR_recvfrom)
+ #define __NR_recvfrom 207
+ #endif
+-
+ #if !defined(__NR_setsockopt)
+ #define __NR_setsockopt 208
+ #endif
+-
+ #if !defined(__NR_getsockopt)
+ #define __NR_getsockopt 209
+ #endif
+-
+ #if !defined(__NR_shutdown)
+ #define __NR_shutdown 210
+ #endif
+-
+ #if !defined(__NR_sendmsg)
+ #define __NR_sendmsg 211
+ #endif
+-
+ #if !defined(__NR_recvmsg)
+ #define __NR_recvmsg 212
+ #endif
+-
+ #if !defined(__NR_readahead)
+ #define __NR_readahead 213
+ #endif
+-
+ #if !defined(__NR_brk)
+ #define __NR_brk 214
+ #endif
+-
+ #if !defined(__NR_munmap)
+ #define __NR_munmap 215
+ #endif
+-
+ #if !defined(__NR_mremap)
+ #define __NR_mremap 216
+ #endif
+-
+ #if !defined(__NR_add_key)
+ #define __NR_add_key 217
+ #endif
+-
+ #if !defined(__NR_request_key)
+ #define __NR_request_key 218
+ #endif
+-
+ #if !defined(__NR_keyctl)
+ #define __NR_keyctl 219
+ #endif
+-
+ #if !defined(__NR_clone)
+ #define __NR_clone 220
+ #endif
+-
+ #if !defined(__NR_execve)
+ #define __NR_execve 221
+ #endif
+-
+ #if !defined(__NR_mmap)
+ #define __NR_mmap 222
+ #endif
+-
+ #if !defined(__NR_fadvise64)
+ #define __NR_fadvise64 223
+ #endif
+-
+ #if !defined(__NR_swapon)
+ #define __NR_swapon 224
+ #endif
+-
+ #if !defined(__NR_swapoff)
+ #define __NR_swapoff 225
+ #endif
+-
+ #if !defined(__NR_mprotect)
+ #define __NR_mprotect 226
+ #endif
+-
+ #if !defined(__NR_msync)
+ #define __NR_msync 227
+ #endif
+-
+ #if !defined(__NR_mlock)
+ #define __NR_mlock 228
+ #endif
+-
+ #if !defined(__NR_munlock)
+ #define __NR_munlock 229
+ #endif
+-
+ #if !defined(__NR_mlockall)
+ #define __NR_mlockall 230
+ #endif
+-
+ #if !defined(__NR_munlockall)
+ #define __NR_munlockall 231
+ #endif
+-
+ #if !defined(__NR_mincore)
+ #define __NR_mincore 232
+ #endif
+-
+ #if !defined(__NR_madvise)
+ #define __NR_madvise 233
+ #endif
+-
+ #if !defined(__NR_remap_file_pages)
+ #define __NR_remap_file_pages 234
+ #endif
+-
+ #if !defined(__NR_mbind)
+ #define __NR_mbind 235
+ #endif
+-
+ #if !defined(__NR_get_mempolicy)
+ #define __NR_get_mempolicy 236
+ #endif
+-
+ #if !defined(__NR_set_mempolicy)
+ #define __NR_set_mempolicy 237
+ #endif
+-
+ #if !defined(__NR_migrate_pages)
+ #define __NR_migrate_pages 238
+ #endif
+-
+ #if !defined(__NR_move_pages)
+ #define __NR_move_pages 239
+ #endif
+-
+ #if !defined(__NR_rt_tgsigqueueinfo)
+ #define __NR_rt_tgsigqueueinfo 240
+ #endif
+-
+ #if !defined(__NR_perf_event_open)
+ #define __NR_perf_event_open 241
+ #endif
+-
+ #if !defined(__NR_accept4)
+ #define __NR_accept4 242
+ #endif
+-
+ #if !defined(__NR_recvmmsg)
+ #define __NR_recvmmsg 243
+ #endif
+-
+ #if !defined(__NR_wait4)
+ #define __NR_wait4 260
+ #endif
+-
+ #if !defined(__NR_prlimit64)
+ #define __NR_prlimit64 261
+ #endif
+-
+ #if !defined(__NR_fanotify_init)
+ #define __NR_fanotify_init 262
+ #endif
+-
+ #if !defined(__NR_fanotify_mark)
+ #define __NR_fanotify_mark 263
+ #endif
+-
+ #if !defined(__NR_name_to_handle_at)
+ #define __NR_name_to_handle_at 264
+ #endif
+-
+ #if !defined(__NR_open_by_handle_at)
+ #define __NR_open_by_handle_at 265
+ #endif
+-
+ #if !defined(__NR_clock_adjtime)
+ #define __NR_clock_adjtime 266
+ #endif
+-
+ #if !defined(__NR_syncfs)
+ #define __NR_syncfs 267
+ #endif
+-
+ #if !defined(__NR_setns)
+ #define __NR_setns 268
+ #endif
+-
+ #if !defined(__NR_sendmmsg)
+ #define __NR_sendmmsg 269
+ #endif
+-
+ #if !defined(__NR_process_vm_readv)
+ #define __NR_process_vm_readv 270
+ #endif
+-
+ #if !defined(__NR_process_vm_writev)
+ #define __NR_process_vm_writev 271
+ #endif
+-
+ #if !defined(__NR_kcmp)
+ #define __NR_kcmp 272
+ #endif
+-
+ #if !defined(__NR_finit_module)
+ #define __NR_finit_module 273
+ #endif
+-
+ #if !defined(__NR_sched_setattr)
+ #define __NR_sched_setattr 274
+ #endif
+-
+ #if !defined(__NR_sched_getattr)
+ #define __NR_sched_getattr 275
+ #endif
+-
+ #if !defined(__NR_renameat2)
+ #define __NR_renameat2 276
+ #endif
+-
+ #if !defined(__NR_seccomp)
+ #define __NR_seccomp 277
+ #endif
+-
+ #if !defined(__NR_getrandom)
+ #define __NR_getrandom 278
+ #endif
+-
+ #if !defined(__NR_memfd_create)
+ #define __NR_memfd_create 279
+ #endif
+-
+ #if !defined(__NR_bpf)
+ #define __NR_bfp 280
+ #endif
+-
+ #if !defined(__NR_execveat)
+ #define __NR_execveat 281
+ #endif
+-
+ #if !defined(__NR_userfaultfd)
+ #define __NR_userfaultfd 282
+ #endif
+-
+ #if !defined(__NR_membarrier)
+ #define __NR_membarrier 283
+ #endif
+-
+ #if !defined(__NR_mlock2)
+ #define __NR_mlock2 284
+ #endif
+-
+ #if !defined(__NR_copy_file_range)
+ #define __NR_copy_file_range 285
+ #endif
+-
+ #if !defined(__NR_preadv2)
+ #define __NR_preadv2 286
+ #endif
+-
+ #if !defined(__NR_pwritev2)
+ #define __NR_pwritev2 287
+ #endif
+-
+ #if !defined(__NR_pkey_mprotect)
+ #define __NR_pkey_mprotect 288
+ #endif
+-
+ #if !defined(__NR_pkey_alloc)
+ #define __NR_pkey_alloc 289
+ #endif
+-
+ #if !defined(__NR_pkey_free)
+ #define __NR_pkey_free 290
+ #endif
+-
+ #if !defined(__NR_statx)
+ #define __NR_statx 291
+ #endif
+-
+ #if !defined(__NR_io_pgetevents)
+ #define __NR_io_pgetevents 292
+ #endif
+-
+ #if !defined(__NR_rseq)
+ #define __NR_rseq 293
+ #endif
+-
+ #if !defined(__NR_clone3)
+ #define __NR_clone3 435
+ #endif
+-
+-#endif  // SANDBOX_LINUX_SYSTEM_HEADERS_LOONG64_LINUX_SYSCALLS_H_
++#endif  // SANDBOX_LINUX_SYSTEM_HEADERS_LOONGARCH64_LINUX_SYSCALLS_H_
+diff --git a/qtwebengine/src/3rdparty/chromium/sandbox/policy/linux/bpf_network_policy_linux.cc b/qtwebengine/src/3rdparty/chromium/sandbox/policy/linux/bpf_network_policy_linux.cc
+index ed1582d79..f7a7b14df 100644
+--- a/qtwebengine/src/3rdparty/chromium/sandbox/policy/linux/bpf_network_policy_linux.cc
++++ b/qtwebengine/src/3rdparty/chromium/sandbox/policy/linux/bpf_network_policy_linux.cc
+@@ -255,7 +255,7 @@ ResultExpr NetworkProcessPolicy::EvaluateSyscall(int sysno) const {
+     case __NR_fdatasync:
+     case __NR_fsync:
+     case __NR_mremap:
+-#if !defined(__aarch64__)
++#if !defined(__aarch64__) && !defined(__loongarch_lp64)
+     case __NR_getdents:
+ #endif
+     case __NR_getdents64:
+-- 
+2.31.1
+

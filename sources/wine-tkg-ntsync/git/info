@@ -1,0 +1,6 @@
+URL=https://github.com/Kron4ek/wine-tkg.git
+FILE=wine-tkg-ntsync-git_git.tar.gz
+DIR=wine-tkg-ntsync-git_git
+GIT_BRANCH=ntsync
+GIT_COMMIT=
+GIT_SUBMODULE=1

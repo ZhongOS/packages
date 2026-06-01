@@ -1,0 +1,477 @@
+URL=BASH=/bin/bash
+BASHOPTS=checkwinsize:cmdhist:complete_fullquote:extquote:force_fignore:globasciiranges:hostcomplete:interactive_comments:progcomp:promptvars:sourcepath
+BASH_ALIASES=()
+BASH_ARGC=()
+BASH_ARGV=()
+BASH_CMDS=()
+BASH_LINENO=([0]="687" [1]="0")
+BASH_SOURCE=([0]="./update.sh" [1]="./update.sh")
+BASH_VERSINFO=([0]="5" [1]="1" [2]="0" [3]="1" [4]="release" [5]="x86_64-redhat-linux-gnu")
+BASH_VERSION='5.1.0(1)-release'
+COLUMNS=238
+DIRSTACK=()
+DIR_AFT=
+DIR_NAME=unifont-16.0.04/
+DIR_PRE=unifont-
+DIR_URL=http://unifoundry.com/pub/unifont/unifont-16.0.04/
+EMU_BROWSER=
+EUID=1000
+EXCLUDE_STR=
+EXTRA_NAME=
+FILE_CURRENT_VERSION=0.9.5.0
+FILE_NAME=NULL
+FILE_URL=https://github.com/sctplab/usrsctp/archive/0.9.5.0/usrsctp-0.9.5.0.tar.gz
+FILE_VERSION=0.9.5.0
+FUNCNAME=([0]="get_github_new_file" [1]="main")
+GROUPS=()
+GROUP_ATTACH=
+GROUP_NAME=KDE-KFS
+HASH_STR=60fb4133c68869bf0993144978b4847d94a0f9c7b477f64a346ea133cfe35bc11820204ab327dcf9a929b6f65a26d16cc7efbce65e49967c3347b39376e57001
+HOME=/home/lauser
+HOSTNAME=bogon
+HOSTTYPE=x86_64
+IFS=$' \t\n'
+INCLUDE_STR=
+LC_ALL=zh_CN.UTF-8
+LINES=48
+LOG_DIRECTORY=/opt/mylaos/Sunhaiyong/update/logs/
+MACHTYPE=x86_64-redhat-linux-gnu
+METHOD=GITHUB
+OLDPWD=/opt/mylaos/Sunhaiyong
+OPT='?'
+OPTERR=1
+OPTIND=2
+OSTYPE=linux-gnu
+PACKAGES=$'a52dec\naalib\nabseil-cpp\naccountsservice\nacl\nadwaita-icon-theme\nalabaster\nalembic\nalsa-firmware\nalsa-lib\nalsa-oss\nalsa-plugins\nalsa-tools\nalsa-utils\nappdirs\nappstream\nappstream-glib\napr\napr-util\nasciidoc\nasciidoctor\nasio\nassimp\natk\natkmm\natkmm228\nat-spi2-atk\nat-spi2-core\nattr\nattrs\naudacity\naudiofile\naudit-userspace\naugeas\nautoconf\nautoconf-archive\nautogen\nautomake\navahi\navf\nbabel\nbabl\nBambuStudio\nbash\nbash-completion\nbc\nbeautifulsoup4\nBento4\nbinutils\nbison\nblfs-systemd-units\nblueprint-compiler\nbluez\nboost\nbridge-utils\nbrotli\nbs4\nbubblewrap\nbusybox\nbzip2\ncabextract\ncairo\ncairomm\ncairomm-1\ncargo-c\nCatch2\ncbindgen\nc-blosc\nccache\ncdparanoia-III\nc-dvar\nCelestia\ncereal\ncertifi\ncfitsio\ncgal\nchai\ncharset-normalizer\ncheck\nchromium\nchrony\nCImg\nc-ini\ncldr-emoji-annotation\nclinfo\nc-list\ncmake\ncoin\nCoin4\ncolord\nconsole-setup\ncoordgenlibs\ncoreutils\ncorevoikko\ncpio\ncpp-httplib\nCPU-X\ncracklib\nc-rbtree\ncryptsetup\ncscope\nc-shquote\ncssselect\nc-stdaux\nctags\ncups\ncurl\nc-utf8\ncyrus-sasl\ncython\ndav1d\ndbus\ndbus-broker\ndbus-glib\ndbus-python\ndconf\ndconf-editor\ndejagnu\ndejavu-fonts-ttf\ndenemo\ndesktop-file-utils\ndhcp\ndhcpcd\ndiffutils\ndiskcache\ndkms\ndmidecode\ndnsmasq\ndnspython\ndocbook-3.1\ndocbook-4.5\ndocbook-5.0.1\ndocbook-5.1\ndocbook-dsssl\ndocbook-xml-4.5\ndocbook-xsl\ndocbook-xsl-nons\ndoctest\ndocutils\ndosbox\ndosfstools\ndotconf\ndotnet\ndouble-conversion\ndoxygen\ndracut\ndtc\ndune\ndwarves\ndxvk\ne2fsprogs\neditables\nefibootmgr\nefivar\neigen3\nelfutils\nelogind\nemacs\nembree\nenchant\nerfa\nethtool\nexfat\nexiv2\nexpat\nexpect\nfaac\nfaad2\nfancy\nfcitx5\nfcitx5-chinese-addons\nfcitx5-configtool\nfcitx5-gtk\nfcitx5-lua\nfcitx5-qt\nfcitx-libpinyin\nfdk-aac\nffmpeg\nffms2\nfftw\nfile\nFileZilla\nfindutils\nfirefox\nfirefox-esr\nfirewalld\nfish-shell\nflac\nflatbuffers\nflatpak\nflex\nflit\nflit-core\nflite\nfltk\nfmt\nfontconfig\nfontforge\nfonttools\nfpc\nFreeCAD\nfreeglut\nfreerdp\nfreetype\nfrei0r\nfribidi\nfstrcmp\nfuse\nfuseiso\ngame.libretro\ngame.libretro.mame2003\ngame.libretro.mame2003_plus\ngawk\ngc\ngcc\ngconf\ngcr\ngcr3\ngdb\ngdbm\ngdk-pixbuf\ngdk-pixbuf-xlib\ngegl\ngettext\ngexiv2\nghc\ngi-docgen\ngiflib\ngimp\ngit\nglad\nglaxnimate\nglean-parser\nglew\nglfw\nglibc\nglibmm\nglibmm266\nglib-networking\nglm\nglslang\nglu\ngmp\ngnome-keyring\ngnome-sudoku\ngnugo\ngnupg\ngnutls\ngobject-introspection\ngodot\ngodot-cpp\ngolang\ngoogletest\ngperf\ngperftools\ngpgme\ngpicview\ngpm\ngranite\ngranite-6\ngrantlee\ngraphene\ngraphite\ngraphviz\ngrep\ngroff\ngrub\ngsettings-desktop-schemas\ngsl\nGSL\ngst-libav\ngst-plugins-bad\ngst-plugins-base\ngst-plugins-good\ngst-plugins-ugly\ngstreamer\ngstreamer-vaapi\ngtk2\ngtk3\ngtk4\ngtk-doc\ngtk-engines\ngtkglext\ngtkmm\ngtkmm-3\ngtksourceview\ngtksourceview4\ngtk-vnc\nguile\ngzip\nharfbuzz\nhatch-fancy-pypi-readme\nhatchling\nhatch-vcs\nhdf5\nhelp2man\nhfst-ospell\nhicolor-icon-theme\nhighlight\nhighway\nhiredis\nhivex\nhtml5lib\nhtml5lib-python\nhtml5-parser\nhwdata\nhyphen\niana-etc\nibus\nibus-pinyin\nicoutils\nicu4c\nidna\nImageMagick\nimagesize\nImath\nimlib2\nimp3\nindi\ninetutils\ninfozip\ninih\niniparser\ninkscape\ninputstream.adaptive\ninputstream.ffmpegdirect\ninputstream.rtmp\nintltool\niproute2\niptables\niso-codes\nispc\nitstool\njack2\njansson\njasper\nJinja2\njq\njson\nJSON\njson-c\njson-glib\njsonschema\njsonschema-specifications\nkbd\nkColorPicker\nKDE6-KF\nKDE6-kirigami-addons\nKDE6-KSP\nKDE6-Plasma\nKDE6-polkit-qt-1\nKDE-KF\nKDE-KF-Port\nKDE-Plasma\nkdiagram\nKDSoap\nkdsoap-ws-discovery-client\nkeybinder\nkeybinder3\nkeyutils\nkicad\nkImageAnnotator\nkirigami-addons\nkmod\nKooha\nkrb5\nktextaddons\nkuserfeedback\nlame\nlapack\nlcms\nless\nlftp\nlibadwaita\nlibaio\nlibappimage\nlibappindicator\nlibarchive\nlibass\nlibassuan\nlibatasmart\nlibavc1394\nlibavif\nlibavtp\nlibblockdev\nlibbpf\nlibbytesize\nlibcanberra\nlibcap\nlibcapi20-3\nlibcddb\nlibcdio\nlibcloudproviders\nlibconfig\nlibcroco\nlibdaemon\nlibdatachannel\nlibdbusmenu\nlibdbusmenu-qt\nlibdecor\nlibdeflate\nlibdisplay-info\nlibdmtx\nlibdrm\nlibdv\nlibdvbpsi\nlibdvdread\nlibedit\nlibei\nlibepoxy\nliberation-fonts\nlibev\nlibevdev\nlibevent\nlibexif\nlibfakekey\nlibffi\nlibfilezilla\nlibfishsound\nlibfm\nlibfuse\nlibgcrypt\nlibgee\nlibgit2\nlibglvnd\nlibgpg-error\nlibgphoto2\nlibgudev\nlibguestfs\nlibgusb\nlibhandy\nlibheif\nlibical\nlibiconv\nlibidn2\nlibiec61883\nlibime\nlibimobiledevice\nlibimobiledevice-glue\nlibindicator\nlibinput\nlibiscsi\nlibjpeg-turbo\nlibjuice\nlibjxl\nlibksba\nlibltc\nlibmanette\nlibmbim\nlibmediainfo\nlibmicrodns\nlibmng\nlibmnl\nlibmpeg2\nlibmtp\nlibmypaint\nlibndp\nlibnftnl\nlibnice\nlibnl\nlibnma\nlibnotify\nlibnova\nlibnsl\nlibnvme\nlibogg\nliboggz\nlibosinfo\nlibpaper\nlibpcap\nlibpipeline\nlibplacebo\nlibplist\nlibpng\nlibpng12\nlibproxy\nlibpsl\nlibpwquality\nlibqalculate\nlibqmi\nlibqrencode\nLibRaw\nlibraw1394\nlibreoffice\nLibrePCB\nlibretro-database\nlibrsvg\nlibrtprocess\nlibsamplerate\nlibsass\nlibseccomp\nlibsecret\nlibsepol\nlibshout\nlibsigc++\nlibsigc++-2\nlibslirp\nlibsndfile\nlibsodium\nlibsoup\nlibsoup-2\nlibspiro\nlibspnav\nlibsrtp\nlibssh\nlibssh2\nlibstoragemgmt\nlibtasn1\nlibtatsu\nlibteam\nlibtheora\nlibtirpc\nlibtool\nlibtraceevent\nlibtracefs\nlibunique\nlibunistring\nlibunwind\nlibusb\nlibusbmuxd\nlibutempter\nlibva\nlibva-utils\nlibvdpau\nlibvdpau-va-gl\nlibvirt\nlibvirt-glib\nlibvirt-python\nlibvisual\nlibvncserver\nlibvorbis\nlibvorbisidec\nlibvpl\nlibvpx\nlibwacom\nlibwebp\nlibwnck\nlibwnck2\nlibwpe\nlibxcb\nlibxcrypt\nlibxisf\nlibxkbcommon\nlibxklavier\nlibxml++2\nlibxml2\nlibxmlb\nlibxslt\nlibyaml\nlibzen\nlibzip\nlightdm\nlightdm-gtk-greeter\nlinks\nlinux\nlinuxdeploy\nlinux-firmware\nlinux-pam\nlit\nllvm-project\nlmdb\nlm-sensors\nlog4c\nlttng-ust\nlua\nlutris\nLVM2\nlxappearance\nlxde-common\nlxde-icon-theme\nlxinput\nlxmenu-data\nlxml\nlxpanel\nlxrandr\nlxsession\nlxtask\nlxterminal\nlz4\nlzip\nlzo\nm4\nmad\nmaeparser\nmake\nmake-ca\nMako\nmame\nman-db\nmandoc\nMangoHud\nman-pages\nmariadb\nMarkdown\nMarkupSafe\nMaterialX\nmatplotlib\nmaturin\nmbedtls\nmdadm\nmed\nmed-fichier\nmediainfo\nmednafen\nmednaffe\nmenu-cache\nmesa\nmesa-demos\nmeson\nmeson-python\nmingw-w64\nminizip-ng\nmlt\nmm-common\nmobile-broadband-provider-info\nModemManager\nModule-Build\nmolsketch\nmosh\nmozjs-102\nmozjs-115\nmozjs-78\nmozjs-91\nmpc\nmpfr\nmpg123\nMPlayer\nmpv\nmtdev\nmusl\nmypaint-brushes\nnasm\nncompress\nncurses\nndctl\nnettle\nnet-tools\nNetworkManager\nnetwork-manager-applet\nnewt\nnftables\nnghttp2\nngspice\nninja\nnlopt\nnng\nnode\nnpth\nnspr\nnss\nntfs-3g\nnumpy\nnvtop\nobs-studio\nocaml\nocaml5\nocamlgraph\nOCCT\nocl-icd\noctave\noidn\nollama\nomxil\noneTBB\nonnxruntime\nopam\nopenal-soft\nopenbabel\nOpenBLAS\nopenbox\nOpenCL-Headers\nOpenCOLLADA\nOpenColorIO\nopencore-amr\nopencv\nopenexr\nopenh264\nOpenImageIO\nopen-iscsi\nopen-isns\nopenjpeg\nopenldap\nopenpgl\nOpenShadingLanguage\nopenssh\nopenssl\nOpenSubdiv\nOpenTimelineIO\nOpenUSD\nopenvdb\nOpenXR-SDK\nopus\nopusfile\norc\noss4\nostree\noxygen-icons\np11-kit\np7zip\npackaging\npango\npangomm\npangomm24\nParse-Yapp\nparted\npartio\npatch\npatchelf\npathspec\npciutils\npcl\npcmanfm\npcre\npcre2\npcsc-lite\nperl\nPerlIO-utf8_strict\nphc-winner-argon2\nphonon\nphonon-backend-gstreamer\nphonon-backend-vlc\npip\npipewire\npivy\npixman\npkgconf\npkg-config\nplasma-wayland-protocols\nplatformdirs\nplog\npluggy\nply\nplymouth\npo4a\npodman\nPod-Parser\npoetry\npoetry-core\npolkit\npolkit-qt-1\npoppler\npoppler-data\npopt\npostject\npotrace\nppp\nppsspp\nprocps-ng\nprotobuf\nProton\npsmisc\npugixml\npulseaudio\npulseaudio-qt\npvr.iptvsimple\npybind11\npycairo\npycparser\nPygments\npygobject\nPyOpenGL\npypa-build\npyparsing\npyproject\npyproject-metadata\nPyQt5\npytest-runner\nPython\npython-zstandard\npyxdg\nPyYAML\npyzy\nq4wine\nqbs\nqca\nqcoro\nqemu\nqmltermwidget\nQR-Code-generator\nQScintilla\nqt5\nqt6\nqtchooser\nqt-creator\nqtkeychain\nQtScrcpy\nrapidjson\nrdfind\nreadline\nreferencing\nRemmina\nrequests\nRetroArch\nrift\nripgrep\nrnnoise\nrobin-map\nroman-numerals-py\nrpcsvc-proto\nrpds-py\nrsync\nrtmpdump\nruby\nrust-bindgen\nrustc\nsamba\nsane-backends\nsassc\nscons\nscreen\nsddm\nsdl12-compat\nSDL2\nSDL3\nSDL_ttf\nsed\nselinux\nsemantic-version\nsensorfw\nserf\nsetuptools\nsetuptools-rust\nsetuptools-scm\nsgml-common\nshaderc\nshadow\nshared-mime-info\nsharutils\nsip\nsip4\nsiril\nsix\nslang\nsmartypants\nsmplayer\nsnappy\nsnowball\nsnowballstemmer\nsocat\nsoupsieve\nspdlog\nspeechd\nspeex\nspeexdsp\nsphinx\nsphinxcontrib-applehelp\nsphinxcontrib-devhelp\nsphinxcontrib-htmlhelp\nsphinxcontrib-jquery\nsphinxcontrib-jsmath\nsphinxcontrib-qthelp\nsphinxcontrib-serializinghtml\nsphinx-rtd-theme\nspice\nspice-gtk\nspice-protocol\nSPIRV-Headers\nSPIRV-LLVM-Translator\nSPIRV-Tools\nsqlite\nsquashfs\nsquashfuse\nssr\nstartup-notification\nstellarsolver\nstrace\nsubversion\nsudo\nswig\nsystemd\ntaglib\ntar\ntcl\ntexinfo\nthc-hydra\nthunderbird\nthunderbird-esr\ntiff\ntinycss2\ntinyxml\ntinyxml2\ntizonia-openmax-il\ntk\ntmux\ntoml\ntomli\ntracker\ntrove-classifiers\ntwolame\ntyping-extensions\ntypogrify\ntzdata\nudisks\numockdev\nunifdef\nunifont\nunixODBC\nunrar\nunzip\nupower\nURI\nurllib3\nusbredir\nusbutils\nuserspace-rcu\nusrsctp\nutfcpp\nuthash\nutil-linux\nutil-macros\nv4l-utils\nvala\nVentoy\nvim\nvirglrenderer\nvirt-manager\nvirt-viewer\nvkd3d-proton\nvlc\nvolk\nvolume_key\nvscode\nvte\nvte28\nVTK\nVulkan-Headers\nVulkan-Loader\nVulkan-Tools\nwavpack\nwayland\nwaylandpp\nwayland-protocols\nwayland-utils\nwcslib\nwebencodings\nwebkitgtk\nwebsocketpp\nweston\nwget\nwget2\nwheel\nwhich\nwine\nwine-dev\nwine-nine-standalone\nwine-staging\nwinetricks\nwireless_tools\nwireplumber\nwoff2\nwpa_supplicant\nwpebackend-fdo\nwqy-zenhei\nwxPython\nwxWidgets\nx264\nx265\nxapian-core\nxbitmaps\nxbmc\nxcb-imdkit\nxcb-proto\nxcb-util\nxcb-util-cursor\nxcb-util-image\nxcb-util-keysyms\nxcb-util-renderutil\nxcb-util-wm\nxcursor-themes\nxdg-desktop-portal\nxdg-user-dirs\nxdg-utils\nxdg-utils-cxx\nxdotool\nxerces-c\nxf86-input-wacom\nxfsprogs\nxkeyboard-config\nXML-Parser\nxmlsec1\nxmlto\nxnu\nXorg-Apps\nXorg-Driver\nXorg-Fonts\nXorg-Libs\nxorgproto\nxorg-server\nxorriso\nxplanet\nxterm\nxwayland\nxxHash\nxz\nyajl\nyaml-cpp\nYAML-Tiny\nyt-dlp\nzip\nzlib\nzsh\nzstd\nzxing\nzxing-cpp'
+PACKAGE_NAME=inviwo/utfcpp
+PACKAGE_NAMES=([0]="aura-browser" [1]="bluedevil" [2]="breeze" [3]="breeze-grub" [4]="breeze-gtk" [5]="breeze-plymouth" [6]="discover" [7]="drkonqi" [8]="flatpak-kcm" [9]="kactivitymanagerd" [10]="kde-cli-tools" [11]="kdecoration" [12]="kde-gtk-config" [13]="kdeplasma-addons" [14]="kgamma5" [15]="khotkeys" [16]="kinfocenter" [17]="kmenuedit" [18]="kpipewire" [19]="kscreen" [20]="kscreenlocker" [21]="ksshaskpass" [22]="ksystemstats" [23]="kwallet-pam" [24]="kwayland-integration" [25]="kwin" [26]="kwrited" [27]="layer-shell-qt" [28]="libkscreen" [29]="libksysguard" [30]="milou" [31]="oxygen" [32]="oxygen-sounds" [33]="plank-player" [34]="plasma-bigscreen" [35]="plasma-browser-integration" [36]="plasma-desktop" [37]="plasma-disks" [38]="plasma-firewall" [39]="plasma-integration" [40]="plasma-mobile" [41]="plasma-nano" [42]="plasma-nm" [43]="plasma-pa" [44]="plasma-remotecontrollers" [45]="plasma-sdk" [46]="plasma-systemmonitor" [47]="plasma-thunderbolt" [48]="plasma-vault" [49]="plasma-welcome" [50]="plasma-workspace" [51]="plasma-workspace-wallpapers" [52]="plymouth-kcm" [53]="polkit-kde-agent-1" [54]="powerdevil" [55]="qqc2-breeze-style" [56]="sddm-kcm" [57]="systemsettings" [58]="xdg-desktop-portal-kde")
+PATH=/usr/local/bin:/usr/bin
+PIPESTATUS=([0]="0")
+PKG_NAME=xdg-desktop-portal-kde
+PPID=35637
+PROJ_NAME=
+PROXY_MODE=1
+PROXY_SET_STATUS='1|10.160.102.103:8118'
+PS4='+ '
+PWD=/opt/mylaos/Sunhaiyong/update
+REPLACE_URL=
+RETRY=1
+REVERT_STR=
+RE_NAME=userspace-rcu
+SAVE_PROXY=
+SECOND_DIR=
+SHELL=/bin/bash
+SHELLOPTS=braceexpand:hashall:interactive-comments
+SHLVL=2
+TERM=screen
+TEST_MODE=0
+TMP_DIRECTORY=/opt/mylaos/Sunhaiyong/update/temp/
+TMP_FILE=/opt/mylaos/Sunhaiyong/update/temp/tmp.idNSvhdGiS
+UID=1000
+WARRING_STRING=([0]="发现 docbook-3.1.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [1]="发现 docbook-4.5.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [2]="发现 docbook-5.0.1.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [3]="发现 docbook-5.1.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [4]="发现 docbook-xml-4.5.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [5]="发现 docbook-xsl.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [6]="发现 docbook-xsl-nons.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [7]="发现 fuse.update 中设置的查询路径是一个确定的文件地址，无法自动更新，需人为的查询更新。" [8]="KDE6-KSP中的akonadi-notes 没有搜索到合适的文件，请检查搜索规则！。" [9]="KDE6-KSP中的cervisia 没有搜索到合适的文件，请检查搜索规则！。" [10]="KDE6-KSP中的kipi-plugins 没有搜索到合适的文件，请检查搜索规则！。" [11]="KDE6-KSP中的knotes 没有搜索到合适的文件，请检查搜索规则！。" [12]="KDE6-KSP中的kross-interpreters 没有搜索到合适的文件，请检查搜索规则！。" [13]="KDE6-KSP中的libkipi 没有搜索到合适的文件，请检查搜索规则！。" [14]="KDE6-KSP中的spectacle 没有搜索到合适的文件，请检查搜索规则！。")
+WEBPAGE=https://github.com/inviwo/utfcpp/tags
+WRITE_FORCE=0
+_=break
+https_proxy=10.160.102.103:8118
+i=utfcpp
+j=1
+cmp_version () 
+{ 
+    OLD_VERSION=$1;
+    NEW_VERSION=$2;
+    if [ "x${OLD_VERSION}" == "x${NEW_VERSION}" ]; then
+        echo 0;
+        return;
+    fi;
+    TEST_VERSION=$(echo "${OLD_VERSION}
+${NEW_VERSION}" | sort -V -r | head -n 1);
+    if [ "x${TEST_VERSION}" == "x${NEW_VERSION}" ]; then
+        echo 1;
+        return;
+    fi;
+    echo 2
+}
+get_current_version () 
+{ 
+    if [ -f ../package_version/${1}.version ]; then
+        CURRENT_VERSION=$(cat ../package_version/${1}.version | sed 's/.*VERSION=\"\([^\"]\+\).*/\1/g');
+        echo ${CURRENT_VERSION};
+        return;
+    fi;
+    echo "";
+    return
+}
+get_fedora_repo_new_file () 
+{ 
+    PKG_NAME=$(echo ${1} | sed "s@+@%2B@g");
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    if [ "x${6}" == "x" ]; then
+        wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE};
+    else
+        curl -A "${6}" $(reformat_url ${2}) -o ${TMP_FILE};
+    fi;
+    declare $(bash common/fedora_dir.method "${PKG_NAME}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+    if [ "x${FILE_NAME}" != "x" ]; then
+        case "x${7}" in 
+            "xsha512")
+                wget --timeout=30 -q $(reformat_url ${2}/${FILE_NAME}/sha512/) -O ${TMP_FILE};
+                SHA512SUM_STR="";
+                SHA512SUM_STR="$(cat ${TMP_FILE} | grep -o "href=\"[0-9a-z]\{128,\}\/\"" | grep -o "[0-9a-z]\{128,\}")";
+                if [ "x${SHA512SUM_STR}" != "x" ]; then
+                    wget --timeout=30 -q $(reformat_url ${2}/${FILE_NAME}/sha512/${SHA512SUM_STR}/) -O ${TMP_FILE};
+                    declare $(bash common/ftp.method "${PKG_NAME}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+                    rm ${TMP_FILE};
+                    echo "${FILE_NAME}|${SHA512SUM_STR}";
+                else
+                    echo "NULL";
+                fi;
+                return
+            ;;
+            "xmd5")
+                wget --timeout=30 -q $(reformat_url ${2}/${FILE_NAME}/md5/) -O ${TMP_FILE};
+                MD5SUM_STR="";
+                MD5SUM_STR="$(cat ${TMP_FILE} | grep -o "href=\"[0-9a-z]\{32,\}\/\"" | grep -o "[0-9a-z]\{32,\}")";
+                if [ "x${MD5SUM_STR}" != "x" ]; then
+                    wget --timeout=30 -q $(reformat_url ${2}/${FILE_NAME}/md5/${MD5SUM_STR}/) -O ${TMP_FILE};
+                    declare $(bash common/ftp.method "${PKG_NAME}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+                    rm ${TMP_FILE};
+                    echo "${FILE_NAME}|${MD5SUM_STR}";
+                else
+                    echo "NULL";
+                fi;
+                return
+            ;;
+            *)
+
+            ;;
+        esac;
+    fi;
+    echo "NULL"
+}
+get_ftp_new_file () 
+{ 
+    PKG_NAME=$(echo ${1} | sed "s@+@%2B@g");
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    while true; do
+        case "x${6}" in 
+            "xMozilla")
+                curl -A "${6}" $(reformat_url ${2}) -o ${TMP_FILE}
+            ;;
+            "xNoSSL")
+                wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE} --no-check-certificate
+            ;;
+            *)
+                wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE}
+            ;;
+        esac;
+        EXIT_CODE=$?;
+        if [ $EXIT_CODE -eq 0 ]; then
+            break;
+        fi;
+        sleep 1;
+    done;
+    declare $(bash common/ftp.method "${PKG_NAME}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_ftpdir_new_dir () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    while true; do
+        wget --timeout=30 -q $(reformat_url ${2} '/') -O ${TMP_FILE};
+        EXIT_CODE=$?;
+        if [ $EXIT_CODE -eq 0 ]; then
+            break;
+        fi;
+        sleep 1;
+    done;
+    declare $(bash common/ftpdir.method "${1}" "${TMP_FILE}" "${3}" "${4}" "${5}" "${6}");
+    rm ${TMP_FILE};
+    echo "${DIR_NAME}"
+}
+get_github_new_dir () 
+{ 
+    declare RET_STR="";
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    for RETRY in {1..5};
+    do
+        wget --timeout=30 -q ${2}/ -O ${TMP_FILE};
+        if [ "x$?" != "x0" ]; then
+            if [ "x${RETRY}" == "x5" ]; then
+                echo "NULL";
+                exit;
+            else
+                continue;
+            fi;
+        else
+            break;
+        fi;
+    done;
+    RET_STR=$(bash -e common/github_dir.method "${TMP_FILE}" "${1}" "1" "${3}" "${4}");
+    if [ "x$?" != "x0" ]; then
+        echo "NULL";
+        exit;
+    fi;
+    declare ${RET_STR};
+    rm ${TMP_FILE};
+    if [ "x${DIR_NAME}" == "x" ]; then
+        echo "NULL";
+        exit;
+    fi;
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    for RETRY in {1..5};
+    do
+        wget --timeout=30 -q ${DIR_NAME}/ -O ${TMP_FILE};
+        if [ "x$?" != "x0" ]; then
+            if [ "x${RETRY}" == "x5" ]; then
+                echo "NULL";
+                exit;
+            else
+                continue;
+            fi;
+        else
+            break;
+        fi;
+    done;
+    FILE_NAME="";
+    declare $(bash -e common/github.method "${1}" "${TMP_FILE}" "${3}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_github_new_file () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    for RETRY in {1..5};
+    do
+        wget --timeout=30 -q ${2}/ -O ${TMP_FILE};
+        if [ "x$?" != "x0" ]; then
+            if [ "x${RETRY}" == "x5" ]; then
+                echo "NULL";
+                exit;
+            else
+                continue;
+            fi;
+        else
+            break;
+        fi;
+    done;
+    declare $(bash -e common/github.method "${1}" "${TMP_FILE}" "${3}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_github_new_webdir () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    for RETRY in {1..5};
+    do
+        wget --timeout=30 -q ${2}/ -O ${TMP_FILE};
+        if [ "x$?" != "x0" ]; then
+            if [ "x${RETRY}" == "x5" ]; then
+                echo "NULL";
+                exit;
+            else
+                continue;
+            fi;
+        else
+            break;
+        fi;
+    done;
+    declare $(bash -e common/github_dir.method "${TMP_FILE}" "${1}" "1" "${4}" "${5}");
+    rm ${TMP_FILE};
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    for RETRY in {1..5};
+    do
+        wget --timeout=30 -q ${DIR_NAME}/ -O ${TMP_FILE};
+        if [ "x$?" != "x0" ]; then
+            if [ "x${RETRY}" == "x5" ]; then
+                echo "NULL";
+                exit;
+            else
+                continue;
+            fi;
+        else
+            break;
+        fi;
+    done;
+    declare $(bash common/ftp.method "${1#*/}" "${TMP_FILE}" "${3}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_gitlab_new_file () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    for RETRY in {1..5};
+    do
+        wget --timeout=30 -q ${2}/ -O ${TMP_FILE};
+        if [ "x$?" != "x0" ]; then
+            if [ "x${RETRY}" == "x5" ]; then
+                echo "NULL";
+                exit;
+            else
+                continue;
+            fi;
+        else
+            break;
+        fi;
+    done;
+    declare $(bash -e common/gitlab.method "${1}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_package_name () 
+{ 
+    if [ "x${1}" == "x" ]; then
+        echo "";
+    else
+        echo "${1}" | awk -F'/' '{ print $NF }';
+    fi;
+    return
+}
+get_package_url () 
+{ 
+    declare BASE_URL;
+    declare HTML_SUFF;
+    if [ "x${1}" == "" ] || [ "x{2}" == "" ]; then
+        echo "";
+        exit;
+    fi;
+    DAEMON=$(echo "$1" | grep -o "\(http\|https\|ftp\|ftps\)\:\/\/\(.[^/]*\)\/\{0,1\}");
+    HEAD_STR=$(echo "${2}"  | awk -F'/' '{ print $1 }');
+    case "x${HEAD_STR}" in 
+        "x${2}")
+            BASE_URL=${1};
+            HTML_SUFF=$(echo ${BASE_URL} | awk -F '/' '{ print $NF }' | awk -F '.' '{ print $NF }');
+            if [ "x${HTML_SUFF}" == "xhtml" ] || [ "x${HTML_SUFF}" == "xhtm" ] || [ "x${HTML_SUFF}" == "xphp" ]; then
+                BASE_URL="${BASE_URL%/*}/";
+            fi;
+            REL_URL=${BASE_URL}/${2}
+        ;;
+        "x")
+            if [ "x${2:0:2}" == "x//" ]; then
+                REL_URL="http:${2}";
+            else
+                REL_URL="${DAEMON}/${2}";
+            fi
+        ;;
+        "xhttps:" | "xftp:" | "xhttp:" | "xftps:")
+            REL_URL="${2}"
+        ;;
+        *)
+            BASE_URL=${1};
+            HTML_SUFF=$(echo ${BASE_URL} | awk -F '/' '{ print $NF }' | awk -F '.' '{ print $NF }');
+            if [ "x${HTML_SUFF}" == "xhtml" ] || [ "x${HTML_SUFF}" == "xhtm" ] || [ "x${HTML_SUFF}" == "xphp" ]; then
+                BASE_URL="${BASE_URL%/*}/";
+            fi;
+            REL_URL="${BASE_URL}/${2}"
+        ;;
+    esac;
+    reformat_url "${REL_URL}"
+}
+get_package_version () 
+{ 
+    declare RE_NAME="";
+    if [ "x${3}" != "x" ]; then
+        RE_NAME="${3}";
+    else
+        RE_NAME="${1}";
+    fi;
+    RET_VAL_1=$(echo $2 | awk -F'/' '{print $NF}' | sed "s@^${RE_NAME}[-|_|\.]\{0,1\}@@g" | sed -e "s@\.tar\.[bz2|xz|gz]*\$@@g" -e "s@\.tgz\$@@g" -e "s@\.zip\$@@g"  | sed -e "s@[-_\.]\{0,1\}\(source\|src\|stable\|orig\|repack\.orig\|clean\)@@g");
+    RET_VAL_2=$(echo "${RET_VAL_1}" | grep -v -e "[[:digit:]|-|_]latest\$" -e "[[:digit:]|-|_]rc[0-9]\{0,\}\$" -e "[[:digit:]|-|_]RC[0-9]\{0,\}\$" -e "[[:digit:]|-|_]beta[0-9]\{0,\}\$" -e "[[:digit:]|-|_]alpha[0-9]\{0,\}\$" -e "[[:digit:]|-|_]preview[0-9]\{0,\}\$" );
+    RET_VAL=$(echo "${RET_VAL_2}" | uniq | sort -V -r | head -n 1);
+    echo "${RET_VAL}"
+}
+get_pypi_release_file () 
+{ 
+    PKG_NAME=$(echo ${1} | sed "s@+@%2B@g");
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    case "x${6}" in 
+        "xMozilla")
+            curl -A "${6}" $(reformat_url ${2}) -o ${TMP_FILE}
+        ;;
+        "xNoSSL")
+            wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE} --no-check-certificate
+        ;;
+        *)
+            wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE}
+        ;;
+    esac;
+    declare $(bash common/pypi.method "${PKG_NAME}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_sf_new_file () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE};
+    if [ "x$?" != "x0" ]; then
+        echo "NULL";
+        exit;
+    fi;
+    declare $(bash common/sf.method "${1}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_sfdir_new_dir () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    wget --timeout=30 -q $(reformat_url ${2}) -O ${TMP_FILE};
+    if [ "x$?" != "x0" ]; then
+        echo "NULL";
+        exit;
+    fi;
+    declare $(bash -e common/sfdir.method "${1}" "${TMP_FILE}" "${3}" "${4}" "${5}" "${6}" "${7}");
+    rm ${TMP_FILE};
+    echo "${DIR_NAME}"
+}
+get_webpage_new_file () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    wget --timeout=30 -q ${2} -O ${TMP_FILE};
+    declare $(bash common/webpage.method ${1} ${TMP_FILE});
+    rm ${TMP_FILE};
+    echo "${FILE_NAME}"
+}
+get_webpagedir_new_dir () 
+{ 
+    TMP_FILE=$(mktemp -p ${TMP_DIRECTORY});
+    wget --timeout=30 -q ${2}/ -O ${TMP_FILE};
+    declare $(bash -e common/webpagedir.method "${1}" "${TMP_FILE}" "${3}" "${4}" "${5}");
+    rm ${TMP_FILE};
+    echo "${DIR_NAME}"
+}
+reformat_url () 
+{ 
+    declare URL;
+    URL=$(echo "${1}" | sed "s@\([^:/]\)/\{1,\}@\1/@g");
+    if [ "x${2}" != "x" ]; then
+        if [ "x${URL:1,-1}" != "x${2}" ]; then
+            URL="${URL}${2}";
+        fi;
+    fi;
+    echo ${URL}
+}
+set_package_version () 
+{ 
+    echo -n "${2}" > ../package_version/${1}.version
+}
+set_proxy () 
+{ 
+    declare DOMAIN=$(echo ${1} | grep -o ".\{0,\}//[^/]\{0,\}" | awk -F'/' '{print $NF}');
+    declare PROXY_SERVER=$(cat proxy.set | grep -v "^#" | grep "${DOMAIN} " | awk -F' ' '{ print $2 }');
+    if [ "x${PROXY_SERVER}" == "xNULL" ]; then
+        echo "NULL";
+        return;
+    fi;
+    if [ "x${PROXY_SERVER}" == "x" ]; then
+        if [ "x${SAVE_PROXY}" == "x" ]; then
+            echo "0";
+        else
+            echo "2";
+        fi;
+    else
+        echo "1|${PROXY_SERVER}";
+    fi;
+    return
+}
+NULL
+FILE=utfcpp-'.tar.gz

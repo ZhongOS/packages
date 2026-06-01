@@ -1,0 +1,5 @@
+URL=https://gitlab.com/freepascal.org/fpc/source.git
+FILE=fpc-3.3.2_git.tar.gz
+DIR=fpc-3.3.2_git
+GIT_BRANCH=main
+GIT_COMMIT=

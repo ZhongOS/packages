@@ -1,0 +1,138 @@
+diff -Nurp rustc-1.65.0-src.orig/vendor/object/src/elf.rs rustc-1.65.0-src/vendor/object/src/elf.rs
+--- rustc-1.65.0-src.orig/vendor/object/src/elf.rs	2022-11-02 16:21:42.000000000 +0000
++++ rustc-1.65.0-src/vendor/object/src/elf.rs	2022-11-22 05:11:57.432720702 +0000
+@@ -6250,19 +6250,15 @@ pub const R_NDS32_TLS_TPOFF: u32 = 102;
+ #[allow(missing_docs)]
+ pub const R_NDS32_TLS_DESC: u32 = 119;
+ 
+-// LoongArch values `FileHeader*::e_flags`.
+-/// Uses 64-bit GPRs and the stack for parameter passing
+-pub const EF_LARCH_ABI_LP64S: u32 = 0x1;
+-/// Uses 64-bit GPRs, 32-bit FPRs and the stack for parameter passing
+-pub const EF_LARCH_ABI_LP64F: u32 = 0x2;
+-/// Uses 64-bit GPRs, 64-bit FPRs and the stack for parameter passing
+-pub const EF_LARCH_ABI_LP64D: u32 = 0x3;
+-/// Uses 32-bit GPRs and the stack for parameter passing
+-pub const EF_LARCH_ABI_ILP32S: u32 = 0x5;
+-/// Uses 32-bit GPRs, 32-bit FPRs and the stack for parameter passing
+-pub const EF_LARCH_ABI_ILP32F: u32 = 0x6;
+-/// Uses 32-bit GPRs, 64-bit FPRs and the stack for parameter passing
+-pub const EF_LARCH_ABI_ILP32D: u32 = 0x7;
++pub const EF_LARCH_ABI_MODIFIER_MASK: u32 = 0x7;
++/// Uses GPRs and the stack for parameter passing
++pub const EF_LARCH_ABI_SOFT_FLOAT: u32 = 0x1;
++/// Uses GPRs, 32-bit FPRs and the stack for parameter passing
++pub const EF_LARCH_ABI_SINGLE_FLOAT: u32 = 0x2;
++/// Uses GPRs, 64-bit FPRs and the stack for parameter passing
++pub const EF_LARCH_ABI_DOUBLE_FLOAT: u32 = 0x3;
++/// Uses relocation types directly writing to immediate slots
++pub const EF_LARCH_OBJABI_V1: u32 = 0x40;
+ 
+ // LoongArch values `Rel*::r_type`.
+ /// No reloc
+@@ -6372,6 +6368,105 @@ pub const R_LARCH_SUB64: u32 = 56;
+ pub const R_LARCH_GNU_VTINHERIT: u32 = 57;
+ /// GNU C++ vtable member usage
+ pub const R_LARCH_GNU_VTENTRY: u32 = 58;
++/// 18-bit PC-relative jump offset with two trailing zeros
++pub const R_LARCH_B16: u32 = 64;
++/// 23-bit PC-relative jump offset with two trailing zeros
++pub const R_LARCH_B21: u32 = 65;
++/// 28-bit PC-relative jump offset with two trailing zeros
++pub const R_LARCH_B26: u32 = 66;
++/// 12..=31 bits of 32/64-bit absolute address
++pub const R_LARCH_ABS_HI20: u32 = 67;
++/// 0..=11 bits of 32/64-bit absolute address
++pub const R_LARCH_ABS_LO12: u32 = 68;
++/// 32..=51 bits of 64-bit absolute address
++pub const R_LARCH_ABS64_LO20: u32 = 69;
++/// 52..=63 bits of 64-bit absolute address
++pub const R_LARCH_ABS64_HI12: u32 = 70;
++/// The signed 32-bit offset `offs` from `PC & 0xfffff000` to
++/// `(S + A + 0x800) & 0xfffff000`, with 12 trailing zeros removed.
++///
++/// We define the *PC relative anchor* for `S + A` as `PC + offs` (`offs`
++/// is sign-extended to VA bits).
++pub const R_LARCH_PCALA_HI20: u32 = 71;
++/// Same as R_LARCH_ABS_LO12.  0..=11 bits of the 32/64-bit offset from the
++/// [PC relative anchor][R_LARCH_PCALA_HI20].
++pub const R_LARCH_PCALA_LO12: u32 = 72;
++/// 32..=51 bits of the 64-bit offset from the
++/// [PC relative anchor][R_LARCH_PCALA_HI20].
++pub const R_LARCH_PCALA64_LO20: u32 = 73;
++/// 52..=63 bits of the 64-bit offset from the
++/// [PC relative anchor][R_LARCH_PCALA_HI20].
++pub const R_LARCH_PCALA64_HI12: u32 = 74;
++/// The signed 32-bit offset `offs` from `PC & 0xfffff000` to
++/// `(GP + G + 0x800) & 0xfffff000`, with 12 trailing zeros removed.
++///
++/// We define the *PC relative anchor* for the GOT entry at `GP + G` as
++/// `PC + offs` (`offs` is sign-extended to VA bits).
++pub const R_LARCH_GOT_PC_HI20: u32 = 75;
++/// 0..=11 bits of the 32/64-bit offset from the
++/// [PC relative anchor][R_LARCH_GOT_PC_HI20] to the GOT entry.
++pub const R_LARCH_GOT_PC_LO12: u32 = 76;
++/// 32..=51 bits of the 64-bit offset from the
++/// [PC relative anchor][R_LARCH_GOT_PC_HI20] to the GOT entry.
++pub const R_LARCH_GOT64_PC_LO20: u32 = 77;
++/// 52..=63 bits of the 64-bit offset from the
++/// [PC relative anchor][R_LARCH_GOT_PC_HI20] to the GOT entry.
++pub const R_LARCH_GOT64_PC_HI12: u32 = 78;
++/// 12..=31 bits of 32/64-bit GOT entry absolute address
++pub const R_LARCH_GOT_HI20: u32 = 79;
++/// 0..=11 bits of 32/64-bit GOT entry absolute address
++pub const R_LARCH_GOT_LO12: u32 = 80;
++/// 32..=51 bits of 64-bit GOT entry absolute address
++pub const R_LARCH_GOT64_LO20: u32 = 81;
++/// 52..=63 bits of 64-bit GOT entry absolute address
++pub const R_LARCH_GOT64_HI12: u32 = 82;
++/// 12..=31 bits of TLS LE 32/64-bit offset from thread pointer
++pub const R_LARCH_TLS_LE_HI20: u32 = 83;
++/// 0..=11 bits of TLS LE 32/64-bit offset from thread pointer
++pub const R_LARCH_TLS_LE_LO12: u32 = 84;
++/// 32..=51 bits of TLS LE 64-bit offset from thread pointer
++pub const R_LARCH_TLS_LE64_LO20: u32 = 85;
++/// 52..=63 bits of TLS LE 64-bit offset from thread pointer
++pub const R_LARCH_TLS_LE64_HI12: u32 = 86;
++/// The signed 32-bit offset `offs` from `PC & 0xfffff000` to
++/// `(GP + IE + 0x800) & 0xfffff000`, with 12 trailing zeros removed.
++///
++/// We define the *PC relative anchor* for the TLS IE GOT entry at
++/// `GP + IE` as `PC + offs` (`offs` is sign-extended to VA bits).
++pub const R_LARCH_TLS_IE_PC_HI20: u32 = 87;
++/// 0..=12 bits of the 32/64-bit offset from the
++/// [PC-relative anchor][R_LARCH_TLS_IE_PC_HI20] to the TLS IE GOT entry.
++pub const R_LARCH_TLS_IE_PC_LO12: u32 = 88;
++/// 32..=51 bits of the 64-bit offset from the
++/// [PC-relative anchor][R_LARCH_TLS_IE_PC_HI20] to the TLS IE GOT entry.
++pub const R_LARCH_TLS_IE64_PC_LO20: u32 = 89;
++/// 52..=63 bits of the 64-bit offset from the
++/// [PC-relative anchor][R_LARCH_TLS_IE_PC_HI20] to the TLS IE GOT entry.
++pub const R_LARCH_TLS_IE64_PC_HI12: u32 = 90;
++/// 12..=31 bits of TLS IE GOT entry 32/64-bit absolute address
++pub const R_LARCH_TLS_IE_HI20: u32 = 91;
++/// 0..=11 bits of TLS IE GOT entry 32/64-bit absolute address
++pub const R_LARCH_TLS_IE_LO12: u32 = 92;
++/// 32..=51 bits of TLS IE GOT entry 64-bit absolute address
++pub const R_LARCH_TLS_IE64_LO20: u32 = 93;
++/// 51..=63 bits of TLS IE GOT entry 64-bit absolute address
++pub const R_LARCH_TLS_IE64_HI12: u32 = 94;
++/// 12..=31 bits of the offset from `PC` to `GP + GD + 0x800`, where
++/// `GP + GD` is a TLS LD GOT entry
++pub const R_LARCH_TLS_LD_PC_HI20: u32 = 95;
++/// 12..=31 bits of TLS LD GOT entry 32/64-bit absolute address
++pub const R_LARCH_TLS_LD_HI20: u32 = 96;
++/// 12..=31 bits of the 32/64-bit PC-relative offset to the PC-relative
++/// anchor for the TLE GD GOT entry.
++pub const R_LARCH_TLS_GD_PC_HI20: u32 = 97;
++/// 12..=31 bits of TLS GD GOT entry 32/64-bit absolute address
++pub const R_LARCH_TLS_GD_HI20: u32 = 98;
++/// 32-bit PC relative
++pub const R_LARCH_32_PCREL: u32 = 99;
++/// Paired with a normal relocation at the same address to indicate the
++/// insturction can be relaxed
++pub const R_LARCH_RELAX: u32 = 100;
++
+ 
+ unsafe_impl_endian_pod!(
+     FileHeader32,

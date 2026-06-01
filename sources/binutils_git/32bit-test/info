@@ -1,0 +1,10 @@
+# URL=https://github.com/cloudspurs/binutils-gdb.git
+URL=https://sourceware.org/git/binutils-gdb.git
+FILE=binutils_git-32bit-test_git.tar.gz
+DIR=binutils_git-32bit-test_git
+# GIT_BRANCH=la32
+GIT_BRANCH=master
+GIT_COMMIT=
+SAVE_COMMIT=d08515a68e5b44f5e0b045e371a996e4196226ed
+GIT_SUBMODULE=0
+GIT_UPDATE_MODE=每周

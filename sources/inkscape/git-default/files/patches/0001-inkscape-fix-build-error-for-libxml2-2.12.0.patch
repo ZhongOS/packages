@@ -1,0 +1,24 @@
+From ff96d747d77c92c9589e5278a27d995f4a165ce3 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Sun, 19 Nov 2023 11:49:06 +0000
+Subject: [PATCH] inkscape fix build error for libxml2 2.12.0
+
+---
+ src/object/uri.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/object/uri.cpp b/src/object/uri.cpp
+index 05539a6..09ed10b 100644
+--- a/src/object/uri.cpp
++++ b/src/object/uri.cpp
+@@ -19,6 +19,7 @@
+ #include <glibmm/convert.h>
+ #include <glibmm/ustring.h>
+ #include <glibmm/miscutils.h>
++#include <libxml/xmlmemory.h>
+ 
+ #include "bad-uri-exception.h"
+ 
+-- 
+2.31.1
+

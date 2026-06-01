@@ -1,0 +1,6 @@
+URL=https://git.suyu.dev/suyu/suyu.git
+FILE=suyu-git_git.tar.gz
+DIR=suyu-git_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=1

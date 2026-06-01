@@ -1,0 +1,6 @@
+URL=https://github.com/ibus/ibus-pinyin.git
+FILE=ibus-pinyin-git-default_git.tar.gz
+DIR=ibus-pinyin-git-default_git
+GIT_BRANCH=
+GIT_COMMIT=
+GIT_SUBMODULE=0

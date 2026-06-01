@@ -1,0 +1,25 @@
+From 30320c4e39471c1bd5ad9a6804dc68f87d874d72 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 16 Apr 2025 02:37:54 +0000
+Subject: [PATCH] q4wine 1.4.0 fix for l10n files install failed.
+
+---
+ src/l10n/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/l10n/CMakeLists.txt b/src/l10n/CMakeLists.txt
+index 44188e5..68b7b13 100644
+--- a/src/l10n/CMakeLists.txt
++++ b/src/l10n/CMakeLists.txt
+@@ -11,7 +11,7 @@ foreach (LANG ${LINGUAS})
+     )
+     SET (QM_L10N
+         ${QM_L10N}
+-        ${CMAKE_SOURCE_DIR}/src/l10n/q4wine_${LANG}.qm
++        ${CMAKE_CURRENT_BINARY_DIR}/q4wine_${LANG}.qm
+     )
+     set(I18N_TRANSLATED_LANGUAGES
+         ${I18N_TRANSLATED_LANGUAGES}
+-- 
+2.31.1
+

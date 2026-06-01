@@ -1,0 +1,31 @@
+From 89a34d5fb0f6fbe9f2843110321a3b70a46dc6f9 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 30 Oct 2024 07:53:05 +0000
+Subject: [PATCH] pyside6 remove some definitions from QtHelp for Qt 6.8.0
+
+---
+ sources/pyside6/PySide6/QtHelp/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sources/pyside6/PySide6/QtHelp/CMakeLists.txt b/sources/pyside6/PySide6/QtHelp/CMakeLists.txt
+index 7bf46dc..7a7bc57 100644
+--- a/sources/pyside6/PySide6/QtHelp/CMakeLists.txt
++++ b/sources/pyside6/PySide6/QtHelp/CMakeLists.txt
+@@ -5,12 +5,12 @@ project(QtHelp)
+ 
+ set(QtHelp_SRC
+ ${QtHelp_GEN_DIR}/qcompressedhelpinfo_wrapper.cpp
+-${QtHelp_GEN_DIR}/qhelpcontentitem_wrapper.cpp
++# ${QtHelp_GEN_DIR}/qhelpcontentitem_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpcontentmodel_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpcontentwidget_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpglobal_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpengine_wrapper.cpp
+-${QtHelp_GEN_DIR}/qhelpenginecore_wrapper.cpp
++# ${QtHelp_GEN_DIR}/qhelpenginecore_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpfilterdata_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpfilterengine_wrapper.cpp
+ ${QtHelp_GEN_DIR}/qhelpfiltersettingswidget_wrapper.cpp
+-- 
+2.31.1
+

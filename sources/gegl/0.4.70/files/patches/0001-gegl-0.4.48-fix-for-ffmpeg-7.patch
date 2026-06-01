@@ -1,0 +1,94 @@
+From 4e205211810cf5c97731569e2c17284eeb2be7b9 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 10 Sep 2024 12:32:32 +0000
+Subject: [PATCH] gegl 0.4.48 fix for ffmpeg 7.
+
+---
+ operations/external/ff-load.c |  4 ++--
+ operations/external/ff-save.c | 20 ++++++++++----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/operations/external/ff-load.c b/operations/external/ff-load.c
+index 6b96fdf..fbcf843 100644
+--- a/operations/external/ff-load.c
++++ b/operations/external/ff-load.c
+@@ -250,7 +250,7 @@ decode_audio (GeglOperation *operation,
+               while (samples_left)
+               {
+                  int sample_count = samples_left;
+-                 int channels = MIN(p->audio_stream->codecpar->channels, GEGL_MAX_AUDIO_CHANNELS);
++                 int channels = MIN(p->audio_stream->codecpar->ch_layout.u.mask, GEGL_MAX_AUDIO_CHANNELS);
+                  GeglAudioFragment *af = gegl_audio_fragment_new (o->audio_sample_rate, channels,
+                             AV_CH_LAYOUT_STEREO, samples_left);
+   //);
+@@ -553,7 +553,7 @@ prepare (GeglOperation *operation)
+           else
+             {
+               o->audio_sample_rate = p->audio_stream->codecpar->sample_rate;
+-              o->audio_channels = MIN(p->audio_stream->codecpar->channels, GEGL_MAX_AUDIO_CHANNELS);
++              o->audio_channels = MIN(p->audio_stream->codecpar->ch_layout.u.mask, GEGL_MAX_AUDIO_CHANNELS);
+             }
+         }
+ 
+diff --git a/operations/external/ff-save.c b/operations/external/ff-save.c
+index 9196b34..44beeee 100644
+--- a/operations/external/ff-save.c
++++ b/operations/external/ff-save.c
+@@ -315,8 +315,8 @@ add_audio_stream (GeglProperties *o, AVFormatContext * oc, int codec_id)
+   }
+   cp->sample_rate = o->audio_sample_rate;
+ 
+-  cp->channel_layout = AV_CH_LAYOUT_STEREO;
+-  cp->channels = 2;
++  cp->ch_layout.u.mask = AV_CH_LAYOUT_STEREO;
++  cp->ch_layout.nb_channels = 2;
+ 
+   return st;
+ }
+@@ -392,8 +392,8 @@ static AVFrame *alloc_audio_frame(AVCodecContext *c, int nb_samples)
+ 
+   frame->format         = c->sample_fmt;
+ 
+-  frame->channel_layout = c->channel_layout;
+-  frame->channels = c->channels;
++  frame->ch_layout.u.mask = c->ch_layout.u.mask;
++  frame->ch_layout.nb_channels = c->ch_layout.nb_channels;
+   frame->sample_rate    = c->sample_rate;
+   frame->nb_samples     = nb_samples;
+ 
+@@ -423,8 +423,8 @@ static void encode_audio_fragments (Priv *p, AVFormatContext *oc, AVStream *st,
+         {
+           float left = 0, right = 0;
+           get_sample_data (p, i + p->audio_read_pos, &left, &right);
+-          ((float*)frame->data[0])[c->channels*i+0] = left;
+-          ((float*)frame->data[0])[c->channels*i+1] = right;
++          ((float*)frame->data[0])[c->ch_layout.nb_channels*i+0] = left;
++          ((float*)frame->data[0])[c->ch_layout.nb_channels*i+1] = right;
+         }
+         break;
+       case AV_SAMPLE_FMT_FLTP:
+@@ -441,8 +441,8 @@ static void encode_audio_fragments (Priv *p, AVFormatContext *oc, AVStream *st,
+         {
+           float left = 0, right = 0;
+           get_sample_data (p, i + p->audio_read_pos, &left, &right);
+-          ((int16_t*)frame->data[0])[c->channels*i+0] = left * (1<<15);
+-          ((int16_t*)frame->data[0])[c->channels*i+1] = right * (1<<15);
++          ((int16_t*)frame->data[0])[c->ch_layout.nb_channels*i+0] = left * (1<<15);
++          ((int16_t*)frame->data[0])[c->ch_layout.nb_channels*i+1] = right * (1<<15);
+         }
+         break;
+       case AV_SAMPLE_FMT_S32:
+@@ -450,8 +450,8 @@ static void encode_audio_fragments (Priv *p, AVFormatContext *oc, AVStream *st,
+         {
+           float left = 0, right = 0;
+           get_sample_data (p, i + p->audio_read_pos, &left, &right);
+-          ((int32_t*)frame->data[0])[c->channels*i+0] = left * (1<<31);
+-          ((int32_t*)frame->data[0])[c->channels*i+1] = right * (1<<31);
++          ((int32_t*)frame->data[0])[c->ch_layout.nb_channels*i+0] = left * (1<<31);
++          ((int32_t*)frame->data[0])[c->ch_layout.nb_channels*i+1] = right * (1<<31);
+         }
+         break;
+       case AV_SAMPLE_FMT_S32P:
+-- 
+2.31.1
+

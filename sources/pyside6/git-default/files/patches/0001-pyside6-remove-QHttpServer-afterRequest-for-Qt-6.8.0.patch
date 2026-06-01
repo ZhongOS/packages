@@ -1,0 +1,27 @@
+From e456a6d38e4570b41ff617647986a8d3d6aa9ef0 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 29 Oct 2024 09:18:12 +0000
+Subject: [PATCH] pyside6 remove QHttpServer::afterRequest for Qt 6.8.0
+
+---
+ .../pyside6/PySide6/QtHttpServer/typesystem_httpserver.xml    | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/sources/pyside6/PySide6/QtHttpServer/typesystem_httpserver.xml b/sources/pyside6/PySide6/QtHttpServer/typesystem_httpserver.xml
+index 026a875..aecc101 100644
+--- a/sources/pyside6/PySide6/QtHttpServer/typesystem_httpserver.xml
++++ b/sources/pyside6/PySide6/QtHttpServer/typesystem_httpserver.xml
+@@ -21,10 +21,6 @@
+         <inject-code class="target" position="beginning" file="../glue/qhttpserver.cpp"
+                      snippet="qhttpserver-route"/>
+       </add-function>
+-      <add-function signature="afterRequest(PyCallable @callback@)">
+-        <inject-code class="target" position="beginning" file="../glue/qhttpserver.cpp"
+-                     snippet="qhttpserver-afterrequest"/>
+-      </add-function>
+   </object-type>
+   <object-type name="QHttpServerResponder">
+       <enum-type name="StatusCode"/>
+-- 
+2.31.1
+
