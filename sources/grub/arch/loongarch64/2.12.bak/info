@@ -1,6 +1,0 @@
-URL=https://git.savannah.gnu.org/git/grub.git
-FILE=grub-2.12_git.tar.gz
-DIR=grub-2.12_git
-GIT_BRANCH=
-GIT_COMMIT=
-GIT_SUBMODULE=0
