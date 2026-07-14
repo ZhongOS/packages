@@ -1,0 +1,77 @@
+From be0c3093061dcb54c9ee53f74423db8c137293d2 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Thu, 25 Sep 2025 02:06:28 +0000
+Subject: [PATCH] kpipewire 6.4.5 fix for ffmpeg 8.
+
+---
+ src/h264vaapiencoder.cpp   | 6 +++---
+ src/libopenh264encoder.cpp | 6 +++---
+ src/libx264encoder.cpp     | 6 +++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/h264vaapiencoder.cpp b/src/h264vaapiencoder.cpp
+index 0cf251b..b9fd25e 100644
+--- a/src/h264vaapiencoder.cpp
++++ b/src/h264vaapiencoder.cpp
+@@ -130,13 +130,13 @@ bool H264VAAPIEncoder::initialize(const QSize &size)
+ 
+     switch (m_profile) {
+     case H264Profile::Baseline:
+-        m_avCodecContext->profile = FF_PROFILE_H264_CONSTRAINED_BASELINE;
++        m_avCodecContext->profile = AV_PROFILE_H264_CONSTRAINED_BASELINE;
+         break;
+     case H264Profile::Main:
+-        m_avCodecContext->profile = FF_PROFILE_H264_MAIN;
++        m_avCodecContext->profile = AV_PROFILE_H264_MAIN;
+         break;
+     case H264Profile::High:
+-        m_avCodecContext->profile = FF_PROFILE_H264_HIGH;
++        m_avCodecContext->profile = AV_PROFILE_H264_HIGH;
+         break;
+     }
+ 
+diff --git a/src/libopenh264encoder.cpp b/src/libopenh264encoder.cpp
+index db6ed4d..b80cbd7 100644
+--- a/src/libopenh264encoder.cpp
++++ b/src/libopenh264encoder.cpp
+@@ -64,13 +64,13 @@ bool LibOpenH264Encoder::initialize(const QSize &size)
+         // passes that through, but libopenh264 only allows BASELINE.
+         // Until that bug is fixed there'll always be a warning that the
+         // profile is not supported (https://github.com/cisco/openh264/issues/3613)
+-        m_avCodecContext->profile = FF_PROFILE_H264_CONSTRAINED_BASELINE;
++        m_avCodecContext->profile = AV_PROFILE_H264_CONSTRAINED_BASELINE;
+         break;
+     case H264Profile::Main:
+-        m_avCodecContext->profile = FF_PROFILE_H264_MAIN;
++        m_avCodecContext->profile = AV_PROFILE_H264_MAIN;
+         break;
+     case H264Profile::High:
+-        m_avCodecContext->profile = FF_PROFILE_H264_HIGH;
++        m_avCodecContext->profile = AV_PROFILE_H264_HIGH;
+         break;
+     }
+ 
+diff --git a/src/libx264encoder.cpp b/src/libx264encoder.cpp
+index d9fe44f..b277201 100644
+--- a/src/libx264encoder.cpp
++++ b/src/libx264encoder.cpp
+@@ -68,13 +68,13 @@ bool LibX264Encoder::initialize(const QSize &size)
+ 
+     switch (m_profile) {
+     case H264Profile::Baseline:
+-        m_avCodecContext->profile = FF_PROFILE_H264_BASELINE;
++        m_avCodecContext->profile = AV_PROFILE_H264_BASELINE;
+         break;
+     case H264Profile::Main:
+-        m_avCodecContext->profile = FF_PROFILE_H264_MAIN;
++        m_avCodecContext->profile = AV_PROFILE_H264_MAIN;
+         break;
+     case H264Profile::High:
+-        m_avCodecContext->profile = FF_PROFILE_H264_HIGH;
++        m_avCodecContext->profile = AV_PROFILE_H264_HIGH;
+         break;
+     }
+ 
+-- 
+2.31.1
+

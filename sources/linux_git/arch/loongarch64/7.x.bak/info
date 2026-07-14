@@ -1,0 +1,6 @@
+URL=https://github.com/chenhuacai/linux.git
+FILE=linux_git-7.x_git.tar.gz
+DIR=linux_git-7.x_git
+GIT_BRANCH=loongarch-next
+GIT_COMMIT=
+GIT_SUBMODULE=0

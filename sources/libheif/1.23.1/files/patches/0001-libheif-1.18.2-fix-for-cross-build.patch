@@ -1,0 +1,25 @@
+From ab7debf47be923a7b82928cc56737c61e8ec4c3c Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 23 Oct 2024 04:21:19 +0000
+Subject: [PATCH] libheif 1.18.2 fix for cross build.
+
+---
+ gdk-pixbuf/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdk-pixbuf/CMakeLists.txt b/gdk-pixbuf/CMakeLists.txt
+index de67e79..99a8441 100644
+--- a/gdk-pixbuf/CMakeLists.txt
++++ b/gdk-pixbuf/CMakeLists.txt
+@@ -4,7 +4,7 @@ if(UNIX OR MINGW)
+ 
+   if(GDKPIXBUF2_FOUND)
+     execute_process(
+-      COMMAND ${PKG_CONFIG_EXECUTABLE} gdk-pixbuf-2.0 --variable gdk_pixbuf_moduledir
++      COMMAND PKG_CONFIG_SYSROOT_DIR="" ${PKG_CONFIG_EXECUTABLE} gdk-pixbuf-2.0 --variable gdk_pixbuf_moduledir
+               --define-variable=prefix=${CMAKE_INSTALL_PREFIX} OUTPUT_VARIABLE GDKPIXBUF2_MODULE_DIR
+       OUTPUT_STRIP_TRAILING_WHITESPACE)
+ 
+-- 
+2.31.1
+

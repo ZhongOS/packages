@@ -1,0 +1,25 @@
+From b3643d1e6b61a30e0e64d3edb5adbb14889b22c3 Mon Sep 17 00:00:00 2001
+From: Weining Lu <luweining@loongson.cn>
+Date: Tue, 19 Nov 2024 19:07:46 +0800
+Subject: [PATCH] [LoongArch] Default to medium code model
+
+---
+ llvm/lib/Target/LoongArch/LoongArchTargetMachine.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/llvm/lib/Target/LoongArch/LoongArchTargetMachine.cpp b/llvm/lib/Target/LoongArch/LoongArchTargetMachine.cpp
+index e83fc08696ae..075b710edd68 100644
+--- a/llvm/lib/Target/LoongArch/LoongArchTargetMachine.cpp
++++ b/llvm/lib/Target/LoongArch/LoongArchTargetMachine.cpp
+@@ -68,7 +68,7 @@ static CodeModel::Model
+ getEffectiveLoongArchCodeModel(const Triple &TT,
+                                std::optional<CodeModel::Model> CM) {
+   if (!CM)
+-    return CodeModel::Small;
++    return CodeModel::Medium;
+ 
+   switch (*CM) {
+   case CodeModel::Small:
+-- 
+2.45.2
+

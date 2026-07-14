@@ -1,0 +1,25 @@
+From 9554b3eccb928f70e5cd4d551938ebf8e5989d42 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Fri, 19 Apr 2024 01:50:04 +0000
+Subject: [PATCH] xwayland 24.0.99 fix for Yongbao cross build.
+
+---
+ include/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/meson.build b/include/meson.build
+index b83df52..9df2f08 100644
+--- a/include/meson.build
++++ b/include/meson.build
+@@ -200,7 +200,7 @@ conf_data.set('DBE', '1')
+ conf_data.set('DPMSExtension', build_dpms ? '1' : false)
+ conf_data.set('DRI3', build_dri3 ? '1' : false)
+ if build_glx
+-    conf_data.set_quoted('DRI_DRIVER_PATH', dri_dep.get_variable(pkgconfig : 'dridriverdir'))
++    conf_data.set_quoted('DRI_DRIVER_PATH', dri_dep.get_variable(pkgconfig : 'dridriverdir', define_variable: [ 'dridriverdir', '/usr/' + get_option('libdir') + '/dri' ]))
+ endif
+ conf_data.set('MITSHM', build_mitshm ? '1' : false)
+ conf_data.set('PANORAMIX', build_xinerama ? '1' : false)
+-- 
+2.31.1
+
