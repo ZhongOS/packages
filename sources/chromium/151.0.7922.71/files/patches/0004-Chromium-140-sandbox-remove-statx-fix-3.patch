@@ -1,0 +1,25 @@
+From 87c7aaff09b9acab3a63d9bf9ba74afb5c69dae7 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 8 Sep 2025 10:04:31 +0000
+Subject: [PATCH 4/4] Chromium 140 sandbox remove statx fix 3.
+
+---
+ .../seccomp-bpf-helpers/syscall_parameters_restrictions.cc      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc b/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+index 81a0154..c819473 100644
+--- a/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
++++ b/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+@@ -529,7 +529,7 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictSockSendFlags(int sysno) {
+       break;
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+-    defined(__mips__) || defined(__aarch64__)
++    defined(__mips__) || defined(__aarch64__) || defined(__loongarch_lp64)
+     case __NR_sendto:  // Could specify destination.
+       argIndex = 3;
+       break;
+-- 
+2.31.1
+

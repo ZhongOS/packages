@@ -1,0 +1,25 @@
+From b45779330496760a8177ca2b51022ff33110b5a0 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Mon, 20 Nov 2023 06:29:21 +0000
+Subject: [PATCH] powerdevil 5.27 set None to suspend session by default.
+
+---
+ daemon/powerdevilsettingsdefaults.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/daemon/powerdevilsettingsdefaults.cpp b/daemon/powerdevilsettingsdefaults.cpp
+index cf88205..9f95206 100644
+--- a/daemon/powerdevilsettingsdefaults.cpp
++++ b/daemon/powerdevilsettingsdefaults.cpp
+@@ -120,7 +120,7 @@ int ProfileDefaults::defaultAutoSuspendIdleTimeoutSec(const QString &profileGrou
+ 
+ unsigned int ProfileDefaults::defaultAutoSuspendType()
+ {
+-    return qToUnderlying(PowerButtonAction::SuspendToRam);
++    return qToUnderlying(PowerButtonAction::NoAction);
+ }
+ 
+ unsigned int ProfileDefaults::defaultPowerButtonAction(bool isMobile)
+-- 
+2.31.1
+

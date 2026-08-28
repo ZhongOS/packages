@@ -1,0 +1,24 @@
+From 7e3aa7bcd44fa4856e13d8f5244b9560a804a66b Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 14 Aug 2024 16:00:56 +0000
+Subject: [PATCH] fix search clang include miss for i686.
+
+---
+ src/intel/shaders/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/intel/shaders/meson.build b/src/intel/shaders/meson.build
+index e8e2c31..857662a 100644
+--- a/src/intel/shaders/meson.build
++++ b/src/intel/shaders/meson.build
+@@ -67,6 +67,7 @@ foreach gen : intel_shaders_gens
+       '-I' + join_paths(dir_source_root, 'src/intel'),
+       '-I' + join_paths(meson.project_build_root(), 'src/intel'),
+       '-I' + join_paths(dir_source_root, 'src/intel/genxml'),
++      '-I' + join_paths(dir_source_root, 'clang-include'),
+     ],
+     env: ['MESA_SHADER_CACHE_DISABLE=true'],
+     depends : [dep_prog_intel_clc, gen_cl_xml_pack],
+-- 
+2.31.1
+

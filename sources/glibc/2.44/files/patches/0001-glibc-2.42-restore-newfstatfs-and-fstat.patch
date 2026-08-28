@@ -1,0 +1,44 @@
+From b110e2ac1c234ea8a31664e37fe98de71ac4ee7a Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Thu, 11 Sep 2025 09:40:00 +0000
+Subject: [PATCH] glibc 2.42 restore newfstatfs and fstat
+
+---
+ sysdeps/unix/sysv/linux/loongarch/arch-syscall.h     | 2 ++
+ sysdeps/unix/sysv/linux/loongarch/fixup-asm-unistd.h | 2 --
+ sysdeps/unix/sysv/linux/loongarch/lp64/libc.abilist  | 2 ++
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeps/unix/sysv/linux/loongarch/arch-syscall.h b/sysdeps/unix/sysv/linux/loongarch/arch-syscall.h
+index f57a152..fea095c 100644
+--- a/sysdeps/unix/sysv/linux/loongarch/arch-syscall.h
++++ b/sysdeps/unix/sysv/linux/loongarch/arch-syscall.h
+@@ -316,3 +316,5 @@
+ #define __NR_waitid 95
+ #define __NR_write 64
+ #define __NR_writev 66
++#define __NR_newfstatat 79
++#define __NR_fstat 80
+diff --git a/sysdeps/unix/sysv/linux/loongarch/fixup-asm-unistd.h b/sysdeps/unix/sysv/linux/loongarch/fixup-asm-unistd.h
+index c1b89ce..4047bfe 100644
+--- a/sysdeps/unix/sysv/linux/loongarch/fixup-asm-unistd.h
++++ b/sysdeps/unix/sysv/linux/loongarch/fixup-asm-unistd.h
+@@ -17,5 +17,3 @@
+ 
+ /* To avoid the messy usage of the fstat, newfstatat, and statx system calls, we
+ only use statx.  */
+-#undef __NR_fstat
+-#undef __NR_newfstatat
+diff --git a/sysdeps/unix/sysv/linux/loongarch/lp64/libc.abilist b/sysdeps/unix/sysv/linux/loongarch/lp64/libc.abilist
+index a6cab96..407b61b 100644
+--- a/sysdeps/unix/sysv/linux/loongarch/lp64/libc.abilist
++++ b/sysdeps/unix/sysv/linux/loongarch/lp64/libc.abilist
+@@ -2288,3 +2288,5 @@ GLIBC_2.42 uabs F
+ GLIBC_2.42 uimaxabs F
+ GLIBC_2.42 ulabs F
+ GLIBC_2.42 ullabs F
++GLIBC_2.42 fstat F
++GLIBC_2.42 newfstatat F
+-- 
+2.31.1
+

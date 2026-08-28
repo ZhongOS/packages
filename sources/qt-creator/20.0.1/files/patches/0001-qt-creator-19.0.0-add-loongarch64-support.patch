@@ -1,0 +1,94 @@
+From ad2839e5fd1cf54dd1f3fef87d9413e373b356d6 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 24 Mar 2026 09:19:08 +0000
+Subject: [PATCH] qt-creator 19.0.0 add loongarch64 support.
+
+---
+ src/libs/gocmdbridge/client/cmdbridgeclient.cpp  | 1 +
+ src/libs/utils/hostosinfo.cpp                    | 2 ++
+ src/libs/utils/osspecificaspects.cpp             | 2 ++
+ src/libs/utils/osspecificaspects.h               | 2 +-
+ src/plugins/extensionmanager/extensionsmodel.cpp | 2 ++
+ src/plugins/lua/bindings/utils.cpp               | 2 ++
+ 6 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/libs/gocmdbridge/client/cmdbridgeclient.cpp b/src/libs/gocmdbridge/client/cmdbridgeclient.cpp
+index 5561f3d..134fda1 100644
+--- a/src/libs/gocmdbridge/client/cmdbridgeclient.cpp
++++ b/src/libs/gocmdbridge/client/cmdbridgeclient.cpp
+@@ -1013,6 +1013,7 @@ Result<FilePath> Client::getCmdBridgePath(
+         {OsArch::OsArchAMD64, QStringLiteral("amd64")},
+         {OsArch::OsArchArm, QStringLiteral("arm")},
+         {OsArch::OsArchArm64, QStringLiteral("arm64")},
++        {OsArch::OsArchLoongarch64, QStringLiteral("loongarch64")},
+         {OsArch::OsArchUnknown, QStringLiteral("unknown")},
+     };
+ 
+diff --git a/src/libs/utils/hostosinfo.cpp b/src/libs/utils/hostosinfo.cpp
+index 64d4244..86f815b 100644
+--- a/src/libs/utils/hostosinfo.cpp
++++ b/src/libs/utils/hostosinfo.cpp
+@@ -113,6 +113,8 @@ OsArch binaryArchitecture()
+     return OsArchArm;
+ #elif defined(Q_PROCESSOR_IA64)
+     return OsArchItanium;
++#elif defined(Q_PROCESSOR_LOONGARCH_64)
++    return OsArchLoongarch64;
+ #else
+     static_assert(false, "Unknown architecture, please add detection.");
+     return OsArchUnknown;
+diff --git a/src/libs/utils/osspecificaspects.cpp b/src/libs/utils/osspecificaspects.cpp
+index 2d04e19..0622041 100644
+--- a/src/libs/utils/osspecificaspects.cpp
++++ b/src/libs/utils/osspecificaspects.cpp
+@@ -56,6 +56,8 @@ Result<OsArch> osArchFromString(const QString &architecture)
+         return OsArchArm;
+     if (architecture == QLatin1String("arm64") || architecture == QLatin1String("aarch64"))
+         return OsArchArm64;
++    if (architecture == QLatin1String("loongarch64"))
++        return OsArchLoongarch64;
+ 
+     return Utils::ResultError(QString::fromLatin1("Unknown architecture: %1").arg(architecture));
+ }
+diff --git a/src/libs/utils/osspecificaspects.h b/src/libs/utils/osspecificaspects.h
+index dbab2f7..e703605 100644
+--- a/src/libs/utils/osspecificaspects.h
++++ b/src/libs/utils/osspecificaspects.h
+@@ -15,7 +15,7 @@ namespace Utils {
+ // Add more as needed.
+ enum OsType { OsTypeWindows, OsTypeLinux, OsTypeMac, OsTypeOtherUnix, OsTypeOther };
+ 
+-enum OsArch { OsArchUnknown, OsArchX86, OsArchAMD64, OsArchItanium, OsArchArm, OsArchArm64 };
++enum OsArch { OsArchUnknown, OsArchX86, OsArchAMD64, OsArchItanium, OsArchArm, OsArchArm64, OsArchLoongarch64 };
+ 
+ QTCREATOR_UTILS_EXPORT QString osTypeToString(OsType osType);
+ QTCREATOR_UTILS_EXPORT Utils::Result<OsType> osTypeFromString(const QString &string);
+diff --git a/src/plugins/extensionmanager/extensionsmodel.cpp b/src/plugins/extensionmanager/extensionsmodel.cpp
+index fd650fc..b811d62 100644
+--- a/src/plugins/extensionmanager/extensionsmodel.cpp
++++ b/src/plugins/extensionmanager/extensionsmodel.cpp
+@@ -391,6 +391,8 @@ QString customOsArchToString(OsArch osArch)
+         return "arm";
+     case OsArchArm64:
+         return "arm64";
++    case OsArchLoongarch64:
++        return "loongarch64";
+     case OsArchUnknown:
+         break;
+     }
+diff --git a/src/plugins/lua/bindings/utils.cpp b/src/plugins/lua/bindings/utils.cpp
+index ab081d2..fc44a80 100644
+--- a/src/plugins/lua/bindings/utils.cpp
++++ b/src/plugins/lua/bindings/utils.cpp
+@@ -144,6 +144,8 @@ void setupUtilsModule()
+                     return "arm";
+                 case OsArchArm64:
+                     return "arm64";
++                case OsArchLoongarch64:
++                    return "loongarch64";
+                 default:
+                     return "unknown";
+                 }
+-- 
+2.31.1
+

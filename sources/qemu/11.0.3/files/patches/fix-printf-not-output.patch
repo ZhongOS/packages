@@ -1,0 +1,14 @@
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 08162cc..4527ba6 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -874,6 +874,9 @@ abi_long do_brk(abi_ulong brk_val)
+          * then shrunken).  */
+         memset(g2h_untagged(target_brk), 0, brk_page - target_brk);
+ 
++        if (brk_val > target_brk) {
++		return target_brk;
++	}
+         target_brk = brk_val;
+         brk_page = new_host_brk_page;
+         return target_brk;

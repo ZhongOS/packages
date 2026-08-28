@@ -1,0 +1,25 @@
+From 03dbef7b5d1c12bdff1093f87700ddee36735981 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Tue, 5 Mar 2024 14:21:41 +0000
+Subject: [PATCH] OpenShadingLanguage-1.13.7.0 required llvm form 17 to 18.
+
+---
+ src/cmake/externalpackages.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cmake/externalpackages.cmake b/src/cmake/externalpackages.cmake
+index 0705a9b..86e85a4 100644
+--- a/src/cmake/externalpackages.cmake
++++ b/src/cmake/externalpackages.cmake
+@@ -117,7 +117,7 @@ checked_find_package (pugixml REQUIRED
+ # LLVM library setup
+ checked_find_package (LLVM REQUIRED
+                       VERSION_MIN 9.0
+-                      VERSION_MAX 17.9
++                      VERSION_MAX 18.9
+                       PRINT LLVM_SYSTEM_LIBRARIES CLANG_LIBRARIES)
+ # ensure include directory is added (in case of non-standard locations
+ include_directories (BEFORE SYSTEM "${LLVM_INCLUDES}")
+-- 
+2.31.1
+

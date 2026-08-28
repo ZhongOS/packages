@@ -1,0 +1,26 @@
+From bc0451b86764e0094fbe32f9ed7560598d261559 Mon Sep 17 00:00:00 2001
+From: Sun Haiyong <sunhaiyong@zdbr.net>
+Date: Wed, 6 Nov 2024 04:13:25 +0000
+Subject: [PATCH] chromium 130 debian package deps add loongarch64 support.
+
+---
+ chrome/installer/linux/debian/calculate_package_deps.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/chrome/installer/linux/debian/calculate_package_deps.py b/chrome/installer/linux/debian/calculate_package_deps.py
+index 8a8b29418..8569789cd 100755
+--- a/chrome/installer/linux/debian/calculate_package_deps.py
++++ b/chrome/installer/linux/debian/calculate_package_deps.py
+@@ -53,6 +53,9 @@ elif arch == 'mipsel':
+ elif arch == 'mips64el':
+   cmd.extend(['-l%s/usr/lib/mips64el-linux-gnuabi64' % sysroot,
+               '-l%s/lib/mips64el-linux-gnuabi64' % sysroot])
++elif arch == 'loong64':
++  cmd.extend(['-l%s/usr/lib/loongarch64-linux-gnu' % sysroot,
++              '-l%s/lib/loongarch64-linux-gnu' % sysroot])
+ else:
+   print('Unsupported architecture ' + arch)
+   sys.exit(1)
+-- 
+2.31.1
+
